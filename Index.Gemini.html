@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyectazo v1.1 - Hub Multiproyecto TDAH</title>
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --panel-bg: #0f172a;
+            --panel-border: #1e293b;
+            --card-bg: #182238;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        header { background-color: rgba(15, 23, 42, 0.9); border-bottom: 1px solid var(--panel-border); padding: 12px 20px; position: sticky; top: 0; z-index: 30; display: flex; justify-content: space-between; align-items: center; }
+        .logo-box { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; }
+        .logo-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .tag-v1 { font-size: 10px; background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 12px; padding: 2px 6px; }
+        
+        .btn { padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: var(--accent-primary); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { background: #1e293b; color: var(--text-main); border: 1px solid #334155; }
+        .btn-secondary:hover { background: #334155; }
+        .btn-gradient { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3); }
+
+        main { max-width: 1200px; width: 100%; margin: 0 auto; padding: 20px; flex: 1; }
+
+        .hero-card { background: linear-gradient(135deg, #0f172a, #1e1b4b); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .hero-title { font-size: 22px; font-weight: 700; margin: 6px 0; }
+        .micro-box { background: rgba(2, 6, 23, 0.6); border: 1px solid var(--panel-border); border-radius: 12px; padding: 12px 16px; margin-top: 12px; }
+        .micro-label { font-size: 10px; color: #818cf8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .badge { font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .kanban-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; overflow-x: auto; }
+        .kanban-col { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 14px; padding: 12px; min-height: 400px; display: flex; flex-direction: column; }
+        .col-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--panel-border); font-size: 12px; font-weight: 700; }
+        .task-card { background: var(--card-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 12px; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+        .modal-content { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 500px; width: 100%; padding: 24px; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+        .form-input, .form-textarea, .form-select { width: 100%; background: var(--bg-dark); border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px; color: var(--text-main); font-size: 13px; outline: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-box" onclick="showDashboard()">
+            <div class="logo-icon">⚡</div>
+            <div>
+                <div class="logo-title">Proyectazo <span class="tag-v1">v1.1 MVP</span></div>
+                <div style="font-size: 10px; color: var(--text-muted);">Hub Multiproyecto TDAH</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" onclick="openQuickCapture()">💡 Captura Rápida</button>
+            <button class="btn btn-primary" onclick="openNewProjectModal()">+ Nuevo Proyecto</button>
+        </div>
+    </header>
+
+    <main id="appContent"></main>
+
+    <!-- MODALS -->
+    <div id="quickCaptureModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 8px; font-size: 16px;">💡 Captura Rápida de Idea</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Desahoga un pensamiento sin perder el hilo actual.</p>
+            <div class="form-group">
+                <textarea id="quickCaptureText" class="form-textarea" rows="3" placeholder="Escribe tu idea aquí..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button class="btn btn-secondary" onclick="closeQuickCapture()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveQuickCapture()">Guardar en Buzón</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkoutModal" class="modal-overlay hidden">
+        <div class="modal-content" style="border-color: rgba(99, 102, 241, 0.5);">
+            <div style="border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 14px;">
+                <span style="font-size: 10px; color: #818cf8; font-weight: 700; text-transform: uppercase;">Protocolo de Cierre</span>
+                <h3 id="checkoutProjectTitle" style="font-size: 18px; margin-top: 2px;">Cerrar Sesión de Trabajo</h3>
+            </div>
+            <div class="form-group">
+                <label class="form-label">1. ¿Qué avanzaste en esta sesión? (Último logro)</label>
+                <textarea id="checkoutAchievement" class="form-textarea" rows="2" placeholder="Ej: Se definió el esquema de base de datos..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">2. ¿Cuál es el primer micro-paso para la próxima vez? (≤ 10-15 min)</label>
+                <input id="checkoutMicroStep" type="text" class="form-input" placeholder="Ej: Crear el archivo schema.sql">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px;">
+                <button class="btn btn-secondary" onclick="closeCheckoutModal()">Seguir trabajando</button>
+                <button class="btn btn-gradient" onclick="submitCheckout()">💾 Guardar y Volver a Hoy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="newProjectModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 14px;">Crear Nuevo Proyecto</h3>
+            <div class="form-group">
+                <label class="form-label">Nombre del Proyecto</label>
+                <input id="newProjectName" type="text" class="form-input" placeholder="Ej: Consultoría Biotech LIMS">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Icono</label>
+                    <input id="newProjectIcon" type="text" class="form-input" value="🚀" style="text-align: center;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Primer Micro-Paso</label>
+                    <input id="newProjectFirstStep" type="text" class="form-input" placeholder="Ej: Redactar propuesta">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                <button class="btn btn-secondary" onclick="closeNewProjectModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="createProject()">Crear Proyecto</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="newTaskModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 14px;">Agregar Tarea Kanban</h3>
+            <div class="form-group">
+                <label class="form-label">Título de la Tarea</label>
+                <input id="newTaskTitle" type="text" class="form-input" placeholder="Ej: Diseñar tabla de usuarios">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Columna</label>
+                    <select id="newTaskColumn" class="form-select">
+                        <option value="inbox">📥 Buzón / Ideas</option>
+                        <option value="next" selected>📋 Por Hacer</option>
+                        <option value="in_focus">🔥 En Foco (Max 3)</option>
+                        <option value="blocked">⏳ En Espera</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nivel de Energía</label>
+                    <select id="newTaskEnergy" class="form-select">
+                        <option value="low">⚡ Quick Win (≤15m)</option>
+                        <option value="high">🧠 Deep Work (30m+)</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                <button class="btn btn-secondary" onclick="closeNewTaskModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveNewTask()">Agregar Tarea</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'proyectazo_v1_1_db';
+        let state = { activeProjectId: null, projects: [], tasks: [], logs: [] };
+
+        function loadState() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) { try { state = JSON.parse(raw); return; } catch(e){} }
+            const p1 = 'p-biotech';
+            const p2 = 'p-proyectazo';
+            state = {
+                activeProjectId: p1,
+                projects: [
+                    { id: p1, name: 'Consultoría Biotech LIMS', icon: '🔬', last_activity_at: new Date().toISOString(), last_achievement: 'Diseñada arquitectura de BD PostgreSQL para trazabilidad.', next_micro_step: 'Escribir el script de creación de tablas en schema.sql' },
+                    { id: p2, name: 'Proyectazo TDAH OS', icon: '⚡', last_activity_at: new Date(Date.now() - 3600000*12).toISOString(), last_achievement: 'Implementado Protocolo de Cierre e interfaz responsive.', next_micro_step: 'Validar restricción del límite WIP (Máx 3).' }
+                ],
+                tasks: [
+                    { id: 't1', project_id: p1, title: 'Definir campos de lotes de cultivo', column_name: 'in_focus', energy: 'high' },
+                    { id: 't2', project_id: p1, title: 'Enviar cotización inicial', column_name: 'next', energy: 'low' }
+                ],
+                logs: [
+                    { id: 'l1', project_id: p1, achievement: 'Aprobación de requerimientos de software.', next_micro_step: 'Diseñar arquitectura de BD.', created_at: new Date(Date.now() - 86400000).toISOString() }
+                ]
+            };
+            saveState();
+        }
+
+        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+        function showDashboard() { state.activeProjectId = null; saveState(); renderDashboard(); }
+        function openProject(pId) { state.activeProjectId = pId; saveState(); renderProjectView(); }
+
+        function renderDashboard() {
+            const container = document.getElementById('appContent');
+            const focusProject = state.projects[0];
+
+            let html = `
+                ${focusProject ? `
+                <div class="hero-card">
+                    <span style="font-size: 10px; color: #818cf8; font-weight: 700; text-transform: uppercase;">🔥 En lo que estás trabajando</span>
+                    <div class="hero-title">${focusProject.icon}${focusProject.name}</div>
+                    <div class="micro-box">
+                        <div class="micro-label">➔ Próximo micro-paso (≤ 15 min)</div>
+                        <div style="font-size: 14px; font-weight: 600;">${focusProject.next_micro_step}</div>
+                    </div>
+                    <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+                        <button class="btn btn-gradient" onclick="openProject('${focusProject.id}')">CONTINUAR ➔</button>
+                    </div>
+                </div>
+                ` : ''}
+
+                <div style="margin-bottom: 12px; font-size: 16px; font-weight: 700;">📌 Radar de Proyectos Activos</div>
+                <div class="grid-3">
+                    ${state.projects.map(p => `
+                        <div class="card">
+                            <div>
+                                <div class="card-header">
+                                    <div style="font-weight: 700; font-size: 15px;">${p.icon}${p.name}</div>
+                                    <span class="badge badge-green">Activo</span>
+                                </div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                                    <strong>Último logro:</strong> ${p.last_achievement || 'Sin registro'}
+                                </div>
+                                <div style="background: var(--bg-dark); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); font-size: 12px;">
+                                    <span style="color: #818cf8; font-size: 10px; font-weight: 700; display: block;">➔ Próxima Acción:</span>
+                                    ${p.next_micro_step}
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px solid var(--panel-border); pt: 10px;">
+                                <button class="btn btn-secondary" style="font-size: 11px;" onclick="openCheckoutModalFor('${p.id}')">📝 Registrar Avance</button>
+                                <button class="btn btn-primary" style="font-size: 11px;" onclick="openProject('${p.id}')">Abrir Tablero ➔</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderProjectView() {
+            const container = document.getElementById('appContent');
+            const project = state.projects.find(p => p.id === state.activeProjectId);
+            if (!project) return showDashboard();
+
+            const pTasks = state.tasks.filter(t => t.project_id === project.id);
+            const pLogs = state.logs.filter(l => l.project_id === project.id);
+            const cols = [
+                { id: 'inbox', title: '📥 Buzón' },
+                { id: 'next', title: '📋 Por Hacer' },
+                { id: 'in_focus', title: '🔥 En Foco (Max 3)', limit: 3 },
+                { id: 'blocked', title: '⏳ En Espera' },
+                { id: 'done', title: '🎉 Victorias' }
+            ];
+
+            let html = `
+                <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="showDashboard()">➔ Volver</button>
+                        <span style="font-size: 28px;">${project.icon}</span>
+                        <div>
+                            <h2 style="font-size: 18px; font-weight: 700;">${project.name}</h2>
+                            <div style="font-size: 11px; color: var(--text-muted);">Próximo paso: ${project.next_micro_step}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" onclick="openNewTaskModal()">+ Tarea</button>
+                        <button class="btn btn-gradient" onclick="openCheckoutModalFor('${project.id}')">🏁 Cerrar Sesión (Checkout)</button>
+                    </div>
+                </div>
+
+                <div class="kanban-grid">
+                    ${cols.map(col => {
+                        const colTasks = pTasks.filter(t => t.column_name === col.id);
+                        return `
+                            <div class="kanban-col">
+                                <div class="col-header">
+                                    <span>${col.title}</span>
+                                    <span style="background: #1e293b; padding: 2px 6px; border-radius: 10px;">${colTasks.length}${col.limit ? '/'+col.limit : ''}</span>
+                                </div>
+                                <div style="flex: 1;">
+                                    ${colTasks.map(t => `
+                                        <div class="task-card">
+                                            <div style="margin-bottom: 6px;">${t.title}</div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
+                                                <span>${t.energy === 'low' ? '⚡ Quick Win' : '🧠 Deep Work'}</span>
+                                                ${col.id !== 'done' ? `<button style="background:none; border:none; color:#10b981; cursor:pointer;" onclick="moveTask('${t.id}', 'done')">✓</button>` : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; padding: 18px; margin-top: 20px;">
+                    <h3 style="font-size: 14px; margin-bottom: 12px;">📜 Bitácora de Avances</h3>
+                    <div>
+                        ${pLogs.map(l => `
+                            <div style="border-left: 2px solid var(--accent-primary); padding-left: 10px; margin-bottom: 10px;">
+                                <div style="font-size: 10px; color: var(--text-muted);">${new Date(l.created_at).toLocaleString()}</div>
+                                <div style="font-size: 12px;"><strong>Logro:</strong> ${l.achievement}</div>
+                                <div style="font-size: 11px; color: var(--text-muted);"><strong>Siguiente:</strong> ${l.next_micro_step}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function openCheckoutModalFor(pId) {
+            state.activeProjectId = pId;
+            const project = state.projects.find(p => p.id === pId);
+            document.getElementById('checkoutProjectTitle').innerText = project.name;
+            document.getElementById('checkoutAchievement').value = '';
+            document.getElementById('checkoutMicroStep').value = project.next_micro_step || '';
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
+        function submitCheckout() {
+            const achievement = document.getElementById('checkoutAchievement').value.trim();
+            const microStep = document.getElementById('checkoutMicroStep').value.trim();
+            if (!achievement || !microStep) return alert('Completa los dos campos');
+
+            const p = state.projects.find(proj => proj.id === state.activeProjectId);
+            if (p) {
+                p.last_achievement = achievement;
+                p.next_micro_step = microStep;
+                p.last_activity_at = new Date().toISOString();
+                state.logs.unshift({ id: 'l-'+Date.now(), project_id: p.id, achievement, next_micro_step: microStep, created_at: new Date().toISOString() });
+            }
+            saveState();
+            closeCheckoutModal();
+            showDashboard();
+        }
+
+        function openQuickCapture() { document.getElementById('quickCaptureModal').classList.remove('hidden'); }
+        function closeQuickCapture() { document.getElementById('quickCaptureModal').classList.add('hidden'); }
+        function saveQuickCapture() {
+            const txt = document.getElementById('quickCaptureText').value.trim();
+            if (txt && state.projects.length) {
+                state.tasks.push({ id: 't-'+Date.now(), project_id: state.projects[0].id, title: '[Idea] '+txt, column_name: 'inbox', energy: 'low' });
+                saveState();
+            }
+            closeQuickCapture();
+        }
+
+        function openNewProjectModal() { document.getElementById('newProjectModal').classList.remove('hidden'); }
+        function closeNewProjectModal() { document.getElementById('newProjectModal').classList.add('hidden'); }
+        function createProject() {
+            const name = document.getElementById('newProjectName').value.trim();
+            const icon = document.getElementById('newProjectIcon').value.trim() || '🚀';
+            const step = document.getElementById('newProjectFirstStep').value.trim() || 'Definir primera acción';
+
+            if (!name) return alert('Ingresa un nombre');
+            state.projects.push({ id: 'p-'+Date.now(), name, icon, last_activity_at: new Date().toISOString(), last_achievement: 'Creado', next_micro_step: step });
+            saveState();
+            closeNewProjectModal();
+            showDashboard();
+        }
+
+        function openNewTaskModal() { document.getElementById('newTaskModal').classList.remove('hidden'); }
+        function closeNewTaskModal() { document.getElementById('newTaskModal').classList.add('hidden'); }
+        function saveNewTask() {
+            const title = document.getElementById('newTaskTitle').value.trim();
+            const col = document.getElementById('newTaskColumn').value;
+            const energy = document.getElementById('newTaskEnergy').value;
+
+            if (!title) return;
+            if (col === 'in_focus') {
+                const count = state.tasks.filter(t => t.project_id === state.activeProjectId && t.column_name === 'in_focus').length;
+                if (count >= 3) return alert('⚠️ Límite WIP (Máximo 3 en Foco).');
+            }
+            state.tasks.push({ id: 't-'+Date.now(), project_id: state.activeProjectId, title, column_name: col, energy });
+            saveState();
+            closeNewTaskModal();
+            renderProjectView();
+        }
+
+        function moveTask(tId, col) {
+            const t = state.tasks.find(tk => tk.id === tId);
+            if (t) { t.column_name = col; saveState(); renderProjectView(); }
+        }
+
+        window.onload = function() { loadState(); renderDashboard(); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Proyectazo — FocusFlow OS",
+  "short_name": "Proyectazo",
+  "description": "Sistema unificado de gestión multiproyecto diseñado para TDAH. Offline-first y multiplataforma.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080c14",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
