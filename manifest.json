@@ -46,6 +46,12 @@
       "purpose": "maskable"
     },
     {
+      "src": "./assets/logo_icon_sin_bk.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "./favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"

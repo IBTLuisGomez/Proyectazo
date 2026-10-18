@@ -7,6 +7,8 @@
   <meta name="description" content="Nexus Orb — Ecosistema Cognitivo TDAH: Sistema de gestión multiproyecto diseñado para TDAH con Nexus Orb 3D, Ruido Marrón y Modo Zen." />
   <title>Nexus Orb — Ecosistema Cognitivo TDAH</title>
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="assets/logo_icon_sin_bk.png" />
+  <link rel="apple-touch-icon" href="assets/logo_icon_sin_bk.png" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -292,7 +294,7 @@
     <div class="w-full max-w-md flex items-center justify-between z-10 pt-2">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-          <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
+          <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
         </div>
         <div>
           <span class="font-display font-extrabold text-sm tracking-wider text-white block leading-tight">Nexus Orb</span>
@@ -551,7 +553,7 @@
       <div class="nexus-modal-header bg-slate-950/40">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl overflow-hidden border border-purple-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/25">
-            <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
+            <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
           </div>
           <div>
             <h3 class="text-sm sm:text-base font-display font-extrabold flex items-center gap-2">
@@ -633,7 +635,7 @@
       <!-- Brand & Status -->
       <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none" onclick="app.navigate('pensadero')">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-cyan-500/30 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
-          <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
+          <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
         </div>
         <div>
           <div class="flex items-center gap-1.5 sm:gap-2">
@@ -752,7 +754,7 @@
     <div class="grid grid-cols-5 h-16 items-center px-1" id="mobile-nav">
       <button onclick="app.navigate('pensadero')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="pensadero">
         <div class="w-5 h-5 rounded-md overflow-hidden border border-cyan-500/40 shrink-0 mb-0.5">
-          <img src="assets/nexus_n.jpg" alt="Nexus" class="w-full h-full object-cover">
+          <img src="assets/logo_icon_sin_bk.png" alt="Nexus" class="w-full h-full object-cover">
         </div>
         <span class="text-[9px] font-semibold whitespace-nowrap">Nexus Orb</span>
       </button>
@@ -778,7 +780,7 @@
   <!-- Universal Floating Action Button: [ Mic / FAB "Nexus" ] (MOVIBLE / DRAGGABLE) -->
   <button id="universal-nexus-fab" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 text-white shadow-2xl shadow-purple-500/40 hover:scale-105 active:scale-95 transition flex items-center gap-2 group border border-purple-400/40 select-none cursor-grab active:cursor-grabbing touch-none" title="Nexus IA (Arrastra para mover a cualquier parte de la pantalla)">
     <div class="w-6 h-6 rounded-full overflow-hidden border border-white/40 shrink-0 pointer-events-none">
-      <img src="assets/nexus_n.jpg" alt="Nexus" class="w-full h-full object-cover">
+      <img src="assets/logo_icon_sin_bk.png" alt="Nexus" class="w-full h-full object-cover">
     </div>
     <span class="text-xs font-bold font-display tracking-wide flex items-center gap-1.5 pointer-events-none">
       <span>Nexus IA</span>
@@ -819,14 +821,17 @@
         <!-- Selector de Humo Neón (Categoría Cognitiva) -->
         <div>
           <span class="block text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Color de Humo en el Orbe</span>
-          <div class="grid grid-cols-4 gap-1.5 text-xs">
+          <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5 text-xs">
+            <button type="button" onclick="app.selectGadgetSmoke('humo_general')" class="gadget-smoke-btn p-2 rounded-xl border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 ring-2 ring-cyan-400 flex flex-col items-center gap-0.5" data-smoke="humo_general">
+              <span>✨</span> <span class="text-[10px] font-bold">General</span>
+            </button>
             <button type="button" onclick="app.selectGadgetSmoke('humo_blanco')" class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_blanco">
               <span>⚪</span> <span class="text-[10px]">Soltar</span>
             </button>
             <button type="button" onclick="app.selectGadgetSmoke('humo_rojo')" class="gadget-smoke-btn p-2 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_rojo">
               <span>🔴</span> <span class="text-[10px]">Urgencia</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_dorado')" class="gadget-smoke-btn p-2 rounded-xl border border-amber-500/50 bg-amber-500/20 text-amber-300 ring-2 ring-amber-400 flex flex-col items-center gap-0.5" data-smoke="humo_dorado">
+            <button type="button" onclick="app.selectGadgetSmoke('humo_dorado')" class="gadget-smoke-btn p-2 rounded-xl border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_dorado">
               <span>🟡</span> <span class="text-[10px] font-bold">Idea</span>
             </button>
             <button type="button" onclick="app.selectGadgetSmoke('humo_azul')" class="gadget-smoke-btn p-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_azul">
@@ -845,7 +850,7 @@
               <span>🔘</span> <span class="text-[10px]">Someday</span>
             </button>
           </div>
-          <input type="hidden" id="gadget-smoke-category" value="humo_dorado" />
+          <input type="hidden" id="gadget-smoke-category" value="humo_general" />
         </div>
 
         <!-- Banner de Feedback Dinámico -->
@@ -1220,7 +1225,7 @@
       <div class="nexus-modal-header bg-slate-950/40">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border border-emerald-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-            <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
+            <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
           </div>
           <div>
             <h3 class="text-sm sm:text-base font-display font-extrabold text-white">Instalar Nexus Orb en tu Dispositivo</h3>
@@ -1408,25 +1413,25 @@
       </div>
     </div>
   <!-- 10. MODAL: DESPACHO RÁPIDO DE PENSADERO A PROYECTOS (JARVIS DISPATCH) -->
-  <div id="modal-dispatch-thought" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-    <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter text-left">
-      <div class="flex items-start justify-between mb-4 pb-3 border-b theme-border">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-purple-500/25">
+  <div id="modal-dispatch-thought" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter text-left">
+      <div class="nexus-modal-header bg-slate-950/40">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-purple-500/25 shrink-0">
             🚀
           </div>
-          <div>
-            <h3 class="text-base font-display font-extrabold flex items-center gap-2">
+          <div class="min-w-0">
+            <h3 class="text-sm sm:text-base font-display font-extrabold flex items-center gap-2 truncate">
               <span>Despachar a Proyectos</span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">JARVIS Core</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shrink-0">JARVIS</span>
             </h3>
-            <p class="text-[11px] theme-text-muted">Canaliza tu pensamiento directamente a un tablero Kanban o nuevo proyecto</p>
+            <p class="text-[11px] theme-text-muted truncate">Canaliza tu pensamiento a un tablero Kanban o nuevo proyecto</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-dispatch-thought')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button onclick="app.closeModal('modal-dispatch-thought')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
-      <div id="dispatch-thought-body" class="space-y-4 text-xs">
+      <div id="dispatch-thought-body" class="nexus-modal-scroll-body space-y-4 text-xs">
         <!-- Inyectado dinámicamente -->
       </div>
     </div>
@@ -1441,6 +1446,20 @@
      * Atajo perceptivo y neuroquímico para interpretar estado, urgencia y destino.
      */
     const SMOKE_PALETTE = {
+      humo_general: {
+        name: 'Sin Clasificar / Neón General',
+        title: 'Pensamiento Puro / Libre',
+        desc: 'Pensamiento sin clasificar aún. Puedes asignarle color o mandarlo a un proyecto cuando quieras.',
+        hex: '#06B6D4',
+        vec3: [0.02, 0.71, 0.83],
+        coreVec3: [0.01, 0.45, 0.55],
+        category: 'humo_general',
+        module: 'pensadero_puro',
+        cognitiveWeight: 'libre',
+        badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40',
+        icon: '✨',
+        shader: { turbulence: 0.3, pulse: 0.1, density: 1.0, dissipation: 0.1, satellites: 0.0, sink: 0.0, expansion: 0.0, flash: 0.3 }
+      },
       humo_blanco: {
         name: 'Humo Blanco',
         title: 'Limpieza Mental / Vaciado Inmediato',
@@ -1581,14 +1600,19 @@
           satellites: 0.0,
           sink: 0.0,
           expansion: 0.0,
-          flash: 0.0
+          flash: 0.0,
+          multiColor: 1.0
         };
         this.target = { ...this.current };
-        this.activeCategory = 'humo_blanco';
+        this.activeCategory = 'humo_general';
       }
 
       init(canvas) {
         if (!canvas) return;
+        if (this.canvas === canvas && this.gl && this.program) {
+          this.startLoop();
+          return;
+        }
         this.canvas = canvas;
         const gl = canvas.getContext('webgl', { alpha: true, antialias: true }) || 
                    canvas.getContext('experimental-webgl', { alpha: true, antialias: true });
@@ -1606,7 +1630,12 @@
         `;
 
         const fsSource = `
+          #ifdef GL_FRAGMENT_PRECISION_HIGH
           precision highp float;
+          #else
+          precision mediump float;
+          #endif
+
           uniform vec2 u_resolution;
           uniform float u_time;
           uniform vec3 u_color;
@@ -1619,6 +1648,7 @@
           uniform float u_sink;
           uniform float u_expansion;
           uniform float u_flash;
+          uniform float u_multiColor;
 
           // Simplex 3D Noise (Ian McEwan, Stefan Gustavson)
           vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -1747,53 +1777,78 @@
             vec3 refrRd = refract(rd, N, 1.0 / 1.45);
             if (dot(refrRd, refrRd) < 0.001) refrRd = rd;
 
-            // Marcha volumétrica a través del humo atrapado en el cristal
-            float stepDist = (tBack - tFront) / 18.0;
-            vec3 p = pFront + refrRd * (stepDist * 0.4);
+            // Marcha volumétrica a través del humo atrapado en el cristal (22 pasos para fluidez orgánica)
+            float stepDist = (tBack - tFront) / 22.0;
+            vec3 p = pFront + refrRd * (stepDist * 0.35);
 
             vec3 smokeAcc = vec3(0.0);
             float transmission = 1.0;
 
-            float timeScale = u_time * (0.35 + u_turbulence * 0.5);
             float pulseMod = 1.0 + 0.25 * u_pulse * sin(u_time * 8.0);
 
-            for (int i = 0; i < 18; i++) {
+            for (int i = 0; i < 22; i++) {
               float rNorm = length(p) / R;
-              if (rNorm < 0.96) {
-                // Vórtice y rotación 3D del humo
+              if (rNorm < 0.95) {
+                // DOMAIN WARPING MULTI-ESCALA:
+                // El humo se deforma, ondula y riza como gas real en convección continua
                 vec3 q = p;
-                float swirlAngle = timeScale * (1.1 - rNorm * 0.5);
+                // Convección térmica ascendente suave del fluido
+                q.y -= u_time * 0.26 * (1.0 - u_sink * 1.3);
+
+                // Rotación toroidal y vórtice interior
+                float swirlAngle = u_time * (0.22 + u_turbulence * 0.25) * (1.1 - rNorm * 0.45);
                 q.xz = rot2D(swirlAngle) * q.xz;
-                q.yz = rot2D(timeScale * 0.6) * q.yz;
 
-                // Ascenso y convección del humo
-                q.y -= u_time * 0.22 * (1.0 - u_sink * 1.4);
+                // Nivel 1 de deformación de fluido (wisps & plumes)
+                vec3 warp1 = vec3(
+                  snoise(q * 1.6 + vec3(0.0, u_time * 0.12, 0.0)),
+                  snoise(q * 1.6 + vec3(4.3, 0.0, u_time * 0.14)),
+                  snoise(q * 1.6 + vec3(1.2, u_time * 0.10, 3.4))
+                );
 
-                // Muestreo FBM de densidad
-                float noiseVal = fbm(q * (2.8 + u_turbulence * 1.2) + vec3(0.0, u_time * 0.1, 0.0));
+                // Nivel 2 de deformación (turbulencia fina y volutas arremolinadas)
+                vec3 q2 = q * 2.1 + warp1 * 0.65;
+                q2.y -= u_time * 0.18;
+                vec3 warp2 = vec3(
+                  snoise(q2 * 2.0 + vec3(2.5, u_time * 0.18, 1.1)),
+                  snoise(q2 * 2.0 + vec3(1.8, 3.7, u_time * 0.20)),
+                  snoise(q2 * 2.0 + vec3(u_time * 0.15, 5.2, 2.9))
+                );
 
-                // Densidad confinada orgánicamente dentro del cristal
-                float d = smoothstep(-0.15, 0.55, noiseVal);
-                d *= smoothstep(0.96, 0.65, rNorm);
-                d *= (u_density * 0.85 + 0.25);
+                // Muestreo FBM con el espacio deformado (produce volutas gaseosas vivas reales)
+                float noiseVal = fbm(q2 + warp2 * 0.45);
+
+                // Densidad volumétrica confinada orgánicamente dentro del cristal
+                float d = smoothstep(-0.12, 0.52, noiseVal);
+                d *= smoothstep(0.95, 0.60, rNorm); // desvanece suavemente antes de tocar el cristal
+                d *= (u_density * 0.88 + 0.25);
                 d *= (1.0 - u_dissipation * 0.65);
 
                 if (d > 0.01) {
-                  // Gradiente cromático: Núcleo profundo + Manto neón seleccionado
-                  vec3 colStep = mix(u_coreColor, u_color, smoothstep(0.05, 0.7, noiseVal));
-                  // Incandescencia en filamentos densos
-                  colStep += vec3(0.9, 0.95, 1.0) * pow(max(noiseVal, 0.0), 3.0) * 0.9;
+                  // MODELADO DE COLOR VOLUMÉTRICO ACORDE AL COLOR SELECCIONADO:
+                  // 1. Base / Sombra interna densa del gas
+                  vec3 colBase = u_coreColor;
+                  // 2. Manto vibrante principal del color seleccionado
+                  vec3 colBody = u_color;
+                  // 3. Resplandor difuso en las crestas y filamentos externos
+                  vec3 colHighlight = mix(u_color, vec3(1.0), 0.52);
+
+                  // Gradiente continuo según densidad del humo
+                  vec3 colStep = mix(colBase, colBody, smoothstep(-0.05, 0.48, noiseVal));
+                  colStep = mix(colStep, colHighlight, smoothstep(0.28, 0.82, noiseVal));
+
+                  // Filamentos incandescentes luminosos en el corazón de las volutas
+                  float coreLuminance = pow(max(noiseVal, 0.0), 3.0) * 0.85;
+                  colStep += mix(u_color, vec3(1.0), 0.75) * coreLuminance;
+
                   colStep *= pulseMod;
+                  if (u_flash > 0.01) colStep += vec3(u_flash * 0.85);
 
-                  if (u_flash > 0.01) {
-                    colStep += vec3(u_flash * 0.8);
-                  }
-
-                  float stepAlpha = clamp(d * 0.32, 0.0, 1.0);
+                  float stepAlpha = clamp(d * 0.35, 0.0, 1.0);
                   smokeAcc += colStep * stepAlpha * transmission;
                   transmission *= (1.0 - stepAlpha);
 
-                  if (transmission < 0.03) break;
+                  if (transmission < 0.02) break;
                 }
               }
               p += refrRd * stepDist;
@@ -1850,7 +1905,8 @@
           satellites: gl.getUniformLocation(prog, "u_satellites"),
           sink: gl.getUniformLocation(prog, "u_sink"),
           expansion: gl.getUniformLocation(prog, "u_expansion"),
-          flash: gl.getUniformLocation(prog, "u_flash")
+          flash: gl.getUniformLocation(prog, "u_flash"),
+          multiColor: gl.getUniformLocation(prog, "u_multiColor")
         };
 
         this.startLoop();
@@ -1869,10 +1925,16 @@
       }
 
       setSmokeState(category, customParams = null) {
-        const meta = SMOKE_PALETTE[category] || SMOKE_PALETTE.humo_blanco;
+        const meta = SMOKE_PALETTE[category] || SMOKE_PALETTE.humo_general;
         this.activeCategory = category;
         this.target.color = [...meta.vec3];
         this.target.coreColor = [...meta.coreVec3];
+
+        if (category === 'humo_general' || category === 'all') {
+          this.target.multiColor = 1.0;
+        } else {
+          this.target.multiColor = 0.22;
+        }
 
         const s = customParams || meta.shader;
         this.target.turbulence = s.turbulence;
@@ -1952,6 +2014,7 @@
         this.current.sink = lerp(this.current.sink, this.target.sink, lerpSpeed);
         this.current.expansion = lerp(this.current.expansion, this.target.expansion, lerpSpeed);
         this.current.flash = Math.max(0.0, this.current.flash - 0.025);
+        this.current.multiColor = lerp(this.current.multiColor !== undefined ? this.current.multiColor : 1.0, this.target.multiColor !== undefined ? this.target.multiColor : 1.0, lerpSpeed);
 
         gl.useProgram(this.program);
 
@@ -1969,6 +2032,7 @@
         gl.uniform1f(this.uniforms.sink, this.current.sink);
         gl.uniform1f(this.uniforms.expansion, this.current.expansion);
         gl.uniform1f(this.uniforms.flash, this.current.flash);
+        gl.uniform1f(this.uniforms.multiColor, this.current.multiColor);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }
@@ -2072,6 +2136,14 @@
         if (!this.state.pensadero) {
           this.state.pensadero = this.getDefaultPensadero();
         }
+
+        // Limpiar todos los pensamientos para comenzar desde cero conservando los proyectos intactos
+        if (!localStorage.getItem('nexus_pensadero_clean_v3')) {
+          this.state.pensadero = [];
+          localStorage.setItem('nexus_pensadero_clean_v3', 'true');
+          this.saveState();
+        }
+
         if (!this.state.projects || this.state.projects.length === 0) {
           this.state.projects = this.getSeedData().projects;
         }
@@ -2093,96 +2165,7 @@
       }
 
       getDefaultPensadero() {
-        const now = new Date();
-        const yesterday = new Date(Date.now() - 86400000);
-        const twoDaysAgo = new Date(Date.now() - 2 * 86400000);
-        return [
-          {
-            id: 'pen-red-1',
-            content: 'Renovar certificado de e-firma del SAT antes del viernes a las 14:00 (Urgencia Crítica).',
-            category: 'humo_rojo',
-            cognitiveWeight: 'fuego',
-            module: 'Google Tasks / Calendar',
-            isPinned: true,
-            isResolved: false,
-            createdAt: now.toISOString()
-          },
-          {
-            id: 'pen-gold-1',
-            content: 'Crear un plugin de Obsidian que exporte notas de voz en micro-pasos de 15 minutos con Gemini.',
-            category: 'humo_dorado',
-            cognitiveWeight: 'medio',
-            module: 'Proyectos Oro',
-            isPinned: true,
-            isResolved: false,
-            createdAt: yesterday.toISOString()
-          },
-          {
-            id: 'pen-blue-1',
-            content: 'Refactorizar pipeline de audio WebRTC para audio streaming hacia Gemini 1.5 Flash (Deep Work).',
-            category: 'humo_azul',
-            cognitiveWeight: 'pesado',
-            module: 'Deep Work / Flow',
-            isPinned: false,
-            isResolved: false,
-            createdAt: yesterday.toISOString()
-          },
-          {
-            id: 'pen-white-1',
-            content: '¿Por qué me dio vergüenza preguntar en la reunión de las 11? (Descarga catártica para no rumiar más).',
-            category: 'humo_blanco',
-            cognitiveWeight: 'ligero',
-            module: 'Limpieza Mental',
-            isPinned: false,
-            isResolved: false,
-            createdAt: twoDaysAgo.toISOString()
-          },
-          {
-            id: 'pen-green-1',
-            content: 'Completar racha de 15 minutos de lectura técnica sin revisar el móvil.',
-            category: 'humo_verde',
-            cognitiveWeight: 'ligero',
-            module: 'Hábitos y Bienestar',
-            streakCount: 5,
-            isPinned: false,
-            isResolved: false,
-            createdAt: now.toISOString()
-          },
-          {
-            id: 'pen-purple-1',
-            content: 'Llamar a Carlos: su mamá estuvo en el hospital la semana pasada (Avatar de Memoria).',
-            category: 'humo_purpura',
-            cognitiveWeight: 'medio',
-            module: 'CRM Personal',
-            contactName: 'Carlos Méndez',
-            contactContext: 'Le encanta el café de especialidad. Su mamá estuvo en el hospital la semana pasada. No hablar de política.',
-            isPinned: false,
-            isResolved: false,
-            createdAt: yesterday.toISOString()
-          },
-          {
-            id: 'pen-orange-1',
-            content: 'Comprar audífonos con cancelación de ruido de $120 USD (Fricción Financiera).',
-            category: 'humo_naranja',
-            cognitiveWeight: 'medio',
-            module: 'Fricción Financiera',
-            amount: 120,
-            isPinned: false,
-            isResolved: false,
-            createdAt: yesterday.toISOString()
-          },
-          {
-            id: 'pen-ash-1',
-            content: 'Aprender Rust para programar microcontroladores en domótica casera (Hibernación Someday / Maybe).',
-            category: 'humo_ceniza',
-            cognitiveWeight: 'ligero',
-            module: 'Hibernación',
-            hibernatedUntil: Date.now() + 14 * 86400000,
-            isPinned: false,
-            isResolved: false,
-            createdAt: twoDaysAgo.toISOString()
-          }
-        ];
+        return [];
       }
 
       getSeedData() {
@@ -2302,6 +2285,28 @@
 
       uid() {
         return 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      }
+
+      getPensaderoItem(target) {
+        if (!this.state.pensadero) return null;
+        if (typeof target === 'string') {
+          return this.state.pensadero.find(x => x.id === target) || null;
+        }
+        if (typeof target === 'number') {
+          return this.state.pensadero[target] || null;
+        }
+        return null;
+      }
+
+      getPensaderoIndex(target) {
+        if (!this.state.pensadero) return -1;
+        if (typeof target === 'string') {
+          return this.state.pensadero.findIndex(x => x.id === target);
+        }
+        if (typeof target === 'number') {
+          return target;
+        }
+        return -1;
       }
 
       daysSince(dateStr) {
@@ -3280,6 +3285,7 @@
       // ==========================================
       renderViewPensadero(container) {
         const items = this.state.pensadero || [];
+        const generalCount = items.filter(x => x.category === 'humo_general' || !x.category).length;
         const whiteCount = items.filter(x => x.category === 'humo_blanco' || x.category === 'descarga').length;
         const redCount = items.filter(x => (x.category === 'humo_rojo' || x.category === 'duda') && !x.isResolved).length;
         const goldCount = items.filter(x => x.category === 'humo_dorado' || x.category === 'chispa').length;
@@ -3298,6 +3304,7 @@
             }
             return true;
           }
+          if (activeFilter === 'humo_general' || activeFilter === 'general') return it.category === 'humo_general' || !it.category;
           if (activeFilter === 'humo_blanco' || activeFilter === 'blanco') return it.category === 'humo_blanco' || it.category === 'descarga';
           if (activeFilter === 'humo_rojo' || activeFilter === 'rojo') return it.category === 'humo_rojo' || it.category === 'duda';
           if (activeFilter === 'humo_dorado' || activeFilter === 'dorado') return it.category === 'humo_dorado' || it.category === 'chispa';
@@ -3309,7 +3316,7 @@
           return true;
         });
 
-        const activeMeta = SMOKE_PALETTE[activeFilter] || SMOKE_PALETTE.humo_blanco;
+        const activeMeta = SMOKE_PALETTE[activeFilter] || SMOKE_PALETTE.humo_general;
         const activeProjectsCount = (this.state.projects || []).filter(p => p.status === 'activo').length;
 
         container.innerHTML = `
@@ -3385,7 +3392,7 @@
                   <div id="nexus-orb-glow" class="absolute inset-4 md:inset-8 rounded-full blur-3xl opacity-65 transition-all duration-700 pointer-events-none" style="background: radial-gradient(circle, ${activeMeta.hex} 0%, transparent 70%);"></div>
 
                   <!-- Orbe de Cristal Nexus: Esfera 3D de Cristal con Humo Fluido Volumétrico Cambiante (100% WebGL, Sin Imagen Estática) -->
-                  <div id="nexus-core-wrapper" class="relative z-10 w-full h-full flex items-center justify-center select-none cursor-pointer" onclick="app.triggerShockwave()" title="Toca el Orbe de Cristal para emitir una resonancia">
+                  <div id="nexus-core-wrapper" class="relative z-10 w-full h-full flex items-center justify-center select-none cursor-pointer" onclick="app.handleOrbClick(event)" title="Mantén presionado para vaciar un pensamiento al Orbe • Clic para pulso resonante">
                     <!-- Canvas GLSL: Orbe de Cristal Fijo con Humo Neón Líquido Dinámico -->
                     <canvas id="pensadero-glsl-canvas" class="w-full h-full block rounded-full select-none"></canvas>
                   </div>
@@ -3399,23 +3406,24 @@
               </div>
 
               <!-- GADGET DIRECTO: VACIADO AL ORBE EN 1-CLIC -->
-              <div class="relative z-20 w-full max-w-md mx-auto my-1.5 p-1.5 sm:p-2 rounded-2xl bg-slate-900/90 border border-purple-500/40 backdrop-blur-md shadow-2xl flex items-center gap-2">
+              <div class="relative z-20 w-full max-w-md mx-auto my-1.5 p-1.5 sm:p-2 rounded-2xl bg-slate-900/90 border border-purple-500/40 backdrop-blur-md shadow-2xl flex items-center gap-1.5 sm:gap-2">
                 <button onclick="app.openOrbeQuickGadget()" class="p-2 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40 hover:bg-purple-600/50 transition shrink-0" title="Abrir Gadget de Vaciado Rápido">
                   <span>🔮</span>
                 </button>
-                <input type="text" id="pensadero-direct-dump-input" placeholder="Vaciar pensamiento directo al Orbe..." 
+                <input type="text" id="pensadero-direct-dump-input" placeholder="Vaciar pensamiento o idea..." 
                   onkeydown="if(event.key==='Enter') app.quickDumpToOrbe(this.value)"
-                  class="flex-1 bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none px-1" />
+                  class="flex-1 min-w-0 bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none px-1" />
                 <button onclick="app.dictateField('pensadero-direct-dump-input')" class="p-1.5 text-slate-400 hover:text-cyan-400 transition shrink-0" title="Dictar por voz">
                   🎙️
                 </button>
-                <button onclick="app.quickDumpToOrbe(document.getElementById('pensadero-direct-dump-input').value)" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition shrink-0">
+                <button onclick="app.quickDumpToOrbe(document.getElementById('pensadero-direct-dump-input').value)" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition shrink-0">
                   Lanzar
                 </button>
               </div>
 
-              <!-- Reactor de 8 Humos Nucleares para el Orbe -->
+              <!-- Reactor de 9 Humos Nucleares para el Orbe -->
               <div class="relative z-10 flex flex-wrap items-center justify-center gap-2 pt-1 pb-1">
+                <button onclick="app.setOrbeColor('humo_general')" data-smoke="humo_general" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-cyan-400 border-2 border-white hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="✨ Neón General / Sin Clasificar">✨</button>
                 <button onclick="app.setOrbeColor('humo_blanco')" data-smoke="humo_blanco" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-200 border-2 border-white hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="⚪ Humo Blanco: Limpieza Mental / Soltar">⚪</button>
                 <button onclick="app.setOrbeColor('humo_rojo')" data-smoke="humo_rojo" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-rose-500 border-2 border-rose-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔴 Humo Rojo: Urgencia Crítica / Fuego">🔴</button>
                 <button onclick="app.setOrbeColor('humo_dorado')" data-smoke="humo_dorado" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-500 border-2 border-amber-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟡 Humo Dorado: Chispas Oro / Ideas">🟡</button>
@@ -3434,41 +3442,44 @@
             </div>
 
             <!-- CONSOLA DE DISPARO DIRECTO (COMMAND DECK ESTILO JARVIS) -->
-            <div id="pensadero-deck" class="p-3.5 sm:p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur scroll-mt-20">
-              <div class="flex items-center gap-2 mb-2">
+            <div id="pensadero-deck" class="p-3 sm:p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur scroll-mt-20">
+              <div class="flex items-center gap-1.5 sm:gap-2 mb-2">
                 <!-- Botón de Micrófono Nexus Flotante -->
-                <button onclick="app.openNexusVoice('pensadero')" class="p-2.5 rounded-2xl bg-gradient-to-tr from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-md active:scale-95 transition flex items-center justify-center" title="Dictar a Nexus">
+                <button onclick="app.openNexusVoice('pensadero')" class="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-tr from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-md active:scale-95 transition flex items-center justify-center shrink-0" title="Dictar a Nexus">
                   <span class="text-base animate-pulse">🎙️</span>
                 </button>
                 
                 <!-- Input de Comando Inmediato -->
-                <input id="pensadero-jarvis-input" type="text" placeholder="Escribe o dicta cualquier idea, pendiente o rumiación mental..."
+                <input id="pensadero-jarvis-input" type="text" placeholder="Escribe o dicta cualquier idea..."
                   onkeydown="if(event.key==='Enter') app.submitPensaderoJARVIS()"
-                  class="flex-1 px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-700/80 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/60 transition shadow-inner font-sans" />
+                  class="flex-1 min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-950/80 border border-slate-700/80 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/60 transition shadow-inner font-sans" />
 
                 <!-- Botón de Depositar en Orbe -->
-                <button onclick="app.submitPensaderoJARVIS()" class="hidden sm:flex px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition items-center gap-1.5 whitespace-nowrap">
-                  <span>⚡</span> Depositar
+                <button onclick="app.submitPensaderoJARVIS()" class="hidden md:flex px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition items-center gap-1.5 whitespace-nowrap shrink-0" title="Depositar en el Orbe">
+                  <span>⚡</span> <span class="hidden lg:inline">Depositar</span>
                 </button>
 
                 <!-- Botón de Mandar Directo a Proyectos -->
-                <button onclick="app.sendInputDirectToProject()" class="px-4 py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 active:scale-95 transition flex items-center gap-1.5 whitespace-nowrap">
-                  <span>🚀</span> Mandar a Proyecto
+                <button onclick="app.sendInputDirectToProject()" class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 active:scale-95 transition flex items-center gap-1 whitespace-nowrap shrink-0" title="Mandar a Proyecto">
+                  <span class="text-sm">🚀</span>
+                  <span class="hidden sm:inline">Mandar a Proyecto</span>
+                  <span class="sm:hidden text-xs">Proyecto</span>
                 </button>
               </div>
 
               <!-- Selector Rápido de Categorías en línea -->
               <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 text-[11px] font-semibold" id="pensadero-cat-chips">
                 <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" onclick="app.selectPensaderoCat('humo_general')" class="pcat-chip px-2.5 py-1 rounded-xl border border-cyan-500 bg-cyan-500/20 text-cyan-300 font-semibold" data-cat="humo_general">✨ Libre</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_blanco')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_blanco">⚪ Soltar</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_rojo')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_rojo">🔴 Fuego</button>
-                  <button type="button" onclick="app.selectPensaderoCat('humo_dorado')" class="pcat-chip px-2.5 py-1 rounded-xl border border-amber-500 bg-amber-500/20 text-amber-300 font-semibold" data-cat="humo_dorado">🟡 Idea</button>
+                  <button type="button" onclick="app.selectPensaderoCat('humo_dorado')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_dorado">🟡 Idea</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_azul')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_azul">🔵 Deep Work</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_verde')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_verde">🟢 Hábito</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_purpura')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_purpura">🟣 CRM</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_naranja')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_naranja">🟠 Fricción $</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_ceniza')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_ceniza">🔘 Someday</button>
-                  <input type="hidden" id="pensadero-cat-val" value="humo_dorado" />
+                  <input type="hidden" id="pensadero-cat-val" value="humo_general" />
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
@@ -3485,6 +3496,9 @@
                 <div class="flex items-center gap-1.5 overflow-x-auto py-1 text-xs">
                   <button onclick="app.filterPensaderoSmoke('all')" class="px-3 py-1 rounded-xl font-semibold transition ${activeFilter === 'all' ? 'bg-purple-600 text-white shadow-md' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}">
                     Todos (${items.length})
+                  </button>
+                  <button onclick="app.filterPensaderoSmoke('humo_general')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_general' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-cyan-300'}">
+                    ✨ Libre (${generalCount})
                   </button>
                   <button onclick="app.filterPensaderoSmoke('humo_dorado')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_dorado' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-amber-300'}">
                     🟡 Oro (${goldCount})
@@ -3529,14 +3543,95 @@
           const cvs = document.getElementById('pensadero-glsl-canvas');
           if (cvs && this.shaderEngine) {
             this.shaderEngine.init(cvs);
-            const activeSmoke = (activeFilter !== 'all') ? activeFilter : 'humo_blanco';
+            const activeSmoke = (activeFilter !== 'all') ? activeFilter : 'humo_general';
             this.shaderEngine.setSmokeState(activeSmoke);
+            this.initOrbLongPress();
           }
         }, 60);
       }
 
+      handleOrbClick(e) {
+        if (this._suppressOrbClick) {
+          this._suppressOrbClick = false;
+          return;
+        }
+        this.triggerShockwave();
+      }
+
+      initOrbLongPress() {
+        const wrapper = document.getElementById('nexus-core-wrapper');
+        if (!wrapper || wrapper._longPressAttached) return;
+        wrapper._longPressAttached = true;
+
+        let pressTimer = null;
+        let isLongPress = false;
+        let startX = 0, startY = 0;
+
+        const onDown = (e) => {
+          if (e.button !== undefined && e.button !== 0) return;
+          isLongPress = false;
+          this._suppressOrbClick = false;
+          startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+          startY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
+
+          // Efecto visual de carga del orbe al presionar
+          wrapper.style.transform = 'scale(1.06)';
+          wrapper.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          const glow = document.getElementById('nexus-orb-glow');
+          if (glow) glow.style.opacity = '1';
+
+          pressTimer = setTimeout(() => {
+            isLongPress = true;
+            this._suppressOrbClick = true;
+            wrapper.style.transform = 'scale(1)';
+
+            // Vibración y onda expansiva de activación
+            if (navigator.vibrate) {
+              try { navigator.vibrate([70, 40, 100]); } catch(err){}
+            }
+            this.triggerShockwave();
+
+            // Abrir captura directa de pensamiento al orbe
+            this.openOrbeQuickGadget();
+          }, 450);
+        };
+
+        const onMove = (e) => {
+          if (!pressTimer) return;
+          const curX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+          const curY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
+          if (Math.hypot(curX - startX, curY - startY) > 12) {
+            cancel();
+          }
+        };
+
+        const cancel = () => {
+          if (pressTimer) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+          wrapper.style.transform = 'scale(1)';
+          const glow = document.getElementById('nexus-orb-glow');
+          if (glow) glow.style.opacity = '0.65';
+        };
+
+        const onUp = (e) => {
+          cancel();
+          if (isLongPress) {
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
+          }
+        };
+
+        wrapper.addEventListener('pointerdown', onDown);
+        wrapper.addEventListener('pointermove', onMove);
+        wrapper.addEventListener('pointerup', onUp);
+        wrapper.addEventListener('pointercancel', cancel);
+        wrapper.addEventListener('pointerleave', cancel);
+      }
+
       setOrbeColor(category) {
-        const meta = SMOKE_PALETTE[category] || SMOKE_PALETTE.humo_blanco;
+        const meta = SMOKE_PALETTE[category] || SMOKE_PALETTE.humo_general;
         this.pensaderoSmokeFilter = category;
 
         const indicator = document.getElementById('orbe-color-indicator');
@@ -3699,18 +3794,14 @@
         if (!text || !text.trim()) return;
         const cleanText = text.trim();
 
-        let cat = customCategory;
-        if (!cat) {
-          const contract = this.classifyThoughtWithGeminiContract(cleanText);
-          cat = contract.category;
-        }
-        const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_blanco;
+        let cat = customCategory || this.selectedGadgetSmoke || 'humo_general';
+        const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_general;
 
         const newItem = {
           id: this.uid(),
           content: cleanText,
           category: cat,
-          cognitiveWeight: meta.cognitiveWeight || 'medio',
+          cognitiveWeight: meta.cognitiveWeight || 'libre',
           module: meta.module || 'El Pensadero',
           amount: (cat === 'humo_naranja') ? 50 : null,
           contactName: (cat === 'humo_purpura') ? 'Contacto' : null,
@@ -3752,16 +3843,200 @@
         }
       }
 
-      sendInputDirectToProject() {
-        const input = document.getElementById('pensadero-jarvis-input');
-        const text = input ? input.value.trim() : '';
-        if (!text) {
-          alert('Por favor escribe o dicta primero la idea antes de enviarla a un proyecto.');
+      // --- AUTOCLASIFICACIÓN CON NEXUS IA (POR CÓDIGO & GEMINI) ---
+      autoClassifyThought(target) {
+        const item = this.getPensaderoItem(target);
+        if (!item) return;
+
+        const text = item.content.trim();
+        const lower = text.toLowerCase();
+
+        // 1. Detección Inteligente de Proyectos
+        let targetProject = null;
+        if (lower.includes('cytohelix') || lower.includes('landing') || lower.includes('software') || lower.includes('web corporativa') || lower.includes('frontend') || lower.includes('portafolio')) {
+          targetProject = this.state.projects.find(p => p.id === 'p-cytohelix') || this.state.projects.find(p => p.name.toLowerCase().includes('cytohelix'));
+        } else if (lower.includes('cytocore') || lower.includes('célula') || lower.includes('celula') || lower.includes('mesenquimal') || lower.includes('cultivo') || lower.includes('dosis') || lower.includes('laboratorio') || lower.includes('paciente')) {
+          targetProject = this.state.projects.find(p => p.id === 'p-cytocore') || this.state.projects.find(p => p.name.toLowerCase().includes('cytocore'));
+        } else if (lower.includes('focusflow') || lower.includes('kanban') || lower.includes('ruido marrón') || lower.includes('ruido marron') || lower.includes('orbe') || lower.includes('tdah') || lower.includes('spring boot')) {
+          targetProject = this.state.projects.find(p => p.id === 'p-focusflow') || this.state.projects.find(p => p.name.toLowerCase().includes('focusflow'));
+        } else {
+          for (const p of (this.state.projects || [])) {
+            if (lower.includes(p.name.toLowerCase())) {
+              targetProject = p;
+              break;
+            }
+          }
+        }
+
+        if (targetProject) {
+          let cleanTitle = text
+            .replace(/^nexus,?\s*/i, '')
+            .replace(/^agregar?\s+(al\s+proyecto\s+de\s+[a-záéíóúñ\s]+\s+que\s+)/i, '')
+            .replace(/^agregar?\s+(a\s+[a-záéíóúñ\s]+\s+que\s+)/i, '')
+            .trim();
+          if (cleanTitle.length < 3) cleanTitle = text;
+          cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+
+          if (!targetProject.tasks) targetProject.tasks = [];
+          targetProject.tasks.push({
+            id: this.uid(),
+            title: cleanTitle,
+            column: 'buzon',
+            effort: 'S',
+            originThoughtId: item.id,
+            createdAt: new Date().toISOString()
+          });
+
+          this.deletePensaderoItem(item.id);
+          this.saveState();
+          this.render();
+          this.triggerDopamineReward();
+          this.triggerShockwave();
+
+          alert(`✨ ¡Autoclasificado con Nexus IA!\n\nSe detectó el proyecto: "${targetProject.name}".\nSe agregó directamente a su Buzón de tareas:\n"${cleanTitle}"`);
           return;
         }
 
-        // Crear temporalmente y abrir dispatcher
-        const cat = document.getElementById('pensadero-cat-val')?.value || 'humo_dorado';
+        // 2. Si no es un proyecto, clasificar en categoría/color de humo correspondiente
+        const contract = this.classifyThoughtWithGeminiContract(text);
+        item.category = contract.category;
+        item.cognitiveWeight = contract.cognitive_weight;
+        item.module = contract.module;
+        this.saveState();
+        this.render();
+
+        const meta = SMOKE_PALETTE[contract.category] || SMOKE_PALETTE.humo_dorado;
+        this.setOrbeColor(contract.category);
+        this.triggerShockwave();
+        this.triggerDopamineReward();
+
+        alert(`✨ ¡Pensamiento autoclasificado con Nexus IA!\n\nAsignado a: ${meta.icon} ${meta.name} (${meta.title})\nPeso cognitivo: ${contract.cognitive_weight}`);
+      }
+
+      // --- CLASIFICACIÓN / TRASLADO POR COMANDO DE VOZ ---
+      dispatchThoughtByVoice(target) {
+        const item = this.getPensaderoItem(target);
+        if (!item) return;
+
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+          const choice = prompt(`Dictado por voz no disponible en este navegador.\nEscribe a qué proyecto o color deseas moverlo:\n(Ejemplos: 'CytoHelix', 'CytoCore', 'FocusFlow', 'Urgente', 'Idea')`);
+          if (choice) this.processVoiceThoughtDispatch(item.id, choice);
+          return;
+        }
+
+        try {
+          const rec = new SpeechRec();
+          rec.lang = 'es-ES';
+          rec.continuous = false;
+          rec.interimResults = false;
+
+          alert(`🎙️ Habla ahora:\n\nDi a qué proyecto o color deseas mover "${item.content.slice(0, 35)}..."\n\n(Ej: "Mover a CytoHelix", "Agregar a CytoCore", "Marcar como urgente")`);
+
+          rec.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            this.processVoiceThoughtDispatch(item.id, transcript);
+          };
+
+          rec.onerror = (e) => {
+            console.warn("Speech dispatch error:", e);
+          };
+
+          rec.start();
+        } catch(err) {
+          console.error("SpeechRec start error:", err);
+        }
+      }
+
+      processVoiceThoughtDispatch(target, voiceText) {
+        const item = this.getPensaderoItem(target);
+        if (!item) return;
+
+        const lower = voiceText.toLowerCase();
+
+        let targetProject = null;
+        if (lower.includes('cytohelix') || lower.includes('landing') || lower.includes('software')) {
+          targetProject = this.state.projects.find(p => p.id === 'p-cytohelix') || this.state.projects.find(p => p.name.toLowerCase().includes('cytohelix'));
+        } else if (lower.includes('cytocore') || lower.includes('célula') || lower.includes('celula') || lower.includes('dosis') || lower.includes('cultivo')) {
+          targetProject = this.state.projects.find(p => p.id === 'p-cytocore') || this.state.projects.find(p => p.name.toLowerCase().includes('cytocore'));
+        } else if (lower.includes('focusflow') || lower.includes('focus') || lower.includes('kanban')) {
+          targetProject = this.state.projects.find(p => p.id === 'p-focusflow') || this.state.projects.find(p => p.name.toLowerCase().includes('focusflow'));
+        } else {
+          for (const p of (this.state.projects || [])) {
+            if (lower.includes(p.name.toLowerCase())) {
+              targetProject = p;
+              break;
+            }
+          }
+        }
+
+        if (targetProject) {
+          const isNext = lower.includes('próximo') || lower.includes('proximo') || lower.includes('hoy') || lower.includes('foco');
+          const col = isNext ? 'proximo' : 'buzon';
+          if (!targetProject.tasks) targetProject.tasks = [];
+          targetProject.tasks.push({
+            id: this.uid(),
+            title: item.content,
+            column: col,
+            effort: 'S',
+            createdAt: new Date().toISOString()
+          });
+
+          this.deletePensaderoItem(item.id);
+          this.saveState();
+          this.render();
+          this.triggerDopamineReward();
+          alert(`🎙️ Por comando de voz ("${voiceText}"):\n✓ Pensamiento agregado a ${targetProject.emoji} ${targetProject.name} como ${col === 'proximo' ? 'Próximo Paso' : 'Buzón'}.`);
+          return;
+        }
+
+        let cat = null;
+        if (lower.includes('urgente') || lower.includes('rojo') || lower.includes('fuego')) cat = 'humo_rojo';
+        else if (lower.includes('idea') || lower.includes('oro') || lower.includes('dorado')) cat = 'humo_dorado';
+        else if (lower.includes('deep work') || lower.includes('código') || lower.includes('azul')) cat = 'humo_azul';
+        else if (lower.includes('soltar') || lower.includes('blanco') || lower.includes('limpiar')) cat = 'humo_blanco';
+        else if (lower.includes('hábito') || lower.includes('verde') || lower.includes('salud')) cat = 'humo_verde';
+        else if (lower.includes('crm') || lower.includes('llamar') || lower.includes('púrpura') || lower.includes('morado')) cat = 'humo_purpura';
+        else if (lower.includes('dinero') || lower.includes('gasto') || lower.includes('naranja')) cat = 'humo_naranja';
+        else if (lower.includes('congelar') || lower.includes('ceniza') || lower.includes('algún día')) cat = 'humo_ceniza';
+        else if (lower.includes('general') || lower.includes('libre')) cat = 'humo_general';
+
+        if (cat) {
+          this.changeThoughtCategory(item.id, cat);
+          const meta = SMOKE_PALETTE[cat];
+          alert(`🎙️ Por comando de voz ("${voiceText}"):\n✓ Pensamiento clasificado como ${meta.name} (${meta.title}).`);
+        } else {
+          this.autoClassifyThought(item.id);
+        }
+      }
+
+      changeThoughtCategory(target, newCategory) {
+        const item = this.getPensaderoItem(target);
+        if (!item) return;
+
+        const meta = SMOKE_PALETTE[newCategory] || SMOKE_PALETTE.humo_general;
+        item.category = newCategory;
+        item.cognitiveWeight = meta.cognitiveWeight || 'medio';
+        item.module = meta.module || 'El Pensadero';
+
+        this.saveState();
+        this.render();
+        this.setOrbeColor(newCategory);
+        this.triggerShockwave();
+      }
+
+      sendInputDirectToProject() {
+        const jarvisInput = document.getElementById('pensadero-jarvis-input');
+        const directInput = document.getElementById('pensadero-direct-dump-input');
+        let text = (jarvisInput && jarvisInput.value.trim()) || (directInput && directInput.value.trim()) || '';
+        
+        if (!text) {
+          text = prompt('Escribe el pensamiento, idea o tarea que deseas mandar a un proyecto:');
+          if (!text || !text.trim()) return;
+          text = text.trim();
+        }
+
+        const cat = document.getElementById('pensadero-cat-val')?.value || 'humo_general';
         const newItem = {
           id: this.uid(),
           content: text,
@@ -3774,16 +4049,17 @@
         };
         if (!this.state.pensadero) this.state.pensadero = [];
         this.state.pensadero.unshift(newItem);
-        if (input) input.value = '';
+        if (jarvisInput) jarvisInput.value = '';
+        if (directInput) directInput.value = '';
         this.saveState();
         this.render();
 
-        // Lanzar dispatcher para este item recién creado (índice 0)
-        this.quickDispatchThoughtToProject(0);
+        // Lanzar dispatcher para este item recién creado por su ID
+        this.quickDispatchThoughtToProject(newItem.id);
       }
 
-      quickDispatchThoughtToProject(idx) {
-        const item = this.state.pensadero[idx];
+      quickDispatchThoughtToProject(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
 
         const modal = document.getElementById('modal-dispatch-thought');
@@ -3797,14 +4073,14 @@
         body.innerHTML = `
           <div class="space-y-4">
             <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-200">
-              <span class="text-purple-400 font-bold block mb-1">Pensamiento a direccionar:</span>
+              <span class="text-cyan-400 font-bold block mb-1">Pensamiento a direccionar:</span>
               <p class="font-medium text-sm leading-relaxed">${item.content}</p>
             </div>
 
             <!-- Opción: Crear Nuevo Proyecto Formal -->
             <div>
-              <button onclick="app.convertPensaderoToProject(${idx}); app.closeModal('modal-dispatch-thought')" 
-                class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-amber-600/30 to-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-between transition">
+              <button onclick="app.convertPensaderoToProject('${item.id}'); app.closeModal('modal-dispatch-thought')" 
+                class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-amber-600/30 to-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-between transition active:scale-98 shadow-sm">
                 <span class="flex items-center gap-2"><span>✨</span> Convertir en Proyecto Nuevo Completo</span>
                 <span>→</span>
               </button>
@@ -3821,18 +4097,18 @@
                 <div class="space-y-2">
                   ${activeProjects.map(p => `
                     <div class="p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition flex items-center justify-between gap-2">
-                      <div class="flex items-center gap-2">
-                        <span class="text-base">${p.emoji || '📁'}</span>
-                        <div class="text-left">
-                          <strong class="text-xs text-white block">${p.name}</strong>
-                          <span class="text-[10px] text-slate-400">${(p.tasks || []).length} tareas activas</span>
+                      <div class="flex items-center gap-2 min-w-0">
+                        <span class="text-base shrink-0">${p.emoji || '📁'}</span>
+                        <div class="text-left min-w-0">
+                          <strong class="text-xs text-white block truncate">${p.name}</strong>
+                          <span class="text-[10px] text-slate-400">${(p.tasks || []).length} tareas</span>
                         </div>
                       </div>
-                      <div class="flex items-center gap-1.5">
-                        <button onclick="app.executeDispatchThought(${idx}, '${p.id}', 'buzon')" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition" title="Enviar a Buzón de ideas">
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="app.executeDispatchThought('${item.id}', '${p.id}', 'buzon')" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition active:scale-95" title="Enviar a Buzón de ideas">
                           📥 Buzón
                         </button>
-                        <button onclick="app.executeDispatchThought(${idx}, '${p.id}', 'proximo')" class="px-2.5 py-1.5 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-600/30 text-[11px] font-semibold transition" title="Enviar como Próximo Paso">
+                        <button onclick="app.executeDispatchThought('${item.id}', '${p.id}', 'proximo')" class="px-2.5 py-1.5 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-600/30 text-xs font-semibold transition active:scale-95" title="Enviar como Próximo Paso">
                           🎯 Próximo
                         </button>
                       </div>
@@ -3851,10 +4127,10 @@
                 <div class="space-y-1.5">
                   ${otherProjects.map(p => `
                     <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between gap-2">
-                      <span class="text-xs text-slate-300 flex items-center gap-1.5">
-                        <span>${p.emoji || '📁'}</span> ${p.name}
+                      <span class="text-xs text-slate-300 flex items-center gap-1.5 min-w-0 truncate">
+                        <span class="shrink-0">${p.emoji || '📁'}</span> <span class="truncate">${p.name}</span>
                       </span>
-                      <button onclick="app.executeDispatchThought(${idx}, '${p.id}', 'buzon')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold">
+                      <button onclick="app.executeDispatchThought('${item.id}', '${p.id}', 'buzon')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold shrink-0 active:scale-95">
                         📥 Mandar a Buzón
                       </button>
                     </div>
@@ -3868,8 +4144,8 @@
         modal.classList.remove('hidden');
       }
 
-      executeDispatchThought(idx, projectId, column = 'buzon') {
-        const item = this.state.pensadero[idx];
+      executeDispatchThought(target, projectId, column = 'buzon') {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
 
         const project = (this.state.projects || []).find(p => p.id === projectId);
@@ -3886,8 +4162,8 @@
           createdAt: new Date().toISOString()
         });
 
-        // Eliminar del pensadero
-        this.deletePensaderoItem(idx);
+        // Eliminar del pensadero por su ID único
+        this.deletePensaderoItem(item.id);
         this.saveState();
         this.closeModal('modal-dispatch-thought');
         this.render();
@@ -3938,79 +4214,110 @@
                   <span class="block text-[10px] theme-text-muted mt-1.5 text-center font-mono group-hover:text-emerald-400">🎨 Clic para abrir y continuar en Lienzo Freeform →</span>
                 </div>
               ` : ''}
+
+              <!-- Barra de Clasificación y Asignación Rápida a Proyectos -->
+              <div class="mt-3 pt-2.5 border-t theme-border flex flex-wrap items-center justify-between gap-2">
+                <!-- Canalizar a Proyecto con 1 Clic -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Mover a:</span>
+                  ${(this.state.projects || []).filter(p => p.status === 'activo').map(p => `
+                    <button onclick="app.executeDispatchThought('${item.id}', '${p.id}', 'buzon')" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-cyan-400 hover:text-cyan-300 text-xs font-semibold text-slate-200 transition flex items-center gap-1 shadow-sm active:scale-95 shrink-0" title="Enviar como tarea al Buzón de ${p.name}">
+                      <span>${p.emoji}</span> <span class="max-w-[80px] sm:max-w-none truncate">${p.name}</span>
+                    </button>
+                  `).join('')}
+                </div>
+
+                <!-- Autoclasificar con Nexus IA, Voz y Selector de Color -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <!-- Botón Autoclasificar con Nexus IA -->
+                  <button onclick="app.autoClassifyThought('${item.id}')" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-purple-600/30 to-indigo-600/30 text-purple-300 border border-purple-500/40 hover:bg-purple-600/50 text-xs font-bold transition flex items-center gap-1 shadow-sm active:scale-95 shrink-0" title="Analizar texto y autoclasificar a proyecto o color con Nexus IA">
+                    <span>✨</span> <span class="hidden sm:inline">Autoclasificar </span>IA
+                  </button>
+                  <!-- Botón Mover por Voz -->
+                  <button onclick="app.dispatchThoughtByVoice('${item.id}')" class="px-2 py-1 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-600/40 text-xs font-bold transition flex items-center gap-1 shadow-sm active:scale-95 shrink-0" title="Decir por voz a qué proyecto o color mover">
+                    <span>🎙️</span> <span class="hidden sm:inline">Voz</span>
+                  </button>
+                  <!-- Selector de Color de Humo -->
+                  <select onchange="app.changeThoughtCategory('${item.id}', this.value)" class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-xl px-2 py-1 focus:outline-none focus:ring-1 focus:ring-cyan-500 font-mono cursor-pointer shrink-0" title="Cambiar color del pensamiento">
+                    ${Object.keys(SMOKE_PALETTE).map(k => `
+                      <option value="${k}" ${item.category === k ? 'selected' : ''}>${SMOKE_PALETTE[k].icon} ${SMOKE_PALETTE[k].name}</option>
+                    `).join('')}
+                  </select>
+                </div>
+              </div>
             </div>
 
             <!-- Botones de Acción Neuroquímica & Despacho a Proyectos -->
             <div class="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
               
               <!-- Botón Primario: Mandar a Proyecto -->
-              <button onclick="app.quickDispatchThoughtToProject(${idx})" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition flex items-center gap-1" title="Mandar directamente a proyectos o convertir">
-                <span>🚀</span> Mandar a Proyecto
+              <button onclick="app.quickDispatchThoughtToProject('${item.id}')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition flex items-center gap-1 shrink-0" title="Mandar directamente a proyectos o convertir">
+                <span>🚀</span> <span class="hidden sm:inline">Mandar a </span>Proyecto
               </button>
 
               ${(item.category === 'humo_rojo' || item.category === 'duda') ? `
-                <button onclick="app.syncRedSmokeToGoogle('${item.id}', '${encodeURIComponent(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-semibold flex items-center gap-1" title="Sincronizar con Google Tasks y Calendar">
-                  <span>📅</span> Google Sync
+                <button onclick="app.syncRedSmokeToGoogle('${item.id}', '${encodeURIComponent(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Sincronizar con Google Tasks y Calendar">
+                  <span>📅</span> Google
                 </button>
                 ${!item.isResolved ? `
-                  <button onclick="app.resolveRedSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 text-xs font-semibold flex items-center gap-1" title="Apagar fuego">
+                  <button onclick="app.resolveRedSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Apagar fuego">
                     <span>✓</span> Apagar
                   </button>
                 ` : ''}
               ` : ''}
 
               ${(item.category === 'humo_blanco' || item.category === 'descarga') ? `
-                <button onclick="app.releaseWhiteSmoke(${idx})" class="px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-200 border border-white/20 hover:bg-white/20 text-xs font-semibold flex items-center gap-1" title="Soltar y olvidar sin culpa para liberar memoria de trabajo">
+                <button onclick="app.releaseWhiteSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-200 border border-white/20 hover:bg-white/20 text-xs font-semibold flex items-center gap-1 shrink-0" title="Soltar y olvidar sin culpa para liberar memoria de trabajo">
                   <span>💨</span> Soltar
                 </button>
               ` : ''}
 
               ${(item.category === 'humo_dorado' || item.category === 'chispa' || item.category === 'tarea') ? `
-                <button onclick="app.chewGoldSmoke(${idx})" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1" title="Masticar en 3 micro-pasos de 15 min">
+                <button onclick="app.chewGoldSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Masticar en 3 micro-pasos de 15 min">
                   <span>🍴</span> 15m
                 </button>
               ` : ''}
 
               ${(item.category === 'humo_azul') ? `
-                <button onclick="app.scheduleDeepWorkBlock(${idx})" class="px-2.5 py-1.5 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-500/30 text-xs font-semibold flex items-center gap-1" title="Agendar bloque de Deep Work de 2h con buffers">
+                <button onclick="app.scheduleDeepWorkBlock('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Agendar bloque de Deep Work de 2h con buffers">
                   <span>💻</span> Deep Work
                 </button>
               ` : ''}
 
               ${(item.category === 'humo_verde') ? `
-                <button onclick="app.registerHabitStreak(${idx})" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-semibold flex items-center gap-1" title="Alimentar racha y recargar dopamina">
+                <button onclick="app.registerHabitStreak('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Alimentar racha y recargar dopamina">
                   <span>🌱</span> +1 Racha
                 </button>
               ` : ''}
 
               ${(item.category === 'humo_purpura') ? `
-                <button onclick="app.openPersonalCRM(${idx})" class="px-2.5 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 text-xs font-semibold flex items-center gap-1" title="Ver avatar de memoria antes de llamar">
+                <button onclick="app.openPersonalCRM('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Ver avatar de memoria antes de llamar">
                   <span>💜</span> Avatar
                 </button>
               ` : ''}
 
               ${(item.category === 'humo_naranja') ? `
-                <button onclick="app.registerFinancialFriction(${idx})" class="px-2.5 py-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 text-xs font-semibold flex items-center gap-1" title="Evaluar impacto financiero y enfriar compra">
+                <button onclick="app.registerFinancialFriction('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Evaluar impacto financiero y enfriar compra">
                   <span>💳</span> Gasto
                 </button>
               ` : ''}
 
               ${(item.category === 'humo_ceniza') ? `
                 ${item.hibernatedUntil ? `
-                  <button onclick="app.wakeThought(${idx})" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold" title="Despertar pensamiento">
+                  <button onclick="app.wakeThought('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold shrink-0" title="Despertar pensamiento">
                     ☀️ Despertar
                   </button>
                 ` : `
-                  <button onclick="app.hibernateThought(${idx}, 14)" class="px-2.5 py-1.5 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 text-xs font-semibold" title="Congelar por 14 días">
+                  <button onclick="app.hibernateThought('${item.id}', 14)" class="px-2.5 py-1.5 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 text-xs font-semibold shrink-0" title="Congelar por 14 días">
                     ❄️ 14d
                   </button>
                 `}
               ` : ''}
 
-              <button onclick="app.togglePinPensadero(${idx})" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-amber-400 text-xs" title="Fijar">
+              <button onclick="app.togglePinPensadero('${item.id}')" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-amber-400 text-xs shrink-0" title="Fijar">
                 📌
               </button>
-              <button onclick="app.deletePensaderoItem(${idx})" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-rose-400 text-xs" title="Limpiar sin culpa">
+              <button onclick="app.deletePensaderoItem('${item.id}')" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-rose-400 text-xs shrink-0" title="Limpiar sin culpa">
                 🗑️
               </button>
             </div>
@@ -4018,8 +4325,8 @@
         `;
       }
 
-      togglePinPensadero(idx) {
-        const item = this.state.pensadero[idx];
+      togglePinPensadero(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         item.isPinned = !item.isPinned;
         this.state.pensadero.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
@@ -4027,7 +4334,9 @@
         this.render();
       }
 
-      deletePensaderoItem(idx) {
+      deletePensaderoItem(target) {
+        const idx = this.getPensaderoIndex(target);
+        if (idx < 0 || !this.state.pensadero || idx >= this.state.pensadero.length) return;
         const item = this.state.pensadero[idx];
         this.state.pensadero.splice(idx, 1);
         this.saveState();
@@ -4046,8 +4355,8 @@
         }
       }
 
-      convertPensaderoToProject(idx) {
-        const item = this.state.pensadero[idx];
+      convertPensaderoToProject(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
 
         const activeCount = (this.state.projects || []).filter(p => p.status === 'activo').length;
@@ -4086,7 +4395,7 @@
 
         if (!this.state.projects) this.state.projects = [];
         this.state.projects.unshift(newProject);
-        this.deletePensaderoItem(idx);
+        this.deletePensaderoItem(item.id);
         this.saveState();
         this.render();
         this.triggerDopamineReward();
@@ -4112,8 +4421,8 @@
         }
       }
 
-      assignPensaderoToProjectPrompt(idx) {
-        const item = this.state.pensadero[idx];
+      assignPensaderoToProjectPrompt(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         const projects = this.state.projects || [];
         if (projects.length === 0) {
@@ -4137,7 +4446,7 @@
             originThoughtContent: item.content,
             createdAt: new Date().toISOString()
           });
-          this.deletePensaderoItem(idx);
+          this.deletePensaderoItem(item.id);
           this.saveState();
           this.render();
           this.triggerDopamineReward();
@@ -5770,8 +6079,8 @@
         alert(`✓ Sincronizando con Google:\nSe abrió Google Calendar para agendar este pendiente prioritario.`);
       }
 
-      releaseWhiteSmoke(idx) {
-        const item = this.state.pensadero[idx];
+      releaseWhiteSmoke(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
 
         if (this.state.settings?.sound) {
@@ -5791,7 +6100,7 @@
           } catch(e) {}
         }
 
-        this.deletePensaderoItem(idx);
+        this.deletePensaderoItem(item.id);
         if (this.shaderEngine) {
           this.shaderEngine.setSmokeState('humo_blanco');
           this.shaderEngine.pulseShockwave();
@@ -5799,8 +6108,8 @@
         alert("💨 Pensamiento soltado y disuelto en humo blanco.\nTu memoria de trabajo inmediata ha quedado liberada sin culpa.");
       }
 
-      chewGoldSmoke(idx) {
-        const item = this.state.pensadero[idx];
+      chewGoldSmoke(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         const step1 = prompt("Micro-paso 1 de 15 min (inmediato y sin fricción):", `Definir alcance básico de: ${item.content.slice(0, 30)}`);
         if (!step1) return;
@@ -5830,8 +6139,8 @@
         alert(`✓ ¡Idea masticada en ${steps.length} micro-pasos de 15 minutos! Ahora es fácil de iniciar.`);
       }
 
-      scheduleDeepWorkBlock(idx) {
-        const item = this.state.pensadero[idx];
+      scheduleDeepWorkBlock(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         const now = new Date();
         const slotDate = new Date(now.getTime() + 24 * 3600 * 1000);
@@ -5852,8 +6161,8 @@
         alert(`✓ Gap Filling Automático:\nSe agendó un bloque de 2 horas con buffers de 15 min de descanso antes y después en tu Google Calendar.`);
       }
 
-      registerHabitStreak(idx) {
-        const item = this.state.pensadero[idx];
+      registerHabitStreak(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         item.streakCount = (item.streakCount || 0) + 1;
         item.lastCompleted = new Date().toISOString();
@@ -5867,8 +6176,8 @@
         alert(`🎉 ¡Racha alimentada! Llevas ${item.streakCount} días consecutivos en este hábito. Neurotransmisores de dopamina recargados.`);
       }
 
-      openPersonalCRM(idx) {
-        const item = this.state.pensadero[idx];
+      openPersonalCRM(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         const name = item.contactName || "Carlos Méndez";
         const context = item.contactContext || "Le encanta el café de especialidad. Su mamá estuvo en el hospital la semana pasada. No hablar de política.";
@@ -5878,8 +6187,8 @@
         }
       }
 
-      registerFinancialFriction(idx) {
-        const item = this.state.pensadero[idx];
+      registerFinancialFriction(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         const currentAmount = item.amount || 50;
         const res = prompt(`💳 Fricción Financiera TDAH\n\n¿Cuánto cuesta esta compra/gasto ($ USD)?`, currentAmount);
@@ -5912,8 +6221,8 @@
         }
       }
 
-      hibernateThought(idx, days = 14) {
-        const item = this.state.pensadero[idx];
+      hibernateThought(target, days = 14) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         item.category = 'humo_ceniza';
         item.hibernatedUntil = Date.now() + days * 86400000;
@@ -5925,8 +6234,8 @@
         alert(`❄️ Pensamiento hibernado por ${days} días.\nSe ha hundido en el núcleo del Pensadero para no sobrecargar tu pantalla.`);
       }
 
-      wakeThought(idx) {
-        const item = this.state.pensadero[idx];
+      wakeThought(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         item.hibernatedUntil = null;
         item.category = 'humo_dorado';
@@ -5939,8 +6248,8 @@
         alert(`☀️ Pensamiento despertado y devuelto a Proyectos Oro.`);
       }
 
-      sendPensaderoToFreeform(idx) {
-        const item = this.state.pensadero[idx];
+      sendPensaderoToFreeform(target) {
+        const item = this.getPensaderoItem(target);
         if (!item) return;
         this.navigate('freeform');
         setTimeout(() => {
