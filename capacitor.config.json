@@ -1,6 +1,6 @@
 {
-  "appId": "com.proyectazo.app",
-  "appName": "Proyectazo",
+  "appId": "com.nexus.orb",
+  "appName": "Nexus Orb",
   "webDir": ".",
   "bundledWebRuntime": false,
   "server": {

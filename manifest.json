@@ -1,17 +1,35 @@
 {
-  "name": "Proyectazo — FocusFlow OS",
-  "short_name": "Proyectazo",
-  "description": "Sistema unificado de gestión multiproyecto diseñado para TDAH. Offline-first y multiplataforma.",
+  "name": "Nexus Orb — Ecosistema Cognitivo TDAH",
+  "short_name": "Nexus Orb",
+  "description": "Sistema cognitivo de gestión multiproyecto diseñado para TDAH con Nexus Orb 3D, Ruido Marrón y Lienzo Creativo Freeform.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#080c14",
-  "theme_color": "#0f172a",
+  "background_color": "#070a10",
+  "theme_color": "#10b981",
   "orientation": "any",
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Nexus Orb",
+      "url": "./index.html#pensadero",
+      "description": "Orbe 3D para vaciado de mente y canalización de ideas"
+    },
+    {
+      "name": "Hoy & Foco",
+      "url": "./index.html#hoy",
+      "description": "Ver tareas del día y sugerencia de arranque"
+    },
+    {
+      "name": "Lienzo Freeform",
+      "url": "./index.html#freeform",
+      "description": "Dibujo libre, bocetos y notas adhesivas"
+    }
+  ],
   "icons": [
     {
       "src": "./favicon.svg",
-      "sizes": "any",
+      "sizes": "192x192 512x512 any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }

@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Copy web files
 COPY index.html /usr/share/nginx/html/

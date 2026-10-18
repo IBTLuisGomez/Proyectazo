@@ -1,11 +1,11 @@
 #!/bin/bash
 # ==============================================================================
-# Script de Despliegue en DigitalOcean Droplet — Proyectazo FocusFlow OS
+# Script de Despliegue en DigitalOcean Droplet — NEXUS Ecosistema Cognitivo TDAH
 # ==============================================================================
 
 set -e
 
-echo "🚀 Iniciando despliegue de Proyectazo en DigitalOcean Droplet..."
+echo "🚀 Iniciando despliegue de NEXUS en DigitalOcean Droplet..."
 
 # 1. Actualizar paquetes del sistema
 echo "📦 Actualizando paquetes de Ubuntu/Debian..."

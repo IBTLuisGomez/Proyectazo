@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir pydantic python-dotenv google-genai
+
+# Copy service script
+COPY nexus_service.py .
+
+EXPOSE 8002
+
+ENV PORT=8002
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "nexus_service.py"]

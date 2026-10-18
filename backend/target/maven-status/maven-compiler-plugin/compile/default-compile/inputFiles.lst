@@ -1,5 +1,7 @@
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\config\CorsConfig.java
+C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\config\DataInitializer.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\controller\InboxController.java
+C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\controller\PensaderoController.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\controller\ProjectController.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\controller\SessionLogController.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\controller\SyncController.java
@@ -8,15 +10,18 @@ C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\co
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\dto\SyncDataDTO.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\dto\TaskMoveRequest.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\model\InboxItem.java
+C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\model\PensaderoItem.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\model\Project.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\model\SessionLog.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\model\Task.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\ProyectazoApiApplication.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\repository\InboxItemRepository.java
+C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\repository\PensaderoItemRepository.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\repository\ProjectRepository.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\repository\SessionLogRepository.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\repository\TaskRepository.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\service\InboxService.java
+C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\service\PensaderoService.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\service\ProjectService.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\service\SessionLogService.java
 C:\Users\WINDOWS\Documents\000 LocalProjects\Proyectazo\backend\src\main\java\com\proyectazo\service\SyncService.java

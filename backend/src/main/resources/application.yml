@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: proyectazo-api
+    name: nexus-api
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/proyectazo_db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE}

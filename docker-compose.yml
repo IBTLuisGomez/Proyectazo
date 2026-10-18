@@ -3,57 +3,70 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: proyectazo-postgres
+    container_name: nexus-postgres
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-proyectazo_db}
-      POSTGRES_USER: ${POSTGRES_USER:-proyectazo_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-proyectazo_secret_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-nexus_db}
+      POSTGRES_USER: ${POSTGRES_USER:-nexus_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexus_secret_2026}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-proyectazo_user} -d ${POSTGRES_DB:-proyectazo_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nexus_user} -d ${POSTGRES_DB:-nexus_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - proyectazo_net
+      - nexus_net
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: proyectazo-backend
+    container_name: nexus-backend
     restart: always
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-proyectazo_db}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-proyectazo_user}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-proyectazo_secret_2026}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nexus_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nexus_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-nexus_secret_2026}
       SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
       PORT: 8081
     networks:
-      - proyectazo_net
+      - nexus_net
+
+  nexus-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile.nexus
+    container_name: nexus-ai-microservice
+    restart: always
+    environment:
+      PORT: 8002
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    networks:
+      - nexus_net
 
   frontend:
     build:
       context: .
       dockerfile: nginx/Dockerfile
-    container_name: proyectazo-frontend
+    container_name: nexus-frontend
     restart: always
     depends_on:
       - backend
+      - nexus-ai
     ports:
-      - "${PORT:-80}:80"
+      - "${PORT:-8080}:80"
     networks:
-      - proyectazo_net
+      - nexus_net
 
 volumes:
   postgres_data:
     driver: local
 
 networks:
-  proyectazo_net:
+  nexus_net:
     driver: bridge
