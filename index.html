@@ -60,6 +60,37 @@
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 999px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.7); }
 
+    /* Estilos del Orbe Fullscreen y Navegación Dinámica */
+    body.orb-fullview header,
+    body.orb-fullview #mobile-nav,
+    body.orb-fullview #sticky-red-alert-bar,
+    body.orb-fullview #sprint-timer-bar,
+    body.orb-fullview #universal-nexus-fab {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    @media (max-width: 767px) {
+      body.orb-fullview header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(180deg, rgba(7, 10, 16, 0.85) 0%, transparent 100%) !important;
+        border-bottom: none !important;
+        z-index: 30;
+      }
+      body.orb-fullview #mobile-nav {
+        position: fixed !important;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(0deg, rgba(7, 10, 16, 0.92) 0%, transparent 100%) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+        z-index: 30;
+      }
+    }
+
+
     /* ==========================================================================
        SISTEMA DE TEMAS: CLARO vs OSCURO SUAVE (COLORES MÁS CLAROS) vs NOCHE
        ========================================================================== */
@@ -200,8 +231,40 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- Canvas para animación de confeti de dopamina -->
-  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-[100]"></canvas>
+  <!-- ================= SPLASH INTRO CINEMÁTICA MÓVIL (VIDEO NEXUSORB_NEON) ================= -->
+  <div id="nexus-splash-overlay" class="fixed inset-0 z-[120] bg-[#070A10] flex flex-col justify-between items-center transition-all duration-700 p-4 sm:p-6 opacity-0 pointer-events-none hidden">
+    <!-- Top Skip / Brand Header -->
+    <div class="w-full max-w-md flex items-center justify-between z-10 pt-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <span class="font-display font-extrabold text-sm tracking-wider text-white block leading-tight">Nexus Orb</span>
+          <span class="text-[9px] font-mono text-cyan-400">Cognitive OS • Intro</span>
+        </div>
+      </div>
+      <button onclick="app.dismissSplash()" class="px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-300 hover:text-white backdrop-blur flex items-center gap-1 active:scale-95 transition shadow">
+        <span>Omitir</span> <span>➔</span>
+      </button>
+    </div>
+
+    <!-- Center Cinematic Video Sphere -->
+    <div class="relative w-72 h-72 xs:w-80 xs:h-80 my-auto flex items-center justify-center">
+      <div class="absolute inset-0 rounded-full blur-3xl opacity-60 bg-gradient-to-tr from-cyan-500/30 via-purple-600/30 to-amber-500/30 animate-pulse pointer-events-none"></div>
+      <div class="relative w-full h-full rounded-full overflow-hidden shadow-[0_0_60px_rgba(6,182,212,0.4)] flex items-center justify-center bg-black border border-cyan-500/30">
+        <video id="nexus-splash-video" src="assets/NexusOrb_Neon.mp4" playsinline webkit-playsinline class="w-full h-full object-cover scale-105"></video>
+      </div>
+    </div>
+
+    <!-- Bottom Action / Enter -->
+    <div class="w-full max-w-xs flex flex-col items-center gap-3 z-10 pb-4">
+      <button onclick="app.dismissSplash()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:brightness-110 text-white font-display font-extrabold text-sm shadow-xl shadow-cyan-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+        <span>✨</span> <span>Entrar al Sistema</span> <span>➔</span>
+      </button>
+      <p class="text-[10px] font-mono text-slate-400 text-center">Toca para comenzar tu sesión sin fricción</p>
+    </div>
+  </div>
 
   <!-- ================= MODO ZEN / HIPERFOCO (PANTALLA LIMPIA) ================= -->
   <div id="zen-overlay" class="hidden fixed inset-0 z-50 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center transition-all bg-black/80">
@@ -432,8 +495,8 @@
     <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter text-left">
       <div class="flex items-start justify-between mb-3 pb-3 border-b theme-border">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-xl shadow-lg shadow-purple-500/25">
-            🎙️
+          <div class="w-10 h-10 rounded-2xl overflow-hidden border border-purple-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/25">
+            <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
           </div>
           <div>
             <h3 class="text-base font-display font-extrabold flex items-center gap-2">
@@ -507,9 +570,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       
       <!-- Brand & Status -->
-      <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none" onclick="app.navigate('hoy')">
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/25 font-black text-base sm:text-lg shrink-0">
-          ⚡
+      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none" onclick="app.navigate('pensadero')">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-cyan-500/30 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+          <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
         </div>
         <div>
           <div class="flex items-center gap-1.5 sm:gap-2">
@@ -550,21 +613,21 @@
       </nav>
 
       <!-- Global Actions (Quick capture, Sprint Timer, Mobile App/WhatsApp, Theme & Settings) -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         <!-- Mobile App & WhatsApp Share -->
-        <button onclick="app.openMobileAppModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition" title="Instalar en Celular / Tablet o Enviar por WhatsApp">
+        <button onclick="app.openMobileAppModal()" class="flex items-center gap-1 px-2 py-1.5 sm:px-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition" title="Instalar en Celular / Tablet o Enviar por WhatsApp">
           <span>📲</span>
-          <span class="hidden lg:inline">Bajar App / WhatsApp</span>
+          <span class="hidden sm:inline">Instalar App</span>
         </button>
 
-        <!-- Sprint Timer Trigger -->
-        <button onclick="app.toggleTimerWidget()" id="timer-trigger-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-card-subtle hover:brightness-110 text-xs font-mono font-semibold border theme-border transition" title="Temporizador de Sprint">
+        <!-- Sprint Timer Trigger (Visible on larger screens) -->
+        <button onclick="app.toggleTimerWidget()" id="timer-trigger-btn" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-card-subtle hover:brightness-110 text-xs font-mono font-semibold border theme-border transition" title="Temporizador de Sprint">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="timer-dot"></span>
           <span id="header-timer-display">25:00</span>
         </button>
 
         <!-- Quick Capture Button -->
-        <button onclick="app.openQuickCapture()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-md shadow-brand-500/20 active:scale-95 transition" title="Captura rápida (Ctrl+K)">
+        <button onclick="app.openQuickCapture()" class="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-md shadow-brand-500/20 active:scale-95 transition" title="Captura rápida (Ctrl+K)">
           <span>+</span>
           <span class="hidden sm:inline">Capturar</span>
           <kbd class="hidden lg:inline text-[9px] bg-brand-700/60 px-1.5 py-0.5 rounded font-mono ml-0.5">Ctrl+K</kbd>
@@ -627,8 +690,10 @@
   <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg border-t theme-header pb-[env(safe-area-inset-bottom,0px)] transition-colors">
     <div class="grid grid-cols-5 h-16 items-center px-1" id="mobile-nav">
       <button onclick="app.navigate('pensadero')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="pensadero">
-        <span class="text-base">🔮</span>
-        <span class="text-[9px] font-semibold mt-0.5 whitespace-nowrap">Nexus Orb</span>
+        <div class="w-5 h-5 rounded-md overflow-hidden border border-cyan-500/40 shrink-0 mb-0.5">
+          <img src="assets/nexus_n.jpg" alt="Nexus" class="w-full h-full object-cover">
+        </div>
+        <span class="text-[9px] font-semibold whitespace-nowrap">Nexus Orb</span>
       </button>
       <button onclick="app.navigate('hoy')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="hoy">
         <span class="text-base">🏠</span>
@@ -642,16 +707,18 @@
         <span class="text-base">🎨</span>
         <span class="text-[9px] font-semibold mt-0.5">Lienzo</span>
       </button>
-      <button onclick="app.openMobileAppModal()" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition">
-        <span class="text-base">📲</span>
-        <span class="text-[9px] font-semibold mt-0.5">Bajar App</span>
+      <button onclick="app.openMobileAppModal()" class="bnav-btn flex flex-col items-center justify-center py-1 text-emerald-400 hover:text-emerald-300 transition">
+        <span class="text-base animate-pulse">📲</span>
+        <span class="text-[9px] font-bold mt-0.5 whitespace-nowrap">Instala Aquí</span>
       </button>
     </div>
   </nav>
 
   <!-- Universal Floating Action Button: [ Mic / FAB "Nexus" ] -->
-  <button onclick="app.openNexusVoice('streaming')" class="fixed bottom-6 right-6 z-40 px-4 py-3 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 text-white shadow-2xl shadow-purple-500/40 hover:scale-105 active:scale-95 transition flex items-center gap-2.5 group border border-purple-400/40" title="Nexus: Audio Streaming & Captura Inteligente Gemini">
-    <span class="text-xl animate-pulse">🎙️</span>
+  <button id="universal-nexus-fab" onclick="app.openNexusVoice('streaming')" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 text-white shadow-2xl shadow-purple-500/40 hover:scale-105 active:scale-95 transition flex items-center gap-2 group border border-purple-400/40" title="Nexus: Audio Streaming & Captura Inteligente Gemini">
+    <div class="w-6 h-6 rounded-full overflow-hidden border border-white/40 shrink-0">
+      <img src="assets/nexus_n.jpg" alt="Nexus" class="w-full h-full object-cover">
+    </div>
     <span class="text-xs font-bold font-display tracking-wide flex items-center gap-1.5">
       <span>Nexus IA</span>
       <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
@@ -1007,20 +1074,67 @@
     <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter">
       <div class="flex items-start justify-between mb-4 pb-3 border-b theme-border">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/30">
-            📲
+          <div class="w-12 h-12 rounded-2xl overflow-hidden border border-emerald-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+            <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
           </div>
           <div>
-            <h3 class="text-base font-display font-extrabold">Bajar App & Enviar por WhatsApp</h3>
-            <p class="text-xs theme-text-muted">Multiplataforma para Celulares, Tablets (iPad/Android) y PC</p>
+            <h3 class="text-base font-display font-extrabold text-white">Instalar Nexus Orb en tu Dispositivo</h3>
+            <p class="text-xs theme-text-muted">App nativa instalable para Android, iPhone, iPad y PC</p>
           </div>
         </div>
         <button onclick="app.closeModal('modal-mobile-app')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="space-y-4 text-xs">
-        <!-- 1. Enlace por WhatsApp -->
-        <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5">
+        <!-- 1. Botón de Instalación Directa / Instala Aquí -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-teal-500/15 to-cyan-500/20 border-2 border-emerald-500/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="font-extrabold text-sm text-emerald-300">📲 Instala Aquí en 1 Clic</span>
+            </div>
+            <span class="text-[11px] theme-text-muted block mt-0.5">Se agrega como aplicación real a tu pantalla de inicio, sin barra de navegador y con icono de Nexus.</span>
+          </div>
+          <button onclick="app.installPWA()" id="pwa-direct-install-btn" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider shrink-0 shadow-xl shadow-emerald-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+            <span>⚡</span> <span id="pwa-btn-label">Instalar Aquí</span>
+          </button>
+        </div>
+
+        <!-- 1.1 App Nativa Android en Kotlin -->
+        <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="space-y-0.5 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-1.5">
+              <span class="text-xs font-mono font-bold text-cyan-300">🤖 App Android Nativa (Kotlin + Gradle)</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Java 17</span>
+            </div>
+            <p class="text-[11px] theme-text-muted">Proyecto Android Studio completo en carpeta <code class="text-cyan-400 font-mono">/android/</code> con Splash nativo en video y puente háptico.</p>
+          </div>
+          <span class="px-3 py-1.5 rounded-xl bg-cyan-500/20 text-cyan-300 font-mono font-bold text-[11px] shrink-0 border border-cyan-500/40">
+            android/
+          </span>
+        </div>
+
+        <!-- 2. Escaneo QR para Celulares y Tablets -->
+        <div class="p-4 rounded-2xl theme-card-subtle border theme-border flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+          <div id="mobile-app-qr" class="shrink-0">
+            <!-- QR generado dinámicamente -->
+          </div>
+          <div class="space-y-1.5 flex-1">
+            <span class="font-bold text-xs block">📷 Escanear con Celular o Tablet</span>
+            <p class="text-[11px] theme-text-muted">
+              Apunta la cámara de tu smartphone o iPad a este código QR para abrir la app sin necesidad de teclear la dirección.
+            </p>
+            <div class="flex items-center gap-2 pt-1">
+              <input type="text" id="mobile-app-url" readonly class="flex-1 px-2.5 py-1 rounded-lg theme-card border theme-border text-[11px] font-mono truncate" />
+              <button onclick="app.copyAppUrl()" id="copy-url-btn" class="px-2.5 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-[11px] shrink-0 transition">
+                Copiar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Enlace por WhatsApp -->
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400 flex items-center gap-1.5 text-xs">
               <span>💬</span> Mandar enlace por WhatsApp
@@ -1043,36 +1157,6 @@
               Enviar directo →
             </button>
           </div>
-        </div>
-
-        <!-- 2. Escaneo QR para Celulares y Tablets -->
-        <div class="p-4 rounded-2xl theme-card-subtle border theme-border flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-          <div id="mobile-app-qr" class="shrink-0">
-            <!-- QR generado dinámicamente -->
-          </div>
-          <div class="space-y-1.5 flex-1">
-            <span class="font-bold text-xs block">📷 Escanear con Celular o Tablet</span>
-            <p class="text-[11px] theme-text-muted">
-              Apunta la cámara de tu smartphone o iPad a este código QR para abrir la app sin necesidad de teclear la dirección.
-            </p>
-            <div class="flex items-center gap-2 pt-1">
-              <input type="text" id="mobile-app-url" readonly class="flex-1 px-2.5 py-1 rounded-lg theme-card border theme-border text-[11px] font-mono truncate" />
-              <button onclick="app.copyAppUrl()" id="copy-url-btn" class="px-2.5 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-[11px] shrink-0 transition">
-                Copiar
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Botón de Instalación Directa PWA -->
-        <div class="p-3.5 rounded-2xl theme-card-subtle border theme-border flex items-center justify-between gap-3">
-          <div>
-            <span class="font-bold block text-xs">📥 Instalar como Aplicación Nativa (PWA)</span>
-            <span class="text-[11px] theme-text-muted">Funciona offline, sin barra de direcciones y con icono propio.</span>
-          </div>
-          <button onclick="app.installPWA()" id="pwa-direct-install-btn" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shrink-0 shadow-md transition">
-            Instalar Ahora
-          </button>
         </div>
 
         <!-- 4. Guía por Plataforma (Android, iOS/iPad, Tablet) -->
@@ -1354,7 +1438,8 @@
       init(canvas) {
         if (!canvas) return;
         this.canvas = canvas;
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        const gl = canvas.getContext('webgl', { alpha: true, antialias: true }) || 
+                   canvas.getContext('experimental-webgl', { alpha: true, antialias: true });
         if (!gl) {
           console.warn("WebGL no disponible en este dispositivo.");
           return;
@@ -1383,13 +1468,14 @@
           uniform float u_expansion;
           uniform float u_flash;
 
+          // Simplex 3D Noise (Ian McEwan, Stefan Gustavson)
           vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
           vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-          vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+          vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
           vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
           float snoise(vec3 v) {
-            const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+            const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
             const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
             vec3 i  = floor(v + dot(v, C.yyy));
             vec3 x0 = v - i + dot(i, C.xxx);
@@ -1410,32 +1496,33 @@
             vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
             vec4 x_ = floor(j * ns.z);
             vec4 y_ = floor(j - 7.0 * x_);
-            vec4 x = x_ *ns.x + ns.yyyy;
-            vec4 y = y_ *ns.x + ns.yyyy;
+            vec4 x = x_ * ns.x + ns.yyyy;
+            vec4 y = y_ * ns.x + ns.yyyy;
             vec4 h = 1.0 - abs(x) - abs(y);
             vec4 b0 = vec4(x.xy, y.xy);
             vec4 b1 = vec4(x.zw, y.zw);
-            vec4 s0 = floor(b0)*2.0 + 1.0;
-            vec4 s1 = floor(b1)*2.0 + 1.0;
+            vec4 s0 = floor(b0) * 2.0 + 1.0;
+            vec4 s1 = floor(b1) * 2.0 + 1.0;
             vec4 sh = -step(h, vec4(0.0));
-            vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
-            vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+            vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+            vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
             vec3 p0 = vec3(a0.xy, h.x);
             vec3 p1 = vec3(a0.zw, h.y);
             vec3 p2 = vec3(a1.xy, h.z);
             vec3 p3 = vec3(a1.zw, h.w);
-            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+            vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
             p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+            vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
             m = m * m;
-            return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+            return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
           }
 
+          // FBM de 4 octavas para volutas de humo orgánicas
           float fbm(vec3 p) {
             float f = 0.0;
-            float amp = 0.5;
+            float amp = 0.52;
             float freq = 1.0;
-            for(int i = 0; i < 4; i++) {
+            for (int i = 0; i < 4; i++) {
               f += amp * snoise(p * freq);
               amp *= 0.5;
               freq *= 2.05;
@@ -1443,53 +1530,134 @@
             return f;
           }
 
+          mat2 rot2D(float a) {
+            float c = cos(a), s = sin(a);
+            return mat2(c, -s, s, c);
+          }
+
           void main() {
-            vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / min(u_resolution.x, u_resolution.y);
-            float dist = length(uv);
+            // Normalizar coordenadas centradas en [-1.0, 1.0]
+            vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / (0.5 * min(u_resolution.x, u_resolution.y));
+            float d2d = length(uv);
 
-            float radius = 0.38 + u_expansion * 0.04 * sin(u_time * 2.0);
-            float pulseMod = 1.0 + 0.18 * u_pulse * sin(u_time * 7.0);
-            radius *= pulseMod;
+            // Cámara y dirección del rayo
+            vec3 ro = vec3(0.0, 0.0, 2.5);
+            vec3 rd = normalize(vec3(uv, -1.6));
 
-            float satRing = 0.0;
+            // ORBE DE CRISTAL FIJO (Radio R = 0.88)
+            float R = 0.88;
+            float b = dot(ro, rd);
+            float c = dot(ro, ro) - R * R;
+            float h = b * b - c;
+
+            // Halo suave y resplandor neón ambiental exterior
+            if (h < 0.0) {
+              float outerGlow = smoothstep(R + 0.35, R, d2d);
+              float pulseAura = 1.0 + 0.15 * u_pulse * sin(u_time * 6.0);
+              vec3 haloCol = u_color * outerGlow * 0.45 * pulseAura * (1.0 - u_sink * 0.5);
+              gl_FragColor = vec4(haloCol, outerGlow * 0.5);
+              return;
+            }
+
+            // Puntos de intersección del rayo con el cristal
+            float sqrtH = sqrt(h);
+            float tFront = -b - sqrtH;
+            float tBack = -b + sqrtH;
+
+            vec3 pFront = ro + rd * tFront;
+            vec3 N = normalize(pFront);
+
+            // ==========================================
+            // ÓPTICA REAL DE CRISTAL (ESFERA FIJA 3D)
+            // ==========================================
+            // 1. Borde Fresnel reflectante y cristalino
+            float fresnel = pow(1.0 - max(dot(-rd, N), 0.0), 2.8);
+            vec3 glassRim = mix(vec3(0.85, 0.95, 1.0), u_color, 0.35) * fresnel * 1.5;
+
+            // 2. Destellos especulares duales (luz de estudio superior y rebote)
+            vec3 Rfl = reflect(rd, N);
+            vec3 lightKey = normalize(vec3(-0.6, 0.8, 0.9));
+            vec3 lightFill = normalize(vec3(0.55, -0.65, 0.5));
+            
+            float spec1 = pow(max(dot(Rfl, lightKey), 0.0), 64.0);
+            float spec1Soft = pow(max(dot(Rfl, lightKey), 0.0), 18.0) * 0.35;
+            float spec2 = pow(max(dot(Rfl, lightFill), 0.0), 28.0) * 0.4;
+            vec3 glassSpecular = vec3(1.0) * (spec1 + spec1Soft) + (u_color * 0.6 + vec3(0.4)) * spec2;
+
+            // 3. Cáustica interna en la base curva del cristal
+            float bottomCaustic = smoothstep(-0.3, -0.85, N.y) * pow(1.0 - abs(N.z), 2.2) * 0.5;
+            vec3 glassCaustic = (u_color * 0.85 + vec3(0.45)) * bottomCaustic;
+
+            // ==========================================
+            // HUMO VOLUMÉTRICO DINÁMICO (INTERIOR FLUIDO)
+            // ==========================================
+            // Refracción del rayo al penetrar el orbe de cristal (IOR ~ 1.45)
+            vec3 refrRd = refract(rd, N, 1.0 / 1.45);
+            if (dot(refrRd, refrRd) < 0.001) refrRd = rd;
+
+            // Marcha volumétrica a través del humo atrapado en el cristal
+            float stepDist = (tBack - tFront) / 18.0;
+            vec3 p = pFront + refrRd * (stepDist * 0.4);
+
+            vec3 smokeAcc = vec3(0.0);
+            float transmission = 1.0;
+
+            float timeScale = u_time * (0.35 + u_turbulence * 0.5);
+            float pulseMod = 1.0 + 0.25 * u_pulse * sin(u_time * 8.0);
+
+            for (int i = 0; i < 18; i++) {
+              float rNorm = length(p) / R;
+              if (rNorm < 0.96) {
+                // Vórtice y rotación 3D del humo
+                vec3 q = p;
+                float swirlAngle = timeScale * (1.1 - rNorm * 0.5);
+                q.xz = rot2D(swirlAngle) * q.xz;
+                q.yz = rot2D(timeScale * 0.6) * q.yz;
+
+                // Ascenso y convección del humo
+                q.y -= u_time * 0.22 * (1.0 - u_sink * 1.4);
+
+                // Muestreo FBM de densidad
+                float noiseVal = fbm(q * (2.8 + u_turbulence * 1.2) + vec3(0.0, u_time * 0.1, 0.0));
+
+                // Densidad confinada orgánicamente dentro del cristal
+                float d = smoothstep(-0.15, 0.55, noiseVal);
+                d *= smoothstep(0.96, 0.65, rNorm);
+                d *= (u_density * 0.85 + 0.25);
+                d *= (1.0 - u_dissipation * 0.65);
+
+                if (d > 0.01) {
+                  // Gradiente cromático: Núcleo profundo + Manto neón seleccionado
+                  vec3 colStep = mix(u_coreColor, u_color, smoothstep(0.05, 0.7, noiseVal));
+                  // Incandescencia en filamentos densos
+                  colStep += vec3(0.9, 0.95, 1.0) * pow(max(noiseVal, 0.0), 3.0) * 0.9;
+                  colStep *= pulseMod;
+
+                  if (u_flash > 0.01) {
+                    colStep += vec3(u_flash * 0.8);
+                  }
+
+                  float stepAlpha = clamp(d * 0.32, 0.0, 1.0);
+                  smokeAcc += colStep * stepAlpha * transmission;
+                  transmission *= (1.0 - stepAlpha);
+
+                  if (transmission < 0.03) break;
+                }
+              }
+              p += refrRd * stepDist;
+            }
+
+            // Satélites / Partículas orbitales resonantes
             if (u_satellites > 0.01) {
-              float ringD = abs(dist - 0.44);
-              float satNoise = snoise(vec3(uv * 5.0, u_time * 0.8));
-              satRing = smoothstep(0.025, 0.0, ringD) * (0.6 + 0.4 * satNoise) * u_satellites;
+              float satNoise = snoise(vec3(uv * 4.0, u_time * 0.9));
+              float satGlow = smoothstep(0.08, 0.0, abs(d2d - 0.72)) * (0.6 + 0.4 * satNoise) * u_satellites;
+              smokeAcc += vec3(0.7, 0.4, 1.0) * satGlow * 1.2;
             }
 
-            float angle = atan(uv.y, uv.x);
-            float swirl = angle + u_time * (0.35 + u_turbulence * 0.6);
-            vec2 swirlUv = vec2(cos(swirl), sin(swirl)) * dist;
-
-            vec3 noiseCoord = vec3(swirlUv * (3.0 + u_turbulence * 2.0), u_time * 0.3);
-            if (u_sink > 0.01) {
-              noiseCoord += vec3(0.0, 0.0, -u_time * 0.8 * u_sink);
-            }
-            float n = fbm(noiseCoord);
-
-            float sphereEdge = smoothstep(radius, radius - 0.14, dist + n * (0.05 + 0.08 * u_turbulence));
-            float rim = smoothstep(radius - 0.15, radius, dist) * sphereEdge;
-            float core = smoothstep(0.18 * (1.0 - u_sink * 0.5), 0.0, dist);
-
-            vec3 col = mix(u_coreColor, u_color, sphereEdge);
-            col += u_color * rim * 1.6;
-            col = mix(col, vec3(1.0), core * 0.6 * (1.0 - u_sink));
-
-            if (u_flash > 0.01) {
-              col += vec3(u_flash * 0.7);
-            }
-
-            if (satRing > 0.01) {
-              col = mix(col, vec3(0.75, 0.45, 1.0), satRing * 0.85);
-            }
-
-            float alpha = sphereEdge * (u_density * (1.0 - u_dissipation * 0.6));
-            alpha = clamp(alpha + satRing * 0.8, 0.0, 1.0);
-
-            vec3 bg = vec3(0.043, 0.059, 0.090); // #0B0F17
-            float aura = smoothstep(radius + 0.18, radius, dist) * 0.25 * (1.0 - u_sink * 0.7);
-            vec3 finalColor = mix(bg + u_color * aura, col, alpha);
+            // Composición: Humo volumétrico fluido contenido dentro de la esfera fija de cristal
+            vec3 finalColor = smokeAcc + glassRim + glassSpecular + glassCaustic;
+            vec3 glassBg = vec3(0.03, 0.045, 0.075);
+            finalColor = mix(glassBg, finalColor, clamp(1.0 - transmission * 0.25 + fresnel * 0.9 + spec1, 0.0, 1.0));
 
             gl_FragColor = vec4(finalColor, 1.0);
           }
@@ -1608,8 +1776,9 @@
         const gl = this.gl;
         if (!gl || !this.program || !this.canvas) return;
 
-        const width = this.canvas.clientWidth;
-        const height = this.canvas.clientHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const width = Math.floor((this.canvas.clientWidth || 320) * dpr);
+        const height = Math.floor((this.canvas.clientHeight || 320) * dpr);
         if (this.canvas.width !== width || this.canvas.height !== height) {
           this.canvas.width = width;
           this.canvas.height = height;
@@ -1727,7 +1896,17 @@
           if (raw) {
             this.state = JSON.parse(raw);
           } else {
-            this.state = this.getSeedData();
+            // Check legacy keys to avoid losing data
+            const legacyKeys = ['nexus_orb_v1', 'proyectazo_unified_v1', 'proyectazo_data'];
+            let foundLegacy = null;
+            for (const lk of legacyKeys) {
+              const leg = localStorage.getItem(lk);
+              if (leg) {
+                foundLegacy = JSON.parse(leg);
+                break;
+              }
+            }
+            this.state = foundLegacy || this.getSeedData();
             this.saveState();
           }
         } catch (e) {
@@ -1738,8 +1917,11 @@
         if (!this.state.settings) {
           this.state.settings = { sound: true, vibration: true, theme: 'theme-dark-soft', userName: 'Usuario' };
         }
-        if (!this.state.pensadero || this.state.pensadero.length <= 3) {
+        if (!this.state.pensadero) {
           this.state.pensadero = this.getDefaultPensadero();
+        }
+        if (!this.state.projects || this.state.projects.length === 0) {
+          this.state.projects = this.getSeedData().projects;
         }
         if (!this.state.inbox) {
           this.state.inbox = [];
@@ -2052,12 +2234,87 @@
           });
         }
 
+        window.addEventListener('popstate', (e) => {
+          // If any modal or zen mode is open, close it first
+          const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
+          if (openModal && openModal.id !== 'confetti-canvas') {
+            this.closeZenMode();
+            this.closeAllModals();
+            return;
+          }
+          if (e.state && e.state.view) {
+            this.navigate(e.state.view, false);
+          } else {
+            // Default to main entrance view
+            this.navigate('pensadero', false);
+          }
+        });
+
+        // Initialize history state on first landing
+        if (!window.location.hash) {
+          window.history.replaceState({ view: this.currentView }, '', `#${this.currentView}`);
+        } else {
+          const hashView = window.location.hash.replace('#', '');
+          if (hashView) this.currentView = hashView;
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
           e.preventDefault();
           this.deferredPrompt = e;
           const btn = document.getElementById('pwa-direct-install-btn');
           if (btn) btn.classList.remove('hidden');
+          const lbl = document.getElementById('pwa-btn-label');
+          this.initSplash();
         });
+
+        // Initialize Splash Intro on mobile if not seen yet
+        setTimeout(() => this.initSplash(), 100);
+      }
+
+      // --- SPLASH INTRO CINEMÁTICA MÓVIL (NEXUSORB_NEON.MP4) ---
+      initSplash() {
+        const isMobile = window.innerWidth < 768;
+        const alreadySeen = sessionStorage.getItem('nexus_intro_seen');
+        if (isMobile && !alreadySeen) {
+          this.showSplash();
+        }
+      }
+
+      showSplash() {
+        const overlay = document.getElementById('nexus-splash-overlay');
+        const video = document.getElementById('nexus-splash-video');
+        if (!overlay) return;
+
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          overlay.classList.add('opacity-100');
+        }, 20);
+
+        if (video) {
+          video.currentTime = 0;
+          video.muted = true;
+          video.play().catch(e => console.log('Video autoplay:', e));
+          video.onended = () => {
+            this.dismissSplash();
+          };
+        }
+      }
+
+      dismissSplash() {
+        const overlay = document.getElementById('nexus-splash-overlay');
+        const video = document.getElementById('nexus-splash-video');
+        if (video) {
+          video.pause();
+        }
+        if (overlay) {
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          overlay.classList.remove('opacity-100');
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+          }, 700);
+        }
+        sessionStorage.setItem('nexus_intro_seen', 'true');
       }
 
       // --- SÍNTESIS DE RUIDO MARRÓN FOCUS (WEB AUDIO API) ---
@@ -2238,10 +2495,23 @@
           });
           if (res.ok) {
             const data = await res.json();
-            if (data && data.projects) {
-              this.state.projects = data.projects;
-              if (data.inbox) this.state.inbox = data.inbox;
-              if (data.pensadero) this.state.pensadero = data.pensadero;
+            if (data && data.projects && data.projects.length > 0) {
+              // Merge projects intelligently
+              const existingIds = new Set((this.state.projects || []).map(p => p.id));
+              for (const bp of data.projects) {
+                if (!existingIds.has(bp.id)) {
+                  this.state.projects.push(bp);
+                }
+              }
+              // Merge thoughts
+              if (data.pensadero && Array.isArray(data.pensadero)) {
+                const existingPenIds = new Set((this.state.pensadero || []).map(p => p.id));
+                for (const bp of data.pensadero) {
+                  if (!existingPenIds.has(bp.id)) {
+                    this.state.pensadero.push(bp);
+                  }
+                }
+              }
               this.saveState();
               this.render();
               if (showNotification) alert("✓ Sincronización con Spring Boot completada con éxito.");
@@ -2331,7 +2601,10 @@
       }
 
       // --- NAVIGATION ---
-      navigate(viewName) {
+      navigate(viewName, pushHistory = true) {
+        if (this.currentView !== viewName && pushHistory) {
+          window.history.pushState({ view: viewName }, '', `#${viewName}`);
+        }
         this.currentView = viewName;
         
         document.querySelectorAll('.nav-btn, .bnav-btn').forEach(btn => {
@@ -2813,6 +3086,9 @@
 
               <!-- Atajos de Cabina -->
               <div class="flex items-center gap-1.5">
+                <button onclick="app.showSplash()" class="px-2.5 py-1 rounded-xl bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25 border border-cyan-500/30 text-[11px] font-semibold flex items-center gap-1 transition" title="Ver intro cinemática Nexus">
+                  <span>🎬</span> <span class="hidden sm:inline">Intro</span>
+                </button>
                 <button onclick="app.triggerShockwave()" class="px-2.5 py-1 rounded-xl bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 text-[11px] font-semibold flex items-center gap-1 transition" title="Pulso de alivio y dispersión de partículas">
                   <span>🌊</span> <span class="hidden sm:inline">Pulso</span>
                 </button>
@@ -2828,8 +3104,8 @@
               </div>
             </div>
 
-            <!-- CUENCA CENTRAL 3D / SHADER GLSL DEL PENSADERO (DOMINANTE E INMERSIVO) -->
-            <div class="pensadero-basin relative flex-1 min-h-[280px] sm:min-h-[340px] md:min-h-[44vh] rounded-3xl border border-slate-800/90 bg-[#070A10] text-center overflow-hidden shadow-2xl flex flex-col justify-between p-3 sm:p-5">
+            <!-- CUENCA CENTRAL 3D / NEXUS ORB (PANTALLA COMPLETA EN APP MÓVIL, CUENCA JARVIS EN WEB) -->
+            <div class="pensadero-basin relative flex-1 min-h-[calc(100dvh-5.5rem)] md:min-h-[620px] lg:min-h-[720px] rounded-3xl border border-slate-800/90 bg-[#070A10] text-center overflow-hidden shadow-2xl flex flex-col justify-between p-3.5 sm:p-5">
               
               <!-- Glows ambientales de fondo -->
               <div class="absolute -top-20 -left-20 w-72 h-72 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -2853,32 +3129,49 @@
                 </div>
               </div>
 
-              <!-- Lienzo 3D WebGL (Canvas interactivo) -->
-              <div class="relative w-full flex-1 my-2 rounded-2xl overflow-hidden border border-slate-800/60 shadow-inner bg-transparent flex items-center justify-center">
-                <canvas id="pensadero-glsl-canvas" class="w-full h-full block cursor-crosshair min-h-[200px]"></canvas>
-                
-                <!-- Overlay de Guía rápida si está vacío -->
-                <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between pointer-events-none text-[10px] font-mono text-slate-400">
-                  <span class="bg-black/60 px-2.5 py-0.5 rounded-md backdrop-blur border border-white/5">GLSL Raymarched FBM Simplex Noise</span>
-                  <span class="bg-black/60 px-2.5 py-0.5 rounded-md backdrop-blur border border-white/5">🎯 ${activeProjectsCount} Proyectos Activos Listos</span>
+              <!-- NÚCLEO CENTRAL DEL PENSADERO (ESFERA DE CRISTAL NEXUS CORE SIN BORDES BLANCOS NI REPETICIÓN DE VIDEO) -->
+              <div class="relative my-auto py-2 flex flex-col items-center justify-center">
+                <!-- Dimensiones responsivas: 260px-320px en móvil, 460px-580px en escritorio -->
+                <div class="relative w-64 h-64 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[460px] md:h-[460px] lg:w-[520px] lg:h-[520px] xl:w-[580px] xl:h-[580px] mx-auto flex items-center justify-center shrink-0">
+                  
+                  <!-- Resplandor Neón Ambiental Trasero reactivo al humo seleccionado -->
+                  <div id="nexus-orb-glow" class="absolute inset-4 md:inset-8 rounded-full blur-3xl opacity-65 transition-all duration-700 pointer-events-none" style="background: radial-gradient(circle, ${activeMeta.hex} 0%, transparent 70%);"></div>
+
+                  <!-- Orbe de Cristal Nexus: Esfera 3D de Cristal con Humo Fluido Volumétrico Cambiante (100% WebGL, Sin Imagen Estática) -->
+                  <div id="nexus-core-wrapper" class="relative z-10 w-full h-full flex items-center justify-center select-none cursor-pointer" onclick="app.triggerShockwave()" title="Toca el Orbe de Cristal para emitir una resonancia">
+                    <!-- Canvas GLSL: Orbe de Cristal Fijo con Humo Neón Líquido Dinámico -->
+                    <canvas id="pensadero-glsl-canvas" class="w-full h-full block rounded-full select-none"></canvas>
+                  </div>
+                </div>
+
+                <div class="mt-2 text-center pointer-events-none">
+                  <span class="text-[11px] font-mono uppercase tracking-wider text-slate-300 bg-black/60 px-3.5 py-1 rounded-full border border-white/5 backdrop-blur">
+                    🔮 Nexus Core • ${activeMeta.name} • ${activeProjectsCount} Proyectos Activos
+                  </span>
                 </div>
               </div>
 
               <!-- Reactor de 8 Humos Nucleares para el Orbe -->
-              <div class="relative z-10 flex flex-wrap items-center justify-center gap-2 pt-1">
-                <button onclick="app.setOrbeColor('humo_blanco')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-200 border-2 border-white hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="⚪ Humo Blanco: Limpieza Mental / Soltar">⚪</button>
-                <button onclick="app.setOrbeColor('humo_rojo')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-rose-500 border-2 border-rose-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔴 Humo Rojo: Urgencia Crítica / Fuego">🔴</button>
-                <button onclick="app.setOrbeColor('humo_dorado')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-500 border-2 border-amber-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟡 Humo Dorado: Chispas Oro / Ideas">🟡</button>
-                <button onclick="app.setOrbeColor('humo_azul')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500 border-2 border-blue-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔵 Humo Azul: Deep Work / En Foco">🔵</button>
-                <button onclick="app.setOrbeColor('humo_verde')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 border-2 border-emerald-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟢 Humo Verde: Hábitos y Salud">🟢</button>
-                <button onclick="app.setOrbeColor('humo_purpura')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-500 border-2 border-purple-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟣 Humo Púrpura: CRM Personal">🟣</button>
-                <button onclick="app.setOrbeColor('humo_naranja')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-500 border-2 border-orange-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟠 Humo Naranja: Fricción Dinero">🟠</button>
-                <button onclick="app.setOrbeColor('humo_ceniza')" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-500 border-2 border-slate-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔘 Humo Ceniza: Hibernación Someday">🔘</button>
+              <div class="relative z-10 flex flex-wrap items-center justify-center gap-2 pt-1 pb-1">
+                <button onclick="app.setOrbeColor('humo_blanco')" data-smoke="humo_blanco" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-200 border-2 border-white hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="⚪ Humo Blanco: Limpieza Mental / Soltar">⚪</button>
+                <button onclick="app.setOrbeColor('humo_rojo')" data-smoke="humo_rojo" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-rose-500 border-2 border-rose-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔴 Humo Rojo: Urgencia Crítica / Fuego">🔴</button>
+                <button onclick="app.setOrbeColor('humo_dorado')" data-smoke="humo_dorado" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-500 border-2 border-amber-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟡 Humo Dorado: Chispas Oro / Ideas">🟡</button>
+                <button onclick="app.setOrbeColor('humo_azul')" data-smoke="humo_azul" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500 border-2 border-blue-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔵 Humo Azul: Deep Work / En Foco">🔵</button>
+                <button onclick="app.setOrbeColor('humo_verde')" data-smoke="humo_verde" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 border-2 border-emerald-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟢 Humo Verde: Hábitos y Salud">🟢</button>
+                <button onclick="app.setOrbeColor('humo_purpura')" data-smoke="humo_purpura" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-500 border-2 border-purple-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟣 Humo Púrpura: CRM Personal">🟣</button>
+                <button onclick="app.setOrbeColor('humo_naranja')" data-smoke="humo_naranja" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-500 border-2 border-orange-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟠 Humo Naranja: Fricción Dinero">🟠</button>
+                <button onclick="app.setOrbeColor('humo_ceniza')" data-smoke="humo_ceniza" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-500 border-2 border-slate-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔘 Humo Ceniza: Hibernación Someday">🔘</button>
+              </div>
+
+              <!-- Indicador de Deslizamiento Suave (Sólo en Móvil / App) -->
+              <div onclick="document.getElementById('pensadero-deck').scrollIntoView({ behavior: 'smooth' })" class="md:hidden py-1 flex flex-col items-center justify-center gap-0.5 text-cyan-400 animate-bounce cursor-pointer opacity-90 select-none">
+                <span class="text-[10px] font-mono tracking-wider font-bold uppercase">Desliza para ver tus notas y proyectos</span>
+                <span class="text-sm">↓</span>
               </div>
             </div>
 
             <!-- CONSOLA DE DISPARO DIRECTO (COMMAND DECK ESTILO JARVIS) -->
-            <div class="p-3.5 sm:p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur">
+            <div id="pensadero-deck" class="p-3.5 sm:p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur scroll-mt-20">
               <div class="flex items-center gap-2 mb-2">
                 <!-- Botón de Micrófono Nexus Flotante -->
                 <button onclick="app.openNexusVoice('pensadero')" class="p-2.5 rounded-2xl bg-gradient-to-tr from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-md active:scale-95 transition flex items-center justify-center" title="Dictar a Nexus">
@@ -2964,8 +3257,12 @@
           </div>
         `;
 
-        // Inicializar o reconectar WebGL Canvas del Pensadero
+        // Inicializar o reconectar WebGL Canvas y Video del Pensadero
         setTimeout(() => {
+          const vid = document.getElementById('nexus-orb-video');
+          if (vid) {
+            vid.play().catch(() => {});
+          }
           const cvs = document.getElementById('pensadero-glsl-canvas');
           if (cvs && this.shaderEngine) {
             this.shaderEngine.init(cvs);
@@ -2976,6 +3273,39 @@
       }
 
       setOrbeColor(category) {
+        const meta = SMOKE_PALETTE[category] || SMOKE_PALETTE.humo_blanco;
+        this.pensaderoSmokeFilter = category;
+
+        const indicator = document.getElementById('orbe-color-indicator');
+        if (indicator) {
+          indicator.style.background = meta.hex;
+          indicator.style.boxShadow = `0 0 14px ${meta.hex}`;
+        }
+        const statusLabel = document.getElementById('orbe-status-label');
+        if (statusLabel) {
+          statusLabel.innerHTML = `${meta.icon} ${meta.name}: ${meta.title}`;
+        }
+
+        // Resplandor Neón de Fondo reactivo (sin ningún borde blanco)
+        const orbGlow = document.getElementById('nexus-orb-glow');
+        if (orbGlow) {
+          orbGlow.style.background = `radial-gradient(circle, ${meta.hex} 0%, transparent 70%)`;
+        }
+        const coreWrapper = document.getElementById('nexus-core-wrapper');
+        if (coreWrapper) {
+          coreWrapper.style.border = 'none';
+          coreWrapper.style.boxShadow = 'none';
+        }
+
+        // Resaltar botón de reactor seleccionado
+        document.querySelectorAll('.smoke-reactor-btn').forEach(btn => {
+          if (btn.getAttribute('data-smoke') === category) {
+            btn.classList.add('ring-2', 'ring-white', 'scale-110');
+          } else {
+            btn.classList.remove('ring-2', 'ring-white', 'scale-110');
+          }
+        });
+
         if (this.shaderEngine) {
           this.shaderEngine.setSmokeState(category);
         }
@@ -6740,12 +7070,20 @@
           this.deferredPrompt.prompt();
           this.deferredPrompt.userChoice.then((choice) => {
             if (choice.outcome === 'accepted') {
-              alert("¡Gracias por instalar Proyectazo!");
+              alert("✓ ¡Genial! Nexus Orb se ha instalado en tu dispositivo como aplicación nativa.");
             }
             this.deferredPrompt = null;
+            const lbl = document.getElementById('pwa-btn-label');
+            if (lbl) lbl.textContent = 'App Instalada';
           });
         } else {
-          alert("Para instalar Proyectazo en tu pantalla principal:\n\n📱 En Android (Chrome):\nToca el menú de tres puntos (⋮) en la esquina superior y selecciona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n\n🍏 En iPhone / iPad (Safari):\nToca el botón Compartir (⎋) en la barra inferior y selecciona 'Agregar al inicio ➕'.");
+          // If already installed or browser hasn't fired prompt yet
+          const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+          if (isStandalone) {
+            alert("✓ Nexus Orb ya está ejecutándose como aplicación instalada en tu dispositivo.");
+            return;
+          }
+          alert("📱 Para instalar Nexus Orb en tu dispositivo:\n\n🤖 En Android (Chrome / Edge):\nToca el menú de tres puntos (⋮) en la esquina superior derecha y selecciona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n\n🍏 En iPhone / iPad (Safari):\nToca el botón Compartir (⎋) en la barra inferior y selecciona 'Agregar al inicio ➕'.\n\n💻 En PC / Mac:\nHaz clic en el icono de instalación ⊕ en la barra de direcciones del navegador.");
         }
       }
     }

@@ -1,0 +1,11 @@
+<resources>
+    <style name="Theme.NexusOrb" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/nexus_bg</item>
+        <item name="android:navigationBarColor">@color/nexus_bg</item>
+        <item name="android:windowBackground">@color/nexus_bg</item>
+    </style>
+
+    <style name="Theme.NexusOrb.Splash" parent="Theme.NexusOrb">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>

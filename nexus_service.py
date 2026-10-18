@@ -282,7 +282,8 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path == '/api/nexus/health' or self.path == '/':
+        clean_path = self.path.split('?')[0].rstrip('/')
+        if clean_path in ('/api/nexus/health', '/nexus/health', '/health', ''):
             self.send_response(200)
             self._send_cors_headers()
             self.send_header('Content-Type', 'application/json')
@@ -304,14 +305,15 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             content_length = int(length_header)
         except Exception:
             content_length = 0
-        post_data = self.rfile.read(content_length).decode('utf-8') if content_length > 0 else ""
+        post_data = self.rfile.read(content_length).decode('utf-8', errors='replace') if content_length > 0 else ""
         try:
             payload = json.loads(post_data) if post_data else {}
         except Exception:
             payload = {}
 
-        if self.path == '/api/nexus/thought':
-            text = payload.get('text', '').strip()
+        clean_path = self.path.split('?')[0].rstrip('/')
+        if clean_path in ('/api/nexus/thought', '/nexus/thought', '/thought', '/classify'):
+            text = (payload.get('text') or payload.get('raw_thought') or '').strip()
             res = process_thought_with_gemini(text)
             self.send_response(200)
             self._send_cors_headers()
@@ -319,8 +321,8 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(res.model_dump_json().encode('utf-8'))
 
-        elif self.path == '/api/nexus/deconstruct':
-            goal = payload.get('goal', '').strip()
+        elif clean_path in ('/api/nexus/deconstruct', '/nexus/deconstruct', '/deconstruct'):
+            goal = (payload.get('goal') or payload.get('text') or '').strip()
             res = deconstruct_goal_with_gemini(goal)
             self.send_response(200)
             self._send_cors_headers()
@@ -328,7 +330,7 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(res.model_dump_json().encode('utf-8'))
 
-        elif self.path == '/api/nexus/reactivate':
+        elif clean_path in ('/api/nexus/reactivate', '/nexus/reactivate', '/reactivate'):
             p_name = payload.get('projectName', 'Proyecto')
             context = payload.get('context', '')
             logs = payload.get('logs', [])

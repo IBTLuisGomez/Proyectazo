@@ -1,9 +1,15 @@
-const CACHE_NAME = 'nexus-unified-v2.0';
+const CACHE_NAME = 'nexus-orb-v3.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './favicon.svg'
+  './favicon.svg',
+  './assets/nexus_n.jpg',
+  './assets/nexus_n_banner.jpg',
+  './assets/nexus_core.jpg',
+  './assets/icon-192.png',
+  './assets/icon-512.png',
+  './assets/icon-maskable.png'
 ];
 
 self.addEventListener('install', event => {
@@ -26,6 +32,12 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  // Ignore API requests and video media streaming in cache
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/api') || url.pathname.startsWith('/nexus') || url.pathname.endsWith('.mp4')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
