@@ -227,6 +227,61 @@
     #nexus-voice-modal.active {
       display: flex !important;
     }
+
+    /* ==========================================================================
+       MODALES 100% RESPONSIVOS EN MÓVIL Y WEB
+       ========================================================================== */
+    .nexus-modal-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(0, 0, 0, 0.78);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      overflow: hidden;
+    }
+    @media (min-width: 640px) {
+      .nexus-modal-wrapper {
+        padding: 1.25rem;
+      }
+    }
+    .nexus-modal-container {
+      width: 100%;
+      max-width: 34rem;
+      max-height: 92vh;
+      max-height: 92dvh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+    .nexus-modal-header {
+      flex-shrink: 0;
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .nexus-modal-scroll-body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 1rem 1.25rem;
+    }
+    .nexus-modal-footer {
+      flex-shrink: 0;
+      padding: 0.75rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -490,40 +545,40 @@
     </div>
   </div>
 
-  <!-- ================= ASISTENTE NEXUS: EL IDEARIO (VOZ A KANBAN & IA) ================= -->
-  <div id="nexus-voice-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-    <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter text-left">
-      <div class="flex items-start justify-between mb-3 pb-3 border-b theme-border">
+  <!-- ================= ASISTENTE NEXUS: EL IDEARIO (VOZ A KANBAN & IA - 100% RESPONSIVO) ================= -->
+  <div id="nexus-voice-modal" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter text-left">
+      <div class="nexus-modal-header bg-slate-950/40">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl overflow-hidden border border-purple-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/25">
             <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
           </div>
           <div>
-            <h3 class="text-base font-display font-extrabold flex items-center gap-2">
+            <h3 class="text-sm sm:text-base font-display font-extrabold flex items-center gap-2">
               <span>El Ideario — Asistente Nexus</span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Gemini 1.5 Flash</span>
+              <span class="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Gemini 1.5</span>
             </h3>
-            <p class="text-[11px] theme-text-muted">Audio Streaming con Extracción Semántica y Clasificación JSON Estructurada</p>
+            <p class="text-[10px] sm:text-[11px] theme-text-muted">Audio Streaming con Extracción Semántica y Clasificación JSON</p>
           </div>
         </div>
-        <button onclick="app.closeNexusVoice()" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button onclick="app.closeNexusVoice()" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
-      <!-- Diagrama de Flujo Pipeline Audio Streaming -->
-      <div class="p-2.5 rounded-2xl bg-slate-950/80 border border-purple-500/30 mb-3 text-[10px] font-mono flex items-center justify-between gap-1 text-slate-300">
-        <span class="flex items-center gap-1 text-purple-300 font-bold"><span>🎙️</span> Audio</span>
-        <span class="text-slate-600">➔</span>
-        <span class="flex items-center gap-1 text-sky-300 font-bold"><span>🧠</span> Gemini NLP</span>
-        <span class="text-slate-600">➔</span>
-        <span class="flex items-center gap-1 text-emerald-300 font-bold"><span>🔮</span> Shader GLSL</span>
-        <span class="text-slate-600">➔</span>
-        <span class="flex items-center gap-1 text-amber-300 font-bold"><span>💾</span> brain_dump</span>
-      </div>
+      <div class="nexus-modal-scroll-body space-y-3.5 text-xs">
+        <!-- Diagrama de Flujo Pipeline Audio Streaming -->
+        <div class="p-2.5 rounded-2xl bg-slate-950/80 border border-purple-500/30 text-[10px] font-mono flex items-center justify-between gap-1 text-slate-300">
+          <span class="flex items-center gap-1 text-purple-300 font-bold"><span>🎙️</span> Audio</span>
+          <span class="text-slate-600">➔</span>
+          <span class="flex items-center gap-1 text-sky-300 font-bold"><span>🧠</span> Gemini</span>
+          <span class="text-slate-600">➔</span>
+          <span class="flex items-center gap-1 text-emerald-300 font-bold"><span>🔮</span> Orbe 3D</span>
+          <span class="text-slate-600">➔</span>
+          <span class="flex items-center gap-1 text-amber-300 font-bold"><span>💾</span> Guardar</span>
+        </div>
 
-      <div class="space-y-3.5 text-xs">
         <!-- Visualizer de Ondas de Voz y Estado de Escucha -->
-        <div class="p-5 rounded-2xl theme-card-subtle border theme-border text-center relative overflow-hidden">
-          <div id="nexus-mic-waves" class="w-16 h-16 rounded-full bg-purple-500/20 border-2 border-purple-500/40 flex items-center justify-center mx-auto mb-2 cursor-pointer hover:scale-105 active:scale-95 transition" onclick="app.toggleNexusListening()">
+        <div class="p-4 sm:p-5 rounded-2xl theme-card-subtle border theme-border text-center relative overflow-hidden">
+          <div id="nexus-mic-waves" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-purple-500/20 border-2 border-purple-500/40 flex items-center justify-center mx-auto mb-2 cursor-pointer hover:scale-105 active:scale-95 transition" onclick="app.toggleNexusListening()">
             <span id="nexus-mic-icon" class="text-2xl">🎙️</span>
           </div>
           <p id="nexus-status-label" class="font-bold text-xs text-purple-300">Presiona el micrófono para hablar o di "Nexus..."</p>
@@ -536,8 +591,8 @@
           <div class="flex gap-2">
             <input type="text" id="nexus-input" placeholder="Habla o escribe tu pensamiento..." 
               class="flex-1 px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium" />
-            <button onclick="app.processNexusCommand()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shrink-0 transition text-xs">
-              Analizar con IA ↵
+            <button onclick="app.processNexusCommand()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shrink-0 transition text-xs">
+              Analizar ↵
             </button>
           </div>
         </div>
@@ -555,12 +610,18 @@
           <p id="nexus-parsed-summary" class="text-xs text-slate-200 leading-relaxed"></p>
 
           <!-- Previsualización del Contrato JSON -->
-          <pre id="nexus-json-preview" class="text-[10px] font-mono text-emerald-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800 overflow-x-auto max-h-32"></pre>
+          <pre id="nexus-json-preview" class="text-[10px] font-mono text-emerald-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800 overflow-x-auto max-h-28"></pre>
 
           <button id="nexus-apply-btn" onclick="app.confirmNexusAction()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition">
-            ✓ Inyectar a Shader GLSL & Persistir en brain_dump
+            ✓ Inyectar a Orbe GLSL & Guardar
           </button>
         </div>
+      </div>
+
+      <div class="nexus-modal-footer bg-slate-950/40 flex justify-end">
+        <button onclick="app.closeNexusVoice()" class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
@@ -714,23 +775,101 @@
     </div>
   </nav>
 
-  <!-- Universal Floating Action Button: [ Mic / FAB "Nexus" ] -->
-  <button id="universal-nexus-fab" onclick="app.openNexusVoice('streaming')" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 text-white shadow-2xl shadow-purple-500/40 hover:scale-105 active:scale-95 transition flex items-center gap-2 group border border-purple-400/40" title="Nexus: Audio Streaming & Captura Inteligente Gemini">
-    <div class="w-6 h-6 rounded-full overflow-hidden border border-white/40 shrink-0">
+  <!-- Universal Floating Action Button: [ Mic / FAB "Nexus" ] (MOVIBLE / DRAGGABLE) -->
+  <button id="universal-nexus-fab" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 text-white shadow-2xl shadow-purple-500/40 hover:scale-105 active:scale-95 transition flex items-center gap-2 group border border-purple-400/40 select-none cursor-grab active:cursor-grabbing touch-none" title="Nexus IA (Arrastra para mover a cualquier parte de la pantalla)">
+    <div class="w-6 h-6 rounded-full overflow-hidden border border-white/40 shrink-0 pointer-events-none">
       <img src="assets/nexus_n.jpg" alt="Nexus" class="w-full h-full object-cover">
     </div>
-    <span class="text-xs font-bold font-display tracking-wide flex items-center gap-1.5">
+    <span class="text-xs font-bold font-display tracking-wide flex items-center gap-1.5 pointer-events-none">
       <span>Nexus IA</span>
       <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
     </span>
   </button>
 
+  <!-- ================= GADGET: VACIADO DIRECTO AL ORBE (HUD FLOTANTE / MODAL) ================= -->
+  <div id="nexus-orbe-quick-gadget-modal" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter">
+      <!-- Header -->
+      <div class="nexus-modal-header bg-slate-950/40">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-500 flex items-center justify-center text-base shadow-lg shadow-purple-500/30">
+            🔮
+          </div>
+          <div>
+            <h3 class="text-sm font-display font-bold text-white">Vaciado Directo al Orbe</h3>
+            <p class="text-[10px] theme-text-muted">Libera tu mente en 1 segundo; el orbe absorbe y clasifica</p>
+          </div>
+        </div>
+        <button onclick="app.closeModal('nexus-orbe-quick-gadget-modal')" class="w-7 h-7 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-xs">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div class="nexus-modal-scroll-body space-y-3.5 text-xs">
+        <div>
+          <label class="block text-xs font-bold mb-1.5 text-slate-300">¿Qué pensamiento deseas soltar o registrar?</label>
+          <div class="relative">
+            <textarea id="gadget-dump-text" rows="3" placeholder="Escribe o dicta aquí... (ej: 'Comprar reactivos para CytoCore' o 'Idea para el diseño de CytoHelix')..." 
+              class="w-full p-3 pr-10 rounded-2xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+            <button type="button" onclick="app.dictateField('gadget-dump-text')" class="absolute right-2.5 top-2.5 p-1.5 rounded-xl bg-purple-600/30 text-purple-300 hover:bg-purple-600/50 transition text-sm" title="Dictar por voz">
+              🎙️
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Humo Neón (Categoría Cognitiva) -->
+        <div>
+          <span class="block text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Color de Humo en el Orbe</span>
+          <div class="grid grid-cols-4 gap-1.5 text-xs">
+            <button type="button" onclick="app.selectGadgetSmoke('humo_blanco')" class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_blanco">
+              <span>⚪</span> <span class="text-[10px]">Soltar</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_rojo')" class="gadget-smoke-btn p-2 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_rojo">
+              <span>🔴</span> <span class="text-[10px]">Urgencia</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_dorado')" class="gadget-smoke-btn p-2 rounded-xl border border-amber-500/50 bg-amber-500/20 text-amber-300 ring-2 ring-amber-400 flex flex-col items-center gap-0.5" data-smoke="humo_dorado">
+              <span>🟡</span> <span class="text-[10px] font-bold">Idea</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_azul')" class="gadget-smoke-btn p-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_azul">
+              <span>🔵</span> <span class="text-[10px]">Foco</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_verde')" class="gadget-smoke-btn p-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_verde">
+              <span>🟢</span> <span class="text-[10px]">Salud</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_purpura')" class="gadget-smoke-btn p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_purpura">
+              <span>🟣</span> <span class="text-[10px]">CRM</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_naranja')" class="gadget-smoke-btn p-2 rounded-xl border border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_naranja">
+              <span>🟠</span> <span class="text-[10px]">Dinero</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_ceniza')" class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-800/40 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_ceniza">
+              <span>🔘</span> <span class="text-[10px]">Someday</span>
+            </button>
+          </div>
+          <input type="hidden" id="gadget-smoke-category" value="humo_dorado" />
+        </div>
+
+        <!-- Banner de Feedback Dinámico -->
+        <div id="gadget-feedback-banner" class="hidden p-2.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs text-center font-mono"></div>
+      </div>
+
+      <!-- Footer con botón de disparo al Orbe -->
+      <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between gap-2">
+        <button onclick="app.closeModal('nexus-orbe-quick-gadget-modal')" class="px-3.5 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+          Cerrar
+        </button>
+        <button onclick="app.submitGadgetDump()" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-display font-extrabold text-xs shadow-lg shadow-purple-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>🔮</span> <span>Lanzar al Orbe de Cristal</span> <span>✨</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= MODALS ================= -->
 
-  <!-- 1. PROTOCOLO DE CIERRE (CHECKOUT) MODAL -->
-  <div id="modal-checkout" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter">
-      <div class="flex items-start justify-between mb-4">
+  <!-- 1. PROTOCOLO DE CIERRE (CHECKOUT) MODAL (100% RESPONSIVO) -->
+  <div id="modal-checkout" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter">
+      <div class="nexus-modal-header bg-slate-950/40">
         <div>
           <div class="flex items-center gap-2">
             <span class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
@@ -738,231 +877,237 @@
             </span>
             <span id="checkout-project-badge" class="text-xs font-medium theme-text-muted"></span>
           </div>
-          <h2 class="text-xl font-display font-extrabold mt-1" id="checkout-title">
+          <h2 class="text-lg font-display font-extrabold mt-0.5" id="checkout-title">
             Registrar avance y asegurar continuidad
           </h2>
           <p class="text-xs theme-text-muted mt-0.5">
             Dale a tu yo del futuro la llave para retomar en 5 segundos sin pensar.
           </p>
         </div>
-        <button onclick="app.closeModal('modal-checkout')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button onclick="app.closeModal('modal-checkout')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
-      <form id="checkout-form" onsubmit="app.submitCheckout(event)" class="space-y-4">
-        <input type="hidden" id="checkout-project-id" />
+      <div class="nexus-modal-scroll-body">
+        <form id="checkout-form" onsubmit="app.submitCheckout(event)" class="space-y-4">
+          <input type="hidden" id="checkout-project-id" />
 
-        <!-- 1. Logro alcanzado con Dictado de Voz -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-bold">
-              1. ¿Qué lograste avanzar hoy? <span class="text-emerald-500">*</span>
-            </label>
-            <button type="button" onclick="app.dictateField('checkout-achievement')" class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
-              <span>🎙️</span> Dictar avance
+          <!-- 1. Logro alcanzado con Dictado de Voz -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold">
+                1. ¿Qué lograste avanzar hoy? <span class="text-emerald-500">*</span>
+              </label>
+              <button type="button" onclick="app.dictateField('checkout-achievement')" class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
+                <span>🎙️</span> Dictar avance
+              </button>
+            </div>
+            <textarea id="checkout-achievement" rows="2" required placeholder="Ej: Definí el esquema inicial de datos..."
+              class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+          </div>
+
+          <!-- 2. Próximo micro-paso (El Hilo de Ariadna) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold flex items-center gap-1">
+                <span>🧵</span> 2. El Hilo de Ariadna (Próximo micro-paso ≤15 min) <span class="text-emerald-500">*</span>
+              </label>
+              <button type="button" onclick="app.dictateField('checkout-next-action')" class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
+                <span>🎙️</span> Dictar hilo
+              </button>
+            </div>
+            <input type="text" id="checkout-next-action" required placeholder="Ej: Crear el controlador REST para la entidad..."
+              class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            <p class="text-[11px] theme-text-muted mt-1">La llave que tu yo del futuro jalará en 5 segundos sin pensar.</p>
+          </div>
+
+          <!-- Algoritmo de Gap Filling: Timeblocking Automático -->
+          <div class="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-700/60 flex items-center justify-between gap-3">
+            <div class="space-y-0.5">
+              <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+                <span>📅</span> Algoritmo Gap Filling (Timeblocking)
+              </span>
+              <p class="text-[10px] theme-text-muted">Busca un bloque libre de 90-120 min la próxima semana con buffers de 15 min.</p>
+            </div>
+            <button type="button" onclick="app.generateTimeblockForNextAction()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 font-bold text-[11px] shrink-0 transition flex items-center gap-1">
+              <span>🗓️</span> Agendar
             </button>
           </div>
-          <textarea id="checkout-achievement" rows="2" required placeholder="Ej: Definí el esquema inicial de datos y creé las primeras 3 vistas..."
-            class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
-        </div>
 
-        <!-- 2. Próximo micro-paso (El Hilo de Ariadna) -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-bold flex items-center gap-1">
-              <span>🧵</span> 2. El Hilo de Ariadna (Próximo micro-paso ≤15 min) <span class="text-emerald-500">*</span>
-            </label>
-            <button type="button" onclick="app.dictateField('checkout-next-action')" class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
-              <span>🎙️</span> Dictar hilo
-            </button>
+          <!-- 3. Tipo de micro-acción y energía -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold mb-1">Tipo de acción</label>
+              <select id="checkout-action-type" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="hacer">⚡ Hacer (acción directa)</option>
+                <option value="esperar">⏳ Esperar (dependencia externa)</option>
+                <option value="decidir">💡 Decidir (elección mental)</option>
+                <option value="explorar">🔍 Explorar (indagación libre)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1">Energía requerida</label>
+              <select id="checkout-energy" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="baja">⚡ Baja (5-15 min, quick win)</option>
+                <option value="media">💡 Media (15-30 min)</option>
+                <option value="alta">🔥 Alta (hiperfoco 45+ min)</option>
+              </select>
+            </div>
           </div>
-          <input type="text" id="checkout-next-action" required placeholder="Ej: Crear el controlador REST para la entidad de pacientes"
-            class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-          <p class="text-[11px] theme-text-muted mt-1">La llave que tu yo del futuro jalará en 5 segundos sin pensar.</p>
-        </div>
 
-        <!-- Algoritmo de Gap Filling: Timeblocking Automático -->
-        <div class="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-700/60 flex items-center justify-between gap-3">
-          <div class="space-y-0.5">
-            <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
-              <span>📅</span> Algoritmo Gap Filling (Timeblocking)
-            </span>
-            <p class="text-[10px] theme-text-muted">Busca un bloque libre de 90-120 min la próxima semana con buffers de 15 min de descanso.</p>
-          </div>
-          <button type="button" onclick="app.generateTimeblockForNextAction()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 font-bold text-[11px] shrink-0 transition flex items-center gap-1">
-            <span>🗓️</span> Agendar Bloque
-          </button>
-        </div>
-
-        <!-- 3. Tipo de micro-acción y energía -->
-        <div class="grid grid-cols-2 gap-3">
+          <!-- 4. Estado resultante del proyecto -->
           <div>
-            <label class="block text-xs font-bold mb-1">Tipo de acción</label>
-            <select id="checkout-action-type" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
-              <option value="hacer">⚡ Hacer (acción directa)</option>
-              <option value="esperar">⏳ Esperar (dependencia externa)</option>
-              <option value="decidir">💡 Decidir (elección mental)</option>
-              <option value="explorar">🔍 Explorar (indagación libre)</option>
-            </select>
+            <label class="block text-xs font-bold mb-1">Estado del proyecto</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl border theme-border theme-card-subtle cursor-pointer hover:border-emerald-500">
+                <input type="radio" name="checkout-status" value="activo" checked class="text-emerald-500 focus:ring-0">
+                <span class="text-xs font-semibold">Activo</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl border theme-border theme-card-subtle cursor-pointer hover:border-amber-500">
+                <input type="radio" name="checkout-status" value="pausado" class="text-amber-500 focus:ring-0">
+                <span class="text-xs font-semibold">Incubar</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl border theme-border theme-card-subtle cursor-pointer hover:border-purple-500">
+                <input type="radio" name="checkout-status" value="completado" class="text-purple-500 focus:ring-0">
+                <span class="text-xs font-semibold">Victoria 🏆</span>
+              </label>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-bold mb-1">Energía requerida</label>
-            <select id="checkout-energy" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
-              <option value="baja">⚡ Baja (5-15 min, quick win)</option>
-              <option value="media">💡 Media (15-30 min)</option>
-              <option value="alta">🔥 Alta (hiperfoco 45+ min)</option>
-            </select>
-          </div>
-        </div>
 
-        <!-- 4. Estado resultante del proyecto -->
-        <div>
-          <label class="block text-xs font-bold mb-1">Estado del proyecto</label>
-          <div class="grid grid-cols-3 gap-2">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border theme-border theme-card-subtle cursor-pointer hover:border-emerald-500">
-              <input type="radio" name="checkout-status" value="activo" checked class="text-emerald-500 focus:ring-0">
-              <span class="text-xs font-semibold">Activo</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border theme-border theme-card-subtle cursor-pointer hover:border-amber-500">
-              <input type="radio" name="checkout-status" value="pausado" class="text-amber-500 focus:ring-0">
-              <span class="text-xs font-semibold">Incubar (Pausar)</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border theme-border theme-card-subtle cursor-pointer hover:border-purple-500">
-              <input type="radio" name="checkout-status" value="completado" class="text-purple-500 focus:ring-0">
-              <span class="text-xs font-semibold">Completado 🏆</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" onclick="app.closeModal('modal-checkout')" class="px-4 py-2.5 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110 transition">
-            Cancelar
-          </button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition">
-            Guardar Avance & Cerrar Sesión ✓
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 2. QUICK CAPTURE / DESCARGA MENTAL MODAL (Ctrl+K) -->
-  <div id="modal-quick-capture" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="theme-card border rounded-3xl max-w-md w-full p-6 shadow-2xl relative fade-enter">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">🧠</span>
-          <h2 class="text-lg font-display font-bold">Captura Rápida al Pensadero</h2>
-        </div>
-        <button onclick="app.closeModal('modal-quick-capture')" class="theme-text-muted hover:text-white">✕</button>
-      </div>
-      <p class="text-xs theme-text-muted mb-4">
-        Vuelca lo que se te ocurrió sin interrumpir tu flujo actual.
-      </p>
-
-      <form id="quick-capture-form" onsubmit="app.submitQuickCapture(event)" class="space-y-4">
-        <div>
-          <textarea id="quick-capture-text" rows="3" required autofocus placeholder="Escribe tu pensamiento, idea o pendiente..."
-            class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold mb-1">Destino</label>
-          <select id="quick-capture-target" class="w-full px-3 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500">
-            <option value="pensadero">🧠 El Pensadero (descarga mental)</option>
-            <!-- Project options injected dynamically -->
-          </select>
-        </div>
-
-        <div class="flex items-center justify-end gap-2 pt-1">
-          <button type="button" onclick="app.closeModal('modal-quick-capture')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
-            Descartar
-          </button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition">
-            Guardar Pensamiento (Enter)
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 3. PROJECT CREATE / EDIT MODAL -->
-  <div id="modal-project" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-display font-extrabold" id="project-modal-title">
-          Nuevo Proyecto
-        </h2>
-        <button onclick="app.closeModal('modal-project')" class="theme-text-muted hover:text-white">✕</button>
-      </div>
-
-      <form id="project-form" onsubmit="app.submitProjectForm(event)" class="space-y-4">
-        <input type="hidden" id="project-form-id" />
-
-        <div class="grid grid-cols-[60px_1fr] gap-3">
-          <div>
-            <label class="block text-xs font-bold mb-1">Emoji</label>
-            <input type="text" id="project-form-emoji" value="⚡" maxlength="2" required
-              class="w-full text-center px-2 py-2.5 rounded-xl theme-card-subtle border theme-border text-lg" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1">Nombre del Proyecto <span class="text-brand-500">*</span></label>
-            <input type="text" id="project-form-name" required placeholder="Ej: Rediseño de Plataforma Web"
-              class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold mb-1">Color representativo</label>
-          <div class="flex items-center gap-2" id="project-color-picker"></div>
-          <input type="hidden" id="project-form-color" value="#10b981" />
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold mb-1">Objetivo principal en 1 frase</label>
-          <input type="text" id="project-form-objective" placeholder="Ej: Lanzar versión Beta accesible para los primeros 20 clientes"
-            class="w-full px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" />
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold mb-1">Primera Próxima Acción (concreta)</label>
-          <input type="text" id="project-form-next-action" placeholder="Ej: Armar el índice de contenidos del entregable"
-            class="w-full px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold mb-1">Estado</label>
-            <select id="project-form-status" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold">
-              <option value="activo">🟢 Activo (en foco)</option>
-              <option value="pausado">🟡 En Incubadora (pausado sin culpa)</option>
-              <option value="idea">🔵 Chispa / Idea</option>
-              <option value="completado">🟣 Completado</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1">Nivel de Energía</label>
-            <select id="project-form-energy" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold">
-              <option value="baja">⚡ Baja energía (Quick wins)</option>
-              <option value="media">💡 Energía media</option>
-              <option value="alta">🔥 Alta energía (Deep work)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between pt-3 border-t theme-border">
-          <button type="button" id="btn-delete-project" onclick="app.deleteCurrentProject()" class="text-xs text-rose-400 hover:text-rose-500 font-semibold hidden">
-            Eliminar proyecto
-          </button>
-          <div class="flex items-center gap-2 ml-auto">
-            <button type="button" onclick="app.closeModal('modal-project')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+          <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-end gap-2 pt-2 -mx-4 -mb-4 px-4 pb-3">
+            <button type="button" onclick="app.closeModal('modal-checkout')" class="px-4 py-2.5 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110 transition">
               Cancelar
             </button>
-            <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition">
-              Guardar Proyecto
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition">
+              Guardar Avance & Cerrar Sesión ✓
             </button>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. QUICK CAPTURE / DESCARGA MENTAL MODAL (100% RESPONSIVO) -->
+  <div id="modal-quick-capture" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter">
+      <div class="nexus-modal-header bg-slate-950/40">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🧠</span>
+          <h2 class="text-base font-display font-bold">Captura Rápida al Pensadero</h2>
         </div>
-      </form>
+        <button onclick="app.closeModal('modal-quick-capture')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+      </div>
+
+      <div class="nexus-modal-scroll-body">
+        <p class="text-xs theme-text-muted mb-3">
+          Vuelca lo que se te ocurrió sin interrumpir tu flujo actual.
+        </p>
+
+        <form id="quick-capture-form" onsubmit="app.submitQuickCapture(event)" class="space-y-4">
+          <div>
+            <textarea id="quick-capture-text" rows="3" required autofocus placeholder="Escribe tu pensamiento, idea o pendiente..."
+              class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold mb-1">Destino</label>
+            <select id="quick-capture-target" class="w-full px-3 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="pensadero">🧠 El Pensadero (descarga mental)</option>
+            </select>
+          </div>
+
+          <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-end gap-2 pt-2 -mx-4 -mb-4 px-4 pb-3">
+            <button type="button" onclick="app.closeModal('modal-quick-capture')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+              Descartar
+            </button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition">
+              Guardar Pensamiento (Enter)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. PROJECT CREATE / EDIT MODAL (100% RESPONSIVO) -->
+  <div id="modal-project" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter">
+      <div class="nexus-modal-header bg-slate-950/40">
+        <h2 class="text-base sm:text-lg font-display font-extrabold" id="project-modal-title">
+          Nuevo Proyecto
+        </h2>
+        <button onclick="app.closeModal('modal-project')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+      </div>
+
+      <div class="nexus-modal-scroll-body">
+        <form id="project-form" onsubmit="app.submitProjectForm(event)" class="space-y-4">
+          <input type="hidden" id="project-form-id" />
+
+          <div class="grid grid-cols-[60px_1fr] gap-3">
+            <div>
+              <label class="block text-xs font-bold mb-1">Emoji</label>
+              <input type="text" id="project-form-emoji" value="⚡" maxlength="2" required
+                class="w-full text-center px-2 py-2.5 rounded-xl theme-card-subtle border theme-border text-lg" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1">Nombre del Proyecto <span class="text-brand-500">*</span></label>
+              <input type="text" id="project-form-name" required placeholder="Ej: Rediseño de Plataforma Web"
+                class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold mb-1">Color representativo</label>
+            <div class="flex items-center gap-2" id="project-color-picker"></div>
+            <input type="hidden" id="project-form-color" value="#10b981" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold mb-1">Objetivo principal en 1 frase</label>
+            <input type="text" id="project-form-objective" placeholder="Ej: Lanzar versión Beta accesible para los primeros 20 clientes"
+              class="w-full px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold mb-1">Primera Próxima Acción (concreta)</label>
+            <input type="text" id="project-form-next-action" placeholder="Ej: Armar el índice de contenidos del entregable"
+              class="w-full px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold mb-1">Estado</label>
+              <select id="project-form-status" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold">
+                <option value="activo">🟢 Activo (en foco)</option>
+                <option value="pausado">🟡 En Incubadora (pausado sin culpa)</option>
+                <option value="idea">🔵 Chispa / Idea</option>
+                <option value="completado">🟣 Completado</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1">Nivel de Energía</label>
+              <select id="project-form-energy" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold">
+                <option value="baja">⚡ Baja energía (Quick wins)</option>
+                <option value="media">💡 Energía media</option>
+                <option value="alta">🔥 Alta energía (Deep work)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between pt-3 -mx-4 -mb-4 px-4 pb-3">
+            <button type="button" id="btn-delete-project" onclick="app.deleteCurrentProject()" class="text-xs text-rose-400 hover:text-rose-500 font-semibold hidden">
+              Eliminar proyecto
+            </button>
+            <div class="flex items-center gap-2 ml-auto">
+              <button type="button" onclick="app.closeModal('modal-project')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+                Cancelar
+              </button>
+              <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition">
+                Guardar Proyecto
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -1069,23 +1214,23 @@
     </div>
   </div>
 
-  <!-- 6. MODAL: APP MÓVIL, TABLET & WHATSAPP SHARE -->
-  <div id="modal-mobile-app" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter">
-      <div class="flex items-start justify-between mb-4 pb-3 border-b theme-border">
+  <!-- 6. MODAL: APP MÓVIL, TABLET & WHATSAPP SHARE (100% RESPONSIVO) -->
+  <div id="modal-mobile-app" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter">
+      <div class="nexus-modal-header bg-slate-950/40">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl overflow-hidden border border-emerald-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border border-emerald-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
             <img src="assets/nexus_n.jpg" alt="Nexus N" class="w-full h-full object-cover">
           </div>
           <div>
-            <h3 class="text-base font-display font-extrabold text-white">Instalar Nexus Orb en tu Dispositivo</h3>
-            <p class="text-xs theme-text-muted">App nativa instalable para Android, iPhone, iPad y PC</p>
+            <h3 class="text-sm sm:text-base font-display font-extrabold text-white">Instalar Nexus Orb en tu Dispositivo</h3>
+            <p class="text-[11px] sm:text-xs theme-text-muted">App nativa instalable para Android, iPhone, iPad y PC</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-mobile-app')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button onclick="app.closeModal('modal-mobile-app')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
-      <div class="space-y-4 text-xs">
+      <div class="nexus-modal-scroll-body space-y-4 text-xs">
         <!-- 1. Botón de Instalación Directa / Instala Aquí -->
         <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-teal-500/15 to-cyan-500/20 border-2 border-emerald-500/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
           <div class="text-center sm:text-left">
@@ -1181,7 +1326,14 @@
           </div>
         </div>
       </div>
+
+      <div class="nexus-modal-footer bg-slate-950/40 flex justify-end">
+        <button onclick="app.closeModal('modal-mobile-app')" class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+          Cerrar
+        </button>
+      </div>
     </div>
+  </div>
   <!-- 7. MODAL: DESGLOSE ATÓMICO ASISTIDO POR GEMINI (AI DECONSTRUCTION) -->
   <div id="modal-ai-deconstruction" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
     <div class="theme-card border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative fade-enter text-left">
@@ -2269,6 +2421,101 @@
 
         // Initialize Splash Intro on mobile if not seen yet
         setTimeout(() => this.initSplash(), 100);
+
+        // Inicializar botón flotante Nexus IA arrastrable
+        setTimeout(() => this.initDraggableNexusFab(), 120);
+      }
+
+      // --- BOTÓN FLOTANTE NEXUS IA ARRASTRABLE (TOUCH & MOUSE CON PERSISTENCIA) ---
+      initDraggableNexusFab() {
+        const fab = document.getElementById('universal-nexus-fab');
+        if (!fab) return;
+
+        // Restaurar posición previa guardada si es válida
+        const saved = localStorage.getItem('nexus_fab_pos');
+        if (saved) {
+          try {
+            const pos = JSON.parse(saved);
+            if (typeof pos.left === 'number' && typeof pos.top === 'number') {
+              const maxLeft = Math.max(8, window.innerWidth - (fab.offsetWidth || 130) - 8);
+              const maxTop = Math.max(8, window.innerHeight - (fab.offsetHeight || 50) - 8);
+              const clampLeft = Math.max(8, Math.min(pos.left, maxLeft));
+              const clampTop = Math.max(8, Math.min(pos.top, maxTop));
+              fab.style.left = `${clampLeft}px`;
+              fab.style.top = `${clampTop}px`;
+              fab.style.right = 'auto';
+              fab.style.bottom = 'auto';
+            }
+          } catch(err) {}
+        }
+
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let initialLeft = 0, initialTop = 0;
+        let hasMoved = false;
+
+        fab.onpointerdown = (e) => {
+          if (e.button !== 0 && e.pointerType === 'mouse') return;
+          try { fab.setPointerCapture(e.pointerId); } catch(err) {}
+          isDragging = true;
+          hasMoved = false;
+          startX = e.clientX;
+          startY = e.clientY;
+
+          const rect = fab.getBoundingClientRect();
+          initialLeft = rect.left;
+          initialTop = rect.top;
+        };
+
+        fab.onpointermove = (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+
+          if (Math.hypot(dx, dy) > 6) {
+            hasMoved = true;
+            let newLeft = initialLeft + dx;
+            let newTop = initialTop + dy;
+
+            const maxLeft = Math.max(8, window.innerWidth - fab.offsetWidth - 8);
+            const maxTop = Math.max(8, window.innerHeight - fab.offsetHeight - 8);
+
+            newLeft = Math.max(8, Math.min(newLeft, maxLeft));
+            newTop = Math.max(8, Math.min(newTop, maxTop));
+
+            fab.style.left = `${newLeft}px`;
+            fab.style.top = `${newTop}px`;
+            fab.style.right = 'auto';
+            fab.style.bottom = 'auto';
+          }
+        };
+
+        const endFabDrag = (e) => {
+          if (isDragging) {
+            isDragging = false;
+            try { fab.releasePointerCapture(e.pointerId); } catch(err) {}
+            if (hasMoved) {
+              const rect = fab.getBoundingClientRect();
+              localStorage.setItem('nexus_fab_pos', JSON.stringify({ left: rect.left, top: rect.top }));
+            } else {
+              this.openNexusVoice('streaming');
+            }
+          }
+        };
+
+        fab.onpointerup = endFabDrag;
+        fab.onpointercancel = endFabDrag;
+
+        // Auto-clamp en caso de rotación o redimensionamiento de pantalla
+        window.addEventListener('resize', () => {
+          const rect = fab.getBoundingClientRect();
+          const maxLeft = Math.max(8, window.innerWidth - fab.offsetWidth - 8);
+          const maxTop = Math.max(8, window.innerHeight - fab.offsetHeight - 8);
+          if (rect.left > maxLeft || rect.top > maxTop) {
+            fab.style.left = `${Math.min(rect.left, maxLeft)}px`;
+            fab.style.top = `${Math.min(rect.top, maxTop)}px`;
+          }
+        });
       }
 
       // --- SPLASH INTRO CINEMÁTICA MÓVIL (NEXUSORB_NEON.MP4) ---
@@ -3129,10 +3376,10 @@
                 </div>
               </div>
 
-              <!-- NÚCLEO CENTRAL DEL PENSADERO (ESFERA DE CRISTAL NEXUS CORE SIN BORDES BLANCOS NI REPETICIÓN DE VIDEO) -->
-              <div class="relative my-auto py-2 flex flex-col items-center justify-center">
-                <!-- Dimensiones responsivas: 260px-320px en móvil, 460px-580px en escritorio -->
-                <div class="relative w-64 h-64 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[460px] md:h-[460px] lg:w-[520px] lg:h-[520px] xl:w-[580px] xl:h-[580px] mx-auto flex items-center justify-center shrink-0">
+              <!-- NÚCLEO CENTRAL DEL PENSADERO (ESFERA DE CRISTAL NEXUS CORE - TAMAÑO PANTALLA EN APP) -->
+              <div class="relative my-auto py-2 flex flex-col items-center justify-center flex-1">
+                <!-- Dimensiones responsivas: Casi el tamaño completo de pantalla en App móvil (88vw), escala majestuosa en escritorio -->
+                <div class="relative w-[88vw] h-[88vw] max-w-[430px] max-h-[430px] xs:w-[92vw] xs:h-[92vw] sm:w-[380px] sm:h-[380px] md:w-[480px] md:h-[480px] lg:w-[540px] lg:h-[540px] xl:w-[600px] xl:h-[600px] mx-auto flex items-center justify-center shrink-0">
                   
                   <!-- Resplandor Neón Ambiental Trasero reactivo al humo seleccionado -->
                   <div id="nexus-orb-glow" class="absolute inset-4 md:inset-8 rounded-full blur-3xl opacity-65 transition-all duration-700 pointer-events-none" style="background: radial-gradient(circle, ${activeMeta.hex} 0%, transparent 70%);"></div>
@@ -3149,6 +3396,22 @@
                     🔮 Nexus Core • ${activeMeta.name} • ${activeProjectsCount} Proyectos Activos
                   </span>
                 </div>
+              </div>
+
+              <!-- GADGET DIRECTO: VACIADO AL ORBE EN 1-CLIC -->
+              <div class="relative z-20 w-full max-w-md mx-auto my-1.5 p-1.5 sm:p-2 rounded-2xl bg-slate-900/90 border border-purple-500/40 backdrop-blur-md shadow-2xl flex items-center gap-2">
+                <button onclick="app.openOrbeQuickGadget()" class="p-2 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40 hover:bg-purple-600/50 transition shrink-0" title="Abrir Gadget de Vaciado Rápido">
+                  <span>🔮</span>
+                </button>
+                <input type="text" id="pensadero-direct-dump-input" placeholder="Vaciar pensamiento directo al Orbe..." 
+                  onkeydown="if(event.key==='Enter') app.quickDumpToOrbe(this.value)"
+                  class="flex-1 bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none px-1" />
+                <button onclick="app.dictateField('pensadero-direct-dump-input')" class="p-1.5 text-slate-400 hover:text-cyan-400 transition shrink-0" title="Dictar por voz">
+                  🎙️
+                </button>
+                <button onclick="app.quickDumpToOrbe(document.getElementById('pensadero-direct-dump-input').value)" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition shrink-0">
+                  Lanzar
+                </button>
               </div>
 
               <!-- Reactor de 8 Humos Nucleares para el Orbe -->
@@ -3388,6 +3651,103 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: text, category: cat })
+          }).catch(() => {});
+        }
+      }
+
+      // --- GADGET DE VACIADO RÁPIDO DIRECTO AL ORBE ---
+      openOrbeQuickGadget() {
+        const modal = document.getElementById('nexus-orbe-quick-gadget-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        this.selectedGadgetSmoke = 'humo_blanco';
+        this.selectGadgetSmoke('humo_blanco');
+        const input = document.getElementById('gadget-dump-text');
+        if (input) {
+          input.value = '';
+          setTimeout(() => input.focus(), 60);
+        }
+      }
+
+      selectGadgetSmoke(cat) {
+        this.selectedGadgetSmoke = cat;
+        document.querySelectorAll('.gadget-smoke-btn').forEach(btn => {
+          if (btn.getAttribute('data-smoke') === cat) {
+            btn.classList.add('ring-2', 'ring-cyan-400', 'bg-slate-800');
+          } else {
+            btn.classList.remove('ring-2', 'ring-cyan-400', 'bg-slate-800');
+          }
+        });
+        this.setOrbeColor(cat);
+      }
+
+      submitGadgetDump() {
+        const input = document.getElementById('gadget-dump-text');
+        if (!input) return;
+        const text = input.value.trim();
+        if (!text) {
+          input.focus();
+          return;
+        }
+        const smoke = this.selectedGadgetSmoke || 'humo_blanco';
+        this.quickDumpToOrbe(text, smoke);
+        this.closeModal('nexus-orbe-quick-gadget-modal');
+        input.value = '';
+      }
+
+      quickDumpToOrbe(text, customCategory = null) {
+        if (!text || !text.trim()) return;
+        const cleanText = text.trim();
+
+        let cat = customCategory;
+        if (!cat) {
+          const contract = this.classifyThoughtWithGeminiContract(cleanText);
+          cat = contract.category;
+        }
+        const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_blanco;
+
+        const newItem = {
+          id: this.uid(),
+          content: cleanText,
+          category: cat,
+          cognitiveWeight: meta.cognitiveWeight || 'medio',
+          module: meta.module || 'El Pensadero',
+          amount: (cat === 'humo_naranja') ? 50 : null,
+          contactName: (cat === 'humo_purpura') ? 'Contacto' : null,
+          hibernatedUntil: (cat === 'humo_ceniza') ? Date.now() + 14 * 86400000 : null,
+          isPinned: false,
+          isResolved: false,
+          createdAt: new Date().toISOString()
+        };
+
+        if (!this.state.pensadero) this.state.pensadero = [];
+        this.state.pensadero.unshift(newItem);
+        this.saveState();
+
+        // Limpiar input embebido si existe
+        const directInput = document.getElementById('pensadero-direct-dump-input');
+        if (directInput) directInput.value = '';
+
+        // Feedback visual inmediato en el Shader 3D (humo + pulso)
+        this.setOrbeColor(cat);
+        this.triggerShockwave();
+
+        // Feedback háptico
+        if (navigator.vibrate) {
+          try { navigator.vibrate([40, 30, 40]); } catch(e){}
+        }
+
+        // Si estamos en la vista Pensadero, refrescar la vista para mostrar la nueva tarjeta
+        if (this.currentView === 'pensadero') {
+          this.render();
+        }
+
+        // Sincronizar en backend si está disponible
+        if (this.backendAvailable) {
+          fetch(`${this.API_BASE}/pensadero`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: cleanText, category: cat })
           }).catch(() => {});
         }
       }
@@ -5052,7 +5412,13 @@
       startNexusListening() {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRec) {
-          alert("Tu navegador no soporta Web Speech API directamente. Puedes escribir tu comando en la caja de texto.");
+          const label = document.getElementById('nexus-status-label');
+          const input = document.getElementById('nexus-input');
+          if (label) label.textContent = 'Dictado no activo en este navegador. Escribe aquí tu comando:';
+          if (input) {
+            input.focus();
+            input.placeholder = "Escribe tu comando o pensamiento para Nexus...";
+          }
           return;
         }
 
@@ -5347,8 +5713,14 @@
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRec) {
-          const val = prompt("Dictado por voz no disponible en este navegador. Escribe aquí:", input.value);
-          if (val !== null) input.value = val;
+          input.focus();
+          const origPlaceholder = input.placeholder;
+          input.placeholder = "Dictado de voz no soportado en este navegador. Escribe aquí...";
+          input.classList.add('ring-2', 'ring-amber-500');
+          setTimeout(() => {
+            input.placeholder = origPlaceholder;
+            input.classList.remove('ring-2', 'ring-amber-500');
+          }, 3500);
           return;
         }
 
@@ -6438,64 +6810,95 @@
             </div>
           </div>
 
-          <!-- Barra de Herramientas Flotante estilo Freeform -->
-          <div class="mb-3 p-2.5 rounded-2xl theme-card border theme-border shadow-xl flex flex-wrap items-center justify-between gap-3 text-xs select-none">
-            
-            <!-- Herramientas de Trazo -->
-            <div class="flex items-center gap-1 p-1 rounded-xl theme-card-subtle border theme-border">
-              <button onclick="app.setFreeformTool('pen')" id="tool-pen" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" title="Bolígrafo fino nítido">
-                <span>✏️</span> <span class="hidden sm:inline">Bolígrafo</span>
-              </button>
-              <button onclick="app.setFreeformTool('brush')" id="tool-brush" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 theme-text-muted hover:text-white" title="Pincel / Marcador suave">
-                <span>🖌️</span> <span class="hidden sm:inline">Pincel</span>
-              </button>
-              <button onclick="app.setFreeformTool('highlighter')" id="tool-highlighter" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 theme-text-muted hover:text-white" title="Resaltador fluorescente semitransparente">
-                <span>🖍️</span> <span class="hidden sm:inline">Resaltador</span>
-              </button>
-              <button onclick="app.setFreeformTool('eraser')" id="tool-eraser" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 theme-text-muted hover:text-white" title="Borrador de trazos">
-                <span>🧹</span> <span class="hidden sm:inline">Borrador</span>
-              </button>
-            </div>
-
-            <!-- Paleta de Colores TDAH -->
-            <div class="flex items-center gap-1.5 p-1 rounded-xl theme-card-subtle border theme-border">
-              <button onclick="app.setFreeformColor('#10b981')" class="ff-color-btn w-6 h-6 rounded-full border-2 border-white ring-2 ring-emerald-500 transition scale-110" style="background:#10b981;" title="Esmeralda Focus"></button>
-              <button onclick="app.setFreeformColor('#06b6d4')" class="ff-color-btn w-6 h-6 rounded-full border theme-border transition hover:scale-105" style="background:#06b6d4;" title="Cian Eléctrico"></button>
-              <button onclick="app.setFreeformColor('#a855f7')" class="ff-color-btn w-6 h-6 rounded-full border theme-border transition hover:scale-105" style="background:#a855f7;" title="Lavanda Creativo"></button>
-              <button onclick="app.setFreeformColor('#eab308')" class="ff-color-btn w-6 h-6 rounded-full border theme-border transition hover:scale-105" style="background:#eab308;" title="Ámbar Alerta"></button>
-              <button onclick="app.setFreeformColor('#f43f5e')" class="ff-color-btn w-6 h-6 rounded-full border theme-border transition hover:scale-105" style="background:#f43f5e;" title="Rosa Neón"></button>
-              <button onclick="app.setFreeformColor('#ffffff')" class="ff-color-btn w-6 h-6 rounded-full border border-slate-400 transition hover:scale-105" style="background:#ffffff;" title="Blanco"></button>
-              <label class="w-6 h-6 rounded-full border theme-border overflow-hidden cursor-pointer flex items-center justify-center hover:scale-105 transition" title="Color personalizado">
-                <input type="color" id="freeform-custom-color" value="#10b981" onchange="app.setFreeformColor(this.value)" class="opacity-0 w-8 h-8 cursor-pointer" />
-                <span class="text-[9px] pointer-events-none">🌈</span>
-              </label>
-            </div>
-
-            <!-- Grosor del Trazo -->
-            <div class="flex items-center gap-1 p-1 rounded-xl theme-card-subtle border theme-border">
-              <button onclick="app.setFreeformSize(2)" class="ff-size-btn px-2 py-0.5 rounded text-[11px] font-mono theme-text-muted hover:text-white" title="Fino">2px</button>
-              <button onclick="app.setFreeformSize(5)" class="ff-size-btn px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/20 text-emerald-400 font-bold" title="Normal">5px</button>
-              <button onclick="app.setFreeformSize(12)" class="ff-size-btn px-2 py-0.5 rounded text-[11px] font-mono theme-text-muted hover:text-white" title="Grueso">12px</button>
-              <button onclick="app.setFreeformSize(24)" class="ff-size-btn px-2 py-0.5 rounded text-[11px] font-mono theme-text-muted hover:text-white" title="Marcador">24px</button>
-            </div>
-
-            <!-- Acciones de Edición (Deshacer, Rehacer, Limpiar) -->
-            <div class="flex items-center gap-1">
-              <button onclick="app.undoFreeform()" class="p-1.5 rounded-lg theme-card-subtle border theme-border theme-text-muted hover:text-white text-xs" title="Deshacer (Ctrl+Z)">
-                ↩️ Deshacer
-              </button>
-              <button onclick="app.redoFreeform()" class="p-1.5 rounded-lg theme-card-subtle border theme-border theme-text-muted hover:text-white text-xs" title="Rehacer (Ctrl+Y)">
-                ↪️ Rehacer
-              </button>
-              <button onclick="app.clearFreeform()" class="px-2.5 py-1.5 rounded-lg theme-card-subtle border theme-border text-rose-400 hover:text-rose-300 text-xs font-semibold" title="Limpiar lienzo por completo">
-                🗑️ Limpiar
-              </button>
-            </div>
-          </div>
-
-          <!-- Contenedor del Lienzo e interacción táctil / stylus -->
-          <div class="relative w-full rounded-3xl overflow-hidden border theme-border shadow-2xl bg-slate-950/70" id="freeform-canvas-container" style="min-height: 540px;">
+          <!-- Contenedor del Lienzo e interacción táctil / stylus (Menú Freeform Flotante Integrado) -->
+          <div class="relative w-full rounded-3xl overflow-hidden border theme-border shadow-2xl bg-slate-950/70 select-none" id="freeform-canvas-container" style="min-height: 580px;">
             <canvas id="freeform-canvas" class="w-full touch-none cursor-crosshair block"></canvas>
+            
+            <!-- ISLA DE HERRAMIENTAS FLOTANTE FREEFORM (MOVIBLE, REDIMENSIONABLE Y ADAPTABLE) -->
+            <div id="freeform-floating-toolbar" class="absolute top-3 left-3 sm:left-1/2 sm:-translate-x-1/2 z-30 select-none shadow-2xl rounded-2xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl text-white transition-all duration-200" style="touch-action: none;">
+              <!-- Cabecera de Arrastre y Control de Tamaño -->
+              <div class="flex items-center justify-between px-3 py-1.5 border-b border-slate-800/80 bg-slate-950/70 rounded-t-2xl cursor-grab active:cursor-grabbing text-slate-400 select-none" id="freeform-drag-handle" title="Arrastra para mover el menú por el lienzo">
+                <div class="flex items-center gap-1.5 pointer-events-none">
+                  <span class="text-xs font-mono font-bold tracking-widest text-slate-500">⋮⋮</span>
+                  <span class="text-[10px] font-mono font-semibold text-slate-300 uppercase tracking-wider">Freeform Island</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <!-- Botón de Redimensionar / Compactar -->
+                  <button type="button" onclick="app.toggleFreeformToolbarMode()" id="freeform-mode-toggle-btn" class="px-2 py-0.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-[10px] font-mono text-cyan-300 border border-slate-700 flex items-center gap-1 transition" title="Cambiar tamaño: Modo Compacto / Modo Completo">
+                    <span id="freeform-mode-icon">⤡</span> <span id="freeform-mode-label" class="hidden sm:inline">Compactar</span>
+                  </button>
+                  <!-- Botón de Orientación (Horizontal / Vertical) -->
+                  <button type="button" onclick="app.toggleFreeformToolbarOrientation()" id="freeform-orient-btn" class="px-1.5 py-0.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-[10px] font-mono text-purple-300 border border-slate-700 transition" title="Cambiar orientación (Horizontal / Vertical)">
+                    ⇄
+                  </button>
+                </div>
+              </div>
+
+              <!-- Paleta Completa (Modo Expandido) -->
+              <div id="freeform-tools-expanded" class="p-2 flex flex-wrap items-center gap-2 text-xs">
+                <!-- Herramientas de Trazo -->
+                <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-950/60 border border-slate-800">
+                  <button onclick="app.setFreeformTool('pen')" id="tool-pen" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" title="Bolígrafo fino">
+                    <span>✏️</span> <span class="hidden sm:inline">Pluma</span>
+                  </button>
+                  <button onclick="app.setFreeformTool('brush')" id="tool-brush" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 text-slate-400 hover:text-white" title="Pincel suave">
+                    <span>🖌️</span> <span class="hidden sm:inline">Pincel</span>
+                  </button>
+                  <button onclick="app.setFreeformTool('highlighter')" id="tool-highlighter" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 text-slate-400 hover:text-white" title="Resaltador">
+                    <span>🖍️</span>
+                  </button>
+                  <button onclick="app.setFreeformTool('eraser')" id="tool-eraser" class="ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 text-slate-400 hover:text-white" title="Borrador">
+                    <span>🧹</span>
+                  </button>
+                  <button onclick="app.addFreeformStickyNote()" class="px-2 py-1 rounded-lg text-amber-300 hover:text-amber-200 transition font-semibold" title="Agregar nota Post-It">
+                    <span>📝</span>
+                  </button>
+                  <label class="px-2 py-1 rounded-lg text-cyan-300 hover:text-cyan-200 transition cursor-pointer" title="Subir imagen al lienzo">
+                    <span>🖼️</span>
+                    <input type="file" accept="image/*" class="hidden" onchange="app.handleFreeformImageUpload(event)" />
+                  </label>
+                </div>
+
+                <!-- Paleta de Colores -->
+                <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/60 border border-slate-800">
+                  <button onclick="app.setFreeformColor('#10b981')" class="ff-color-btn w-5 h-5 rounded-full border-2 border-white ring-2 ring-emerald-500 transition scale-110" style="background:#10b981;" title="Esmeralda"></button>
+                  <button onclick="app.setFreeformColor('#06b6d4')" class="ff-color-btn w-5 h-5 rounded-full border border-slate-700 transition hover:scale-105" style="background:#06b6d4;" title="Cian"></button>
+                  <button onclick="app.setFreeformColor('#a855f7')" class="ff-color-btn w-5 h-5 rounded-full border border-slate-700 transition hover:scale-105" style="background:#a855f7;" title="Púrpura"></button>
+                  <button onclick="app.setFreeformColor('#eab308')" class="ff-color-btn w-5 h-5 rounded-full border border-slate-700 transition hover:scale-105" style="background:#eab308;" title="Ámbar"></button>
+                  <button onclick="app.setFreeformColor('#f43f5e')" class="ff-color-btn w-5 h-5 rounded-full border border-slate-700 transition hover:scale-105" style="background:#f43f5e;" title="Rosa"></button>
+                  <button onclick="app.setFreeformColor('#ffffff')" class="ff-color-btn w-5 h-5 rounded-full border border-slate-400 transition hover:scale-105" style="background:#ffffff;" title="Blanco"></button>
+                  <label class="w-5 h-5 rounded-full border border-slate-700 overflow-hidden cursor-pointer flex items-center justify-center hover:scale-105 transition" title="Color personalizado">
+                    <input type="color" id="freeform-custom-color" value="#10b981" onchange="app.setFreeformColor(this.value)" class="opacity-0 w-6 h-6 cursor-pointer" />
+                    <span class="text-[8px] pointer-events-none">🌈</span>
+                  </label>
+                </div>
+
+                <!-- Grosor del Trazo -->
+                <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-950/60 border border-slate-800">
+                  <button onclick="app.setFreeformSize(2)" class="ff-size-btn px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 hover:text-white">2px</button>
+                  <button onclick="app.setFreeformSize(5)" class="ff-size-btn px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold">5px</button>
+                  <button onclick="app.setFreeformSize(12)" class="ff-size-btn px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 hover:text-white">12px</button>
+                </div>
+
+                <!-- Acciones -->
+                <div class="flex items-center gap-1">
+                  <button onclick="app.undoFreeform()" class="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs" title="Deshacer (Ctrl+Z)">↩️</button>
+                  <button onclick="app.redoFreeform()" class="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs" title="Rehacer (Ctrl+Y)">↪️</button>
+                  <button onclick="app.clearFreeform()" class="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 text-xs font-semibold" title="Limpiar lienzo">🗑️</button>
+                </div>
+              </div>
+
+              <!-- Vista Compacta (Píldora Minimalista Flotante) -->
+              <div id="freeform-tools-compact" class="p-1.5 hidden flex items-center gap-2 text-xs">
+                <span id="freeform-compact-tool-icon" class="text-sm">✏️</span>
+                <span id="freeform-compact-color-dot" class="w-4 h-4 rounded-full border border-white/60 shadow" style="background:#10b981;"></span>
+                <span id="freeform-compact-size-badge" class="text-[10px] font-mono font-bold text-emerald-400">5px</span>
+                <button onclick="app.undoFreeform()" class="p-1 rounded bg-slate-800/80 text-xs hover:text-white" title="Deshacer">↩️</button>
+                <button onclick="app.toggleFreeformToolbarMode()" class="px-2 py-0.5 rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/40 text-[10px] font-bold hover:bg-purple-600/50 transition">
+                  ⤢ Expandir
+                </button>
+              </div>
+            </div>
             
             <!-- Capa de Notas Adhesivas Flotantes tipo Post-It -->
             <div id="freeform-notes-layer" class="absolute inset-0 pointer-events-none p-4 overflow-hidden">
@@ -6601,6 +7004,10 @@
 
         canvas.onpointerup = stopDrawing;
         canvas.onpointercancel = stopDrawing;
+
+        // Inicializar barra flotante integrada tipo Freeform
+        this.initDraggableFreeformToolbar();
+        this.updateFreeformCompactDisplay();
       }
 
       drawFreeformGrid(ctx, w, h) {
@@ -6697,6 +7104,7 @@
         if (active) {
           active.className = 'ff-tool-btn px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
         }
+        this.updateFreeformCompactDisplay();
       }
 
       setFreeformColor(color) {
@@ -6706,6 +7114,7 @@
         });
         const customEl = document.getElementById('freeform-custom-color');
         if (customEl) customEl.value = color;
+        this.updateFreeformCompactDisplay();
       }
 
       setFreeformSize(size) {
@@ -6717,6 +7126,113 @@
         if (activeBtn) {
           activeBtn.className = 'ff-size-btn px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/20 text-emerald-400 font-bold';
         }
+        this.updateFreeformCompactDisplay();
+      }
+
+      // --- CONTROLES Y ARRASTRE DE LA ISLA FLOTANTE FREEFORM ---
+      toggleFreeformToolbarMode() {
+        const expanded = document.getElementById('freeform-tools-expanded');
+        const compact = document.getElementById('freeform-tools-compact');
+        const icon = document.getElementById('freeform-mode-icon');
+        const label = document.getElementById('freeform-mode-label');
+        if (!expanded || !compact) return;
+
+        const isExpanded = !expanded.classList.contains('hidden');
+        if (isExpanded) {
+          expanded.classList.add('hidden');
+          compact.classList.remove('hidden');
+          if (icon) icon.textContent = '⤢';
+          if (label) label.textContent = 'Expandir';
+          this.updateFreeformCompactDisplay();
+        } else {
+          expanded.classList.remove('hidden');
+          compact.classList.add('hidden');
+          if (icon) icon.textContent = '⤡';
+          if (label) label.textContent = 'Compactar';
+        }
+      }
+
+      toggleFreeformToolbarOrientation() {
+        const expanded = document.getElementById('freeform-tools-expanded');
+        if (!expanded) return;
+        const isCol = expanded.classList.contains('flex-col');
+        if (isCol) {
+          expanded.classList.remove('flex-col');
+          expanded.classList.add('flex-row', 'flex-wrap');
+        } else {
+          expanded.classList.remove('flex-row', 'flex-wrap');
+          expanded.classList.add('flex-col');
+        }
+      }
+
+      updateFreeformCompactDisplay() {
+        const toolIcons = { pen: '✏️', brush: '🖌️', highlighter: '🖍️', eraser: '🧹' };
+        const iconEl = document.getElementById('freeform-compact-tool-icon');
+        const dotEl = document.getElementById('freeform-compact-color-dot');
+        const badgeEl = document.getElementById('freeform-compact-size-badge');
+
+        if (iconEl) iconEl.textContent = toolIcons[this.freeform.tool] || '✏️';
+        if (dotEl) dotEl.style.background = this.freeform.color;
+        if (badgeEl) badgeEl.textContent = `${this.freeform.size}px`;
+      }
+
+      initDraggableFreeformToolbar() {
+        const toolbar = document.getElementById('freeform-floating-toolbar');
+        const handle = document.getElementById('freeform-drag-handle');
+        const container = document.getElementById('freeform-canvas-container');
+        if (!toolbar || !handle || !container) return;
+
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let initialLeft = 0, initialTop = 0;
+
+        handle.onpointerdown = (e) => {
+          if (e.button !== 0 && e.pointerType === 'mouse') return;
+          try { handle.setPointerCapture(e.pointerId); } catch(err) {}
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+
+          const rect = toolbar.getBoundingClientRect();
+          const cRect = container.getBoundingClientRect();
+          initialLeft = rect.left - cRect.left;
+          initialTop = rect.top - cRect.top;
+
+          toolbar.classList.remove('sm:left-1/2', 'sm:-translate-x-1/2');
+          toolbar.style.left = `${initialLeft}px`;
+          toolbar.style.top = `${initialTop}px`;
+          toolbar.style.right = 'auto';
+          toolbar.style.bottom = 'auto';
+        };
+
+        handle.onpointermove = (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+
+          const cRect = container.getBoundingClientRect();
+          let newLeft = initialLeft + dx;
+          let newTop = initialTop + dy;
+
+          const maxLeft = Math.max(8, cRect.width - toolbar.offsetWidth - 8);
+          const maxTop = Math.max(8, cRect.height - toolbar.offsetHeight - 8);
+
+          newLeft = Math.max(8, Math.min(newLeft, maxLeft));
+          newTop = Math.max(8, Math.min(newTop, maxTop));
+
+          toolbar.style.left = `${newLeft}px`;
+          toolbar.style.top = `${newTop}px`;
+        };
+
+        const endDrag = (e) => {
+          if (isDragging) {
+            isDragging = false;
+            try { handle.releasePointerCapture(e.pointerId); } catch(err) {}
+          }
+        };
+
+        handle.onpointerup = endDrag;
+        handle.onpointercancel = endDrag;
       }
 
       saveFreeformStateToHistory() {
