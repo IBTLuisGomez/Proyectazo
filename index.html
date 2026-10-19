@@ -39,7 +39,12 @@
     }
   </script>
   <style>
-    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+    }
     html, body {
       width: 100%;
       max-width: 100vw;
@@ -51,12 +56,14 @@
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
       transition: background-color 0.25s ease, color 0.25s ease;
     }
     h1, h2, h3, .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     
-    /* Scrollbars suaves */
+    /* Scrollbars suaves (WebKit & Chromium) */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 999px; }
@@ -294,7 +301,7 @@
     <div class="w-full max-w-md flex items-center justify-between z-10 pt-2">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-          <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
+          <img src="assets/logo_dark.png" alt="Nexus N" class="w-full h-full object-cover app-logo-dynamic">
         </div>
         <div>
           <span class="font-display font-extrabold text-sm tracking-wider text-white block leading-tight">Nexus Orb</span>
@@ -320,6 +327,49 @@
         <span>✨</span> <span>Entrar al Sistema</span> <span>➔</span>
       </button>
       <p class="text-[10px] font-mono text-slate-400 text-center">Toca para comenzar tu sesión sin fricción</p>
+    </div>
+  </div>
+
+  <!-- ================= PANTALLA DE LOGIN CON DISEÑO NEÓN & SESIÓN PERSISTENTE ================= -->
+  <div id="nexus-login-overlay" class="fixed inset-0 z-[115] bg-[#070A10]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 sm:p-6 transition-all duration-500 opacity-0 pointer-events-none hidden">
+    <div class="relative w-full max-w-sm rounded-3xl border border-slate-800/90 bg-slate-900/90 p-6 sm:p-8 shadow-2xl text-center space-y-5 fade-enter">
+      <!-- Glow trasero -->
+      <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <!-- Logo App Dinámico (Oscuro en Dark Mode, Claro en Light Mode) -->
+      <div class="relative mx-auto w-20 h-20 rounded-2xl overflow-hidden border border-cyan-500/40 bg-slate-950 shadow-xl shadow-cyan-500/25 flex items-center justify-center">
+        <img src="assets/logo_dark.png" alt="FocusFlow Nexus" class="w-full h-full object-cover app-logo-dynamic">
+      </div>
+
+      <div>
+        <h2 class="text-xl font-display font-extrabold text-white tracking-wide">FocusFlow OS</h2>
+        <p class="text-xs text-cyan-400 font-mono mt-0.5">Nexus Cognitive OS • Sesión Segura</p>
+        <p class="text-[11px] text-slate-400 mt-2">Accede a tu orbe cognitivo, gestión multiproyecto TDAH y vaciado mental sin fricción.</p>
+      </div>
+
+      <form onsubmit="app.handleLoginSubmit(event)" class="space-y-4 text-left">
+        <div>
+          <label class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold mb-1">Nombre o Alias de Usuario</label>
+          <input type="text" id="login-username-input" placeholder="Tu nombre o alias..." 
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition font-sans" />
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-400">
+          <label class="flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="login-remember-session" checked class="rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-500" />
+            <span>Recordar en este equipo (30 días)</span>
+          </label>
+          <span class="text-[10px] text-emerald-400 font-mono">Offline-Ready</span>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:brightness-110 text-white font-display font-bold text-xs shadow-lg shadow-cyan-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>⚡</span> <span>Iniciar Sesión / Entrar</span> <span>➔</span>
+        </button>
+      </form>
+
+      <div class="text-[10px] font-mono text-slate-500 text-center">
+        No se volverá a solicitar video ni login en cada apertura rápida.
+      </div>
     </div>
   </div>
 
@@ -553,7 +603,7 @@
       <div class="nexus-modal-header bg-slate-950/40">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl overflow-hidden border border-purple-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/25">
-            <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
+            <img src="assets/logo_dark.png" alt="Nexus N" class="w-full h-full object-cover app-logo-dynamic">
           </div>
           <div>
             <h3 class="text-sm sm:text-base font-display font-extrabold flex items-center gap-2">
@@ -635,7 +685,7 @@
       <!-- Brand & Status -->
       <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none" onclick="app.navigate('pensadero')">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-cyan-500/30 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
-          <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
+          <img src="assets/logo_dark.png" alt="Nexus N" class="w-full h-full object-cover app-logo-dynamic">
         </div>
         <div>
           <div class="flex items-center gap-1.5 sm:gap-2">
@@ -754,7 +804,7 @@
     <div class="grid grid-cols-5 h-16 items-center px-1" id="mobile-nav">
       <button onclick="app.navigate('pensadero')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="pensadero">
         <div class="w-5 h-5 rounded-md overflow-hidden border border-cyan-500/40 shrink-0 mb-0.5">
-          <img src="assets/logo_icon_sin_bk.png" alt="Nexus" class="w-full h-full object-cover">
+          <img src="assets/logo_dark.png" alt="Nexus" class="w-full h-full object-cover app-logo-dynamic">
         </div>
         <span class="text-[9px] font-semibold whitespace-nowrap">Nexus Orb</span>
       </button>
@@ -777,44 +827,70 @@
     </div>
   </nav>
 
-  <!-- Universal Floating Action Button: [ Mic / FAB "Nexus" ] (MOVIBLE / DRAGGABLE) -->
-  <button id="universal-nexus-fab" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 text-white shadow-2xl shadow-purple-500/40 hover:scale-105 active:scale-95 transition flex items-center gap-2 group border border-purple-400/40 select-none cursor-grab active:cursor-grabbing touch-none" title="Nexus IA (Arrastra para mover a cualquier parte de la pantalla)">
-    <div class="w-6 h-6 rounded-full overflow-hidden border border-white/40 shrink-0 pointer-events-none">
-      <img src="assets/logo_icon_sin_bk.png" alt="Nexus" class="w-full h-full object-cover">
+  <!-- Universal Floating Action Dock: DUAL WIDGET [ 🔮 Orbe | 🎙️ Nexus IA ] (MOVIBLE / DRAGGABLE) -->
+  <div id="universal-nexus-fab" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 flex items-center p-1 rounded-full bg-slate-900/95 border border-cyan-500/40 shadow-2xl shadow-cyan-500/30 backdrop-blur-xl select-none touch-none transition-transform" title="Widget Dual: Arrastra para mover por la pantalla">
+    <!-- Manija de arrastre táctil -->
+    <div id="nexus-fab-handle" class="px-2 py-1 text-slate-400 cursor-grab active:cursor-grabbing flex items-center justify-center text-xs font-mono select-none" title="Arrastra el widget por la pantalla">
+      ⋮⋮
     </div>
-    <span class="text-xs font-bold font-display tracking-wide flex items-center gap-1.5 pointer-events-none">
-      <span>Nexus IA</span>
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-    </span>
-  </button>
+
+    <!-- Botón 1: Orbe Directo (Vaciado Rápido) -->
+    <button type="button" onclick="app.openOrbeQuickGadget()" class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:brightness-110 text-white font-bold text-xs shadow-md active:scale-95 transition" title="Abrir Orbe de Cristal (Vaciado Mental Rápido)">
+      <span>🔮</span>
+      <span class="text-[11px] font-display hidden xs:inline font-bold">Orbe</span>
+    </button>
+
+    <div class="w-[1px] h-5 bg-slate-700 mx-1"></div>
+
+    <!-- Botón 2: Nexus IA Directo (Voz e Inteligencia) -->
+    <button type="button" onclick="app.openNexusVoice('streaming')" class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md active:scale-95 transition" title="Hablar con Nexus IA">
+      <span class="animate-pulse">🎙️</span>
+      <span class="text-[11px] font-display hidden xs:inline font-bold">Nexus IA</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    </button>
+  </div>
 
   <!-- ================= GADGET: VACIADO DIRECTO AL ORBE (HUD FLOTANTE / MODAL) ================= -->
   <div id="nexus-orbe-quick-gadget-modal" class="hidden nexus-modal-wrapper">
-    <div class="nexus-modal-container theme-card border theme-border shadow-2xl fade-enter">
+    <div class="nexus-modal-container max-w-md theme-card border border-cyan-500/30 shadow-2xl fade-enter text-center">
       <!-- Header -->
-      <div class="nexus-modal-header bg-slate-950/40">
+      <div class="nexus-modal-header bg-slate-950/60 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-500 flex items-center justify-center text-base shadow-lg shadow-purple-500/30">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-base shadow-lg shadow-cyan-500/30">
             🔮
           </div>
-          <div>
-            <h3 class="text-sm font-display font-bold text-white">Vaciado Directo al Orbe</h3>
-            <p class="text-[10px] theme-text-muted">Libera tu mente en 1 segundo; el orbe absorbe y clasifica</p>
+          <div class="text-left">
+            <h3 class="text-sm font-display font-bold text-white">Gadget Nexus Orb Aislado</h3>
+            <p class="text-[10px] text-cyan-400 font-mono">Mantén presionado para hablar y vaciar al orbe</p>
           </div>
         </div>
         <button onclick="app.closeModal('nexus-orbe-quick-gadget-modal')" class="w-7 h-7 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-xs">✕</button>
       </div>
 
+      <!-- Centro Sensorial: Orbe Aislado con interacción Hold-to-Talk -->
+      <div class="py-4 flex flex-col items-center justify-center relative select-none">
+        <div id="gadget-orb-wrapper" class="relative w-40 h-40 rounded-full flex items-center justify-center cursor-pointer select-none transition-transform duration-300 active:scale-95 touch-none" 
+             onpointerdown="app.startGadgetHoldRecording()" onpointerup="app.stopGadgetHoldRecording()" onpointerleave="app.stopGadgetHoldRecording()"
+             title="Mantén presionado para hablar y soltar tu pensamiento">
+          <div id="gadget-orb-glow" class="absolute inset-0 rounded-full blur-2xl opacity-70 bg-gradient-to-tr from-cyan-500/40 via-purple-600/40 to-pink-500/40 animate-pulse pointer-events-none"></div>
+          <div class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-cyan-400/60 shadow-[0_0_40px_rgba(6,182,212,0.5)] flex items-center justify-center bg-black/80 backdrop-blur">
+            <div id="gadget-orb-icon" class="text-4xl animate-bounce">🎙️</div>
+          </div>
+        </div>
+        <div class="mt-2 text-center">
+          <span id="gadget-recording-hint" class="text-xs font-mono font-bold text-cyan-300 bg-slate-950/80 px-3 py-1 rounded-full border border-cyan-500/30">
+            Mantén presionado el Orbe para hablar
+          </span>
+        </div>
+      </div>
+
       <!-- Body -->
       <div class="nexus-modal-scroll-body space-y-3.5 text-xs">
         <div>
-          <label class="block text-xs font-bold mb-1.5 text-slate-300">¿Qué pensamiento deseas soltar o registrar?</label>
+          <label class="block text-xs font-bold mb-1.5 text-slate-300">O escribe rápidamente tu pensamiento:</label>
           <div class="relative">
-            <textarea id="gadget-dump-text" rows="3" placeholder="Escribe o dicta aquí... (ej: 'Comprar reactivos para CytoCore' o 'Idea para el diseño de CytoHelix')..." 
-              class="w-full p-3 pr-10 rounded-2xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
-            <button type="button" onclick="app.dictateField('gadget-dump-text')" class="absolute right-2.5 top-2.5 p-1.5 rounded-xl bg-purple-600/30 text-purple-300 hover:bg-purple-600/50 transition text-sm" title="Dictar por voz">
-              🎙️
-            </button>
+            <textarea id="gadget-dump-text" rows="2" placeholder="Escribe tu idea o nota mental aquí..." 
+              class="w-full p-2.5 rounded-2xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none font-sans"></textarea>
           </div>
         </div>
 
@@ -1225,7 +1301,7 @@
       <div class="nexus-modal-header bg-slate-950/40">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border border-emerald-500/40 bg-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-            <img src="assets/logo_icon_sin_bk.png" alt="Nexus N" class="w-full h-full object-cover">
+            <img src="assets/logo_dark.png" alt="Nexus N" class="w-full h-full object-cover app-logo-dynamic">
           </div>
           <div>
             <h3 class="text-sm sm:text-base font-display font-extrabold text-white">Instalar Nexus Orb en tu Dispositivo</h3>
@@ -1437,6 +1513,82 @@
     </div>
   </div>
 
+  <!-- 10. MODAL / ESTACIÓN: WIDGET DUAL (ORBE + NEXUS IA) -->
+  <div id="modal-dual-widget" class="hidden nexus-modal-wrapper">
+    <div class="nexus-modal-container max-w-xl theme-card border border-cyan-500/40 shadow-2xl fade-enter text-left">
+      <!-- Header -->
+      <div class="nexus-modal-header bg-slate-950/60 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-lg font-bold shadow-lg shadow-purple-500/30">
+            ⚡
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-display font-extrabold text-white flex items-center gap-2">
+              <span>Estación Dual</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Widget Launcher</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">Acceso simultáneo: Vaciado al Orbe y Asistente Nexus IA</p>
+          </div>
+        </div>
+        <button onclick="app.closeModal('modal-dual-widget')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+      </div>
+
+      <!-- Body: Cabina Dual -->
+      <div class="nexus-modal-scroll-body p-4 sm:p-6 space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- ESTACIÓN 1: ORBE DE CRISTAL 3D -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-purple-500/30 text-center flex flex-col justify-between space-y-3 shadow-lg">
+            <div>
+              <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-purple-600/30 to-pink-500/30 border border-purple-400/50 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                🔮
+              </div>
+              <h4 class="text-sm font-bold text-white mt-2 font-display">Orbe de Cristal 3D</h4>
+              <p class="text-[11px] text-purple-300 mt-1">Vaciado mental inmediato y humo reactivo sin listas.</p>
+            </div>
+            
+            <div class="space-y-2">
+              <button onclick="app.closeModal('modal-dual-widget'); app.openOrbeQuickGadget()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+                <span>🔮</span> <span>Vaciado Rápido</span>
+              </button>
+              <button onclick="app.closeModal('modal-dual-widget'); app.navigate('pensadero')" class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
+                Ver Cuenca Completa ➔
+              </button>
+            </div>
+          </div>
+
+          <!-- ESTACIÓN 2: NEXUS IA DIRECTO -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-cyan-500/30 text-center flex flex-col justify-between space-y-3 shadow-lg">
+            <div>
+              <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-cyan-600/30 to-blue-500/30 border border-cyan-400/50 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(6,182,212,0.4)] animate-pulse">
+                🎙️
+              </div>
+              <h4 class="text-sm font-bold text-white mt-2 font-display">Nexus IA Asistente</h4>
+              <p class="text-[11px] text-cyan-300 mt-1">Comandos por voz, autoclasificación y foco.</p>
+            </div>
+
+            <div class="space-y-2">
+              <button onclick="app.closeModal('modal-dual-widget'); app.openNexusVoice('streaming')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+                <span class="animate-pulse">🎙️</span> <span>Hablar con IA</span>
+              </button>
+              <button onclick="app.closeModal('modal-dual-widget'); app.openNexusVoice('pensadero')" class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
+                Comandos de Texto ➔
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 text-[11px] flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span>💡</span> <span>Puedes añadir este widget a tu pantalla de inicio desde el menú de la app.</span>
+          </span>
+          <button onclick="app.openMobileAppModal()" class="text-cyan-400 font-bold hover:underline shrink-0">Ver cómo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= APPLICATION ENGINE JAVASCRIPT ================= -->
   <script>
     /**
@@ -1613,9 +1765,26 @@
           this.startLoop();
           return;
         }
+        this.stopLoop();
         this.canvas = canvas;
-        const gl = canvas.getContext('webgl', { alpha: true, antialias: true }) || 
-                   canvas.getContext('experimental-webgl', { alpha: true, antialias: true });
+
+        // Context loss / restoration listeners para prevenir que la orbe se quede en blanco
+        if (!canvas._webglListenersAttached) {
+          canvas._webglListenersAttached = true;
+          canvas.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            console.warn('WebGL context lost, pausing loop.');
+            this.stopLoop();
+          }, false);
+          canvas.addEventListener('webglcontextrestored', () => {
+            console.log('WebGL context restored, reinitializing engine.');
+            this.canvas = null;
+            this.init(canvas);
+          }, false);
+        }
+
+        const gl = canvas.getContext('webgl', { alpha: true, antialias: false, powerPreference: 'high-performance' }) || 
+                   canvas.getContext('experimental-webgl', { alpha: true, antialias: false });
         if (!gl) {
           console.warn("WebGL no disponible en este dispositivo.");
           return;
@@ -1777,78 +1946,62 @@
             vec3 refrRd = refract(rd, N, 1.0 / 1.45);
             if (dot(refrRd, refrRd) < 0.001) refrRd = rd;
 
-            // Marcha volumétrica a través del humo atrapado en el cristal (22 pasos para fluidez orgánica)
-            float stepDist = (tBack - tFront) / 22.0;
+            // Marcha volumétrica fluida optimizada (15 pasos rápidos sin sobrecalentar GPU)
+            float stepDist = (tBack - tFront) / 15.0;
             vec3 p = pFront + refrRd * (stepDist * 0.35);
 
             vec3 smokeAcc = vec3(0.0);
             float transmission = 1.0;
-
             float pulseMod = 1.0 + 0.25 * u_pulse * sin(u_time * 8.0);
 
-            for (int i = 0; i < 22; i++) {
+            for (int i = 0; i < 15; i++) {
               float rNorm = length(p) / R;
-              if (rNorm < 0.95) {
-                // DOMAIN WARPING MULTI-ESCALA:
-                // El humo se deforma, ondula y riza como gas real en convección continua
+              if (rNorm < 0.94) {
                 vec3 q = p;
-                // Convección térmica ascendente suave del fluido
-                q.y -= u_time * 0.26 * (1.0 - u_sink * 1.3);
+                // Convección ascendente del humo
+                q.y -= u_time * 0.22 * (1.0 - u_sink * 1.3);
 
-                // Rotación toroidal y vórtice interior
-                float swirlAngle = u_time * (0.22 + u_turbulence * 0.25) * (1.1 - rNorm * 0.45);
+                // Rotación toroidal y vórtice
+                float swirlAngle = u_time * (0.20 + u_turbulence * 0.22) * (1.1 - rNorm * 0.45);
                 q.xz = rot2D(swirlAngle) * q.xz;
 
-                // Nivel 1 de deformación de fluido (wisps & plumes)
-                vec3 warp1 = vec3(
-                  snoise(q * 1.6 + vec3(0.0, u_time * 0.12, 0.0)),
-                  snoise(q * 1.6 + vec3(4.3, 0.0, u_time * 0.14)),
-                  snoise(q * 1.6 + vec3(1.2, u_time * 0.10, 3.4))
+                // Deformación de dominio fluida de 1 pasada para máxima velocidad a 60 FPS
+                vec3 warp = vec3(
+                  snoise(q * 1.5 + vec3(0.0, u_time * 0.12, 0.0)),
+                  snoise(q * 1.5 + vec3(4.3, 0.0, u_time * 0.14)),
+                  snoise(q * 1.5 + vec3(1.2, u_time * 0.10, 3.4))
                 );
 
-                // Nivel 2 de deformación (turbulencia fina y volutas arremolinadas)
-                vec3 q2 = q * 2.1 + warp1 * 0.65;
-                q2.y -= u_time * 0.18;
-                vec3 warp2 = vec3(
-                  snoise(q2 * 2.0 + vec3(2.5, u_time * 0.18, 1.1)),
-                  snoise(q2 * 2.0 + vec3(1.8, 3.7, u_time * 0.20)),
-                  snoise(q2 * 2.0 + vec3(u_time * 0.15, 5.2, 2.9))
-                );
+                // Muestreo FBM deformado (produce volutas gaseosas vivas)
+                float noiseVal = fbm(q * 2.0 + warp * 0.55);
 
-                // Muestreo FBM con el espacio deformado (produce volutas gaseosas vivas reales)
-                float noiseVal = fbm(q2 + warp2 * 0.45);
-
-                // Densidad volumétrica confinada orgánicamente dentro del cristal
-                float d = smoothstep(-0.12, 0.52, noiseVal);
-                d *= smoothstep(0.95, 0.60, rNorm); // desvanece suavemente antes de tocar el cristal
+                // Densidad volumétrica confinada en la esfera
+                float d = smoothstep(-0.10, 0.48, noiseVal);
+                d *= smoothstep(0.94, 0.58, rNorm);
                 d *= (u_density * 0.88 + 0.25);
                 d *= (1.0 - u_dissipation * 0.65);
 
-                if (d > 0.01) {
-                  // MODELADO DE COLOR VOLUMÉTRICO ACORDE AL COLOR SELECCIONADO:
-                  // 1. Base / Sombra interna densa del gas
+                if (d > 0.015) {
+                  // Paleta dinámica puramente reactiva al color seleccionado
                   vec3 colBase = u_coreColor;
-                  // 2. Manto vibrante principal del color seleccionado
                   vec3 colBody = u_color;
-                  // 3. Resplandor difuso en las crestas y filamentos externos
                   vec3 colHighlight = mix(u_color, vec3(1.0), 0.52);
 
-                  // Gradiente continuo según densidad del humo
-                  vec3 colStep = mix(colBase, colBody, smoothstep(-0.05, 0.48, noiseVal));
-                  colStep = mix(colStep, colHighlight, smoothstep(0.28, 0.82, noiseVal));
+                  vec3 colStep = mix(colBase, colBody, smoothstep(-0.05, 0.45, noiseVal));
+                  colStep = mix(colStep, colHighlight, smoothstep(0.26, 0.80, noiseVal));
 
-                  // Filamentos incandescentes luminosos en el corazón de las volutas
+                  // Filamentos centrales luminosos
                   float coreLuminance = pow(max(noiseVal, 0.0), 3.0) * 0.85;
                   colStep += mix(u_color, vec3(1.0), 0.75) * coreLuminance;
 
                   colStep *= pulseMod;
                   if (u_flash > 0.01) colStep += vec3(u_flash * 0.85);
 
-                  float stepAlpha = clamp(d * 0.35, 0.0, 1.0);
+                  float stepAlpha = clamp(d * 0.42, 0.0, 1.0);
                   smokeAcc += colStep * stepAlpha * transmission;
                   transmission *= (1.0 - stepAlpha);
 
-                  if (transmission < 0.02) break;
+                  if (transmission < 0.04) break;
                 }
               }
               p += refrRd * stepDist;
@@ -1972,11 +2125,18 @@
 
       startLoop() {
         if (this.animId) cancelAnimationFrame(this.animId);
-        const render = () => {
-          this.renderFrame();
+        let lastTime = 0;
+        const targetFpsInterval = 1000 / 60; // 16.6ms max (optimizado para pantallas de 144Hz/165Hz como Motorola Edge)
+        const render = (currentTime) => {
           this.animId = requestAnimationFrame(render);
+          if (!currentTime) currentTime = performance.now();
+          const elapsed = currentTime - lastTime;
+          if (elapsed >= targetFpsInterval) {
+            lastTime = currentTime - (elapsed % targetFpsInterval);
+            this.renderFrame();
+          }
         };
-        render();
+        render(performance.now());
       }
 
       stopLoop() {
@@ -1990,9 +2150,14 @@
         const gl = this.gl;
         if (!gl || !this.program || !this.canvas) return;
 
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const width = Math.floor((this.canvas.clientWidth || 320) * dpr);
-        const height = Math.floor((this.canvas.clientHeight || 320) * dpr);
+        // Clamping de resolución interna a max 320x320:
+        // El humo es volumétrico y suave; escalado por CSS se ve idéntico y ahorra el 88% de la GPU
+        const maxDim = 320;
+        const clientW = this.canvas.clientWidth || 320;
+        const clientH = this.canvas.clientHeight || 320;
+        const scale = Math.min(1.0, maxDim / Math.max(clientW, clientH));
+        const width = Math.max(128, Math.floor(clientW * scale));
+        const height = Math.max(128, Math.floor(clientH * scale));
         if (this.canvas.width !== width || this.canvas.height !== height) {
           this.canvas.width = width;
           this.canvas.height = height;
@@ -2137,15 +2302,13 @@
           this.state.pensadero = this.getDefaultPensadero();
         }
 
-        // Limpiar todos los pensamientos para comenzar desde cero conservando los proyectos intactos
-        if (!localStorage.getItem('nexus_pensadero_clean_v3')) {
+        // Pensadero limpio e inicializado sin reset destructivo
+        if (!this.state.pensadero) {
           this.state.pensadero = [];
-          localStorage.setItem('nexus_pensadero_clean_v3', 'true');
-          this.saveState();
         }
 
-        if (!this.state.projects || this.state.projects.length === 0) {
-          this.state.projects = this.getSeedData().projects;
+        if (!this.state.projects) {
+          this.state.projects = [];
         }
         if (!this.state.inbox) {
           this.state.inbox = [];
@@ -2169,117 +2332,12 @@
       }
 
       getSeedData() {
-        const now = new Date();
-        const yesterday = new Date(Date.now() - 86400000);
-        const twoDaysAgo = new Date(Date.now() - 2 * 86400000);
-        const fourDaysAgo = new Date(Date.now() - 4 * 86400000);
-        const eightDaysAgo = new Date(Date.now() - 8 * 86400000);
-
         return {
           settings: { sound: true, vibration: true, theme: 'theme-dark-soft', userName: 'Usuario' },
-          pensadero: this.getDefaultPensadero(),
+          pensadero: [],
           inbox: [],
-          projects: [
-            {
-              id: 'p-focusflow',
-              name: 'FocusFlow OS',
-              emoji: '⚡',
-              color: '#10b981',
-              status: 'activo',
-              energy: 'alta',
-              objective: 'Construir el sistema operativo personal para TDAH con Nexus Orb 3D, Spring Boot y despliegue Docker',
-              context: 'Arquitectura unificada offline-first + REST API en Spring Boot 3.3.4, límite WIP estricto de 3 tarjetas y sincronización automática.',
-              nextAction: 'Probar el generador de Ruido Marrón en el temporizador de sprint y validar el flujo de Nexus Orb',
-              nextActionType: 'hacer',
-              lastActivity: now.toISOString(),
-              logs: [
-                {
-                  id: 'log-f1',
-                  date: now.toISOString(),
-                  achievement: 'Diseñé el módulo Nexus Orb 3D para desahogo mental sin fricción y añadí síntesis de Ruido Marrón.',
-                  nextStep: 'Probar el generador de Ruido Marrón en el temporizador de sprint y validar el flujo de Nexus Orb',
-                  energy: 'alta',
-                  duration: 35
-                },
-                {
-                  id: 'log-f2',
-                  date: yesterday.toISOString(),
-                  achievement: 'Construí y empaqueté el backend completo en Spring Boot 3 con endpoints para proyectos, tareas y bitácora.',
-                  nextStep: 'Validar despliegue en Docker y Nginx proxy',
-                  energy: 'alta',
-                  duration: 45
-                }
-              ],
-              tasks: [
-                { id: 'tf-1', title: 'Generar reporte imprimible de la bitácora en PDF', column: 'buzon', effort: 'M' },
-                { id: 'tf-2', title: 'Añadir selector de batería mental en cabecera', column: 'proximo', effort: 'S' },
-                { id: 'tf-3', title: 'Integrar Ruido Marrón sintetizado con Web Audio API', column: 'enfoco', effort: 'S' },
-                { id: 'tf-4', title: 'Completar vista Nexus Orb con desglosador de ráfagas', column: 'enfoco', effort: 'M' },
-                { id: 'tf-5', title: 'Esperar validación de DNS y dominio en DigitalOcean', column: 'esperando', effort: 'S' },
-                { id: 'tf-6', title: 'Compilar backend Spring Boot 3.3.4', column: 'victorias', effort: 'M' },
-                { id: 'tf-7', title: 'Configurar Nginx reverse proxy y Docker Compose', column: 'victorias', effort: 'S' }
-              ]
-            },
-            {
-              id: 'p-cytohelix',
-              name: 'CytoHelix',
-              emoji: '🌐',
-              color: '#3b82f6',
-              status: 'activo',
-              energy: 'alta',
-              objective: 'Página web moderna y plataforma para desarrollo y consultoría de software de alto impacto',
-              context: 'Sitio web corporativo y showcase tecnológico: portafolio de arquitecturas cloud, microservicios, UI/UX reactivo e inteligencia artificial.',
-              nextAction: 'Diseñar la sección de servicios y casos de éxito de desarrollo de software en CytoHelix',
-              nextActionType: 'hacer',
-              lastActivity: yesterday.toISOString(),
-              logs: [
-                {
-                  id: 'log-ch1',
-                  date: yesterday.toISOString(),
-                  achievement: 'Estructuré wireframes y paleta visual futurista para la landing page de CytoHelix.',
-                  nextStep: 'Diseñar la sección de servicios y casos de éxito de desarrollo de software en CytoHelix',
-                  energy: 'alta',
-                  duration: 40
-                }
-              ],
-              tasks: [
-                { id: 'tch-1', title: 'Redactar propuesta de valor y catálogo de servicios de software', column: 'buzon', effort: 'S' },
-                { id: 'tch-2', title: 'Implementar animaciones 3D e interactivas en el hero de CytoHelix', column: 'proximo', effort: 'M' },
-                { id: 'tch-3', title: 'Diseñar sección de servicios y casos de éxito', column: 'enfoco', effort: 'M' },
-                { id: 'tch-4', title: 'Desplegar versión preliminar en Vercel / Nginx', column: 'victorias', effort: 'S' }
-              ]
-            },
-            {
-              id: 'p-cytocore',
-              name: 'CytoCore',
-              emoji: '🔬',
-              color: '#06b6d4',
-              status: 'activo',
-              energy: 'alta',
-              objective: 'Programa web y app para laboratorio de células mesenquimales, cultivo celular y manejo de dosis',
-              context: 'Suite biotecnológica y médica integral: control de lotes de cultivo celular, viabilidad celular, pases biológicos, criopreservación y calculadora precisa de dosis terapéuticas por paciente.',
-              nextAction: 'Validar el módulo de cálculo de dosis según peso del paciente y concentración celular',
-              nextActionType: 'hacer',
-              lastActivity: now.toISOString(),
-              logs: [
-                {
-                  id: 'log-cc1',
-                  date: now.toISOString(),
-                  achievement: 'Definí el modelo de datos para lotes de cultivo celular mesenquimal y trazabilidad de pases.',
-                  nextStep: 'Validar el módulo de cálculo de dosis según peso del paciente y concentración celular',
-                  energy: 'alta',
-                  duration: 50
-                }
-              ],
-              tasks: [
-                { id: 'tcc-1', title: 'Formulario de registro de donantes y consentimientos biológicos', column: 'buzon', effort: 'M' },
-                { id: 'tcc-2', title: 'Algoritmo de cálculo de dosis celulares por kg de peso', column: 'proximo', effort: 'M' },
-                { id: 'tcc-3', title: 'Módulo de monitoreo de cámaras de cultivo y confluencia', column: 'enfoco', effort: 'L' },
-                { id: 'tcc-4', title: 'Trazabilidad de criopreservación en tanques de nitrógeno', column: 'esperando', effort: 'M' },
-                { id: 'tcc-5', title: 'Arquitectura inicial de base de datos para cultivo mesenquimal', column: 'victorias', effort: 'L' }
-              ]
-            }
-          ]
+          projects: [],
+          freeformNotes: []
         };
       }
 
@@ -2341,7 +2399,13 @@
         const icon = document.getElementById('theme-icon');
         const themeColorMeta = document.getElementById('theme-color-meta');
 
-        if (themeName === 'theme-light') {
+        const isLight = (themeName === 'theme-light');
+        const activeLogo = isLight ? 'assets/logo_icon_sin_bk.png' : 'assets/logo_dark.png';
+        document.querySelectorAll('.app-logo-dynamic').forEach(img => {
+          img.src = activeLogo;
+        });
+
+        if (isLight) {
           html.classList.add('theme-light');
           if (icon) icon.textContent = '☀️';
           if (themeColorMeta) themeColorMeta.setAttribute('content', '#f8fafc');
@@ -2412,7 +2476,18 @@
           window.history.replaceState({ view: this.currentView }, '', `#${this.currentView}`);
         } else {
           const hashView = window.location.hash.replace('#', '');
-          if (hashView) this.currentView = hashView;
+          if (hashView === 'gadget') {
+            this.currentView = 'pensadero';
+            setTimeout(() => this.openOrbeQuickGadget(), 350);
+          } else if (hashView === 'nexus-ai') {
+            this.currentView = 'pensadero';
+            setTimeout(() => this.openNexusVoice('streaming'), 350);
+          } else if (hashView === 'dual-widget') {
+            this.currentView = 'pensadero';
+            setTimeout(() => this.openDualWidgetModal(), 350);
+          } else if (hashView) {
+            this.currentView = hashView;
+          }
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -2431,9 +2506,10 @@
         setTimeout(() => this.initDraggableNexusFab(), 120);
       }
 
-      // --- BOTÓN FLOTANTE NEXUS IA ARRASTRABLE (TOUCH & MOUSE CON PERSISTENCIA) ---
+      // --- DOCK FLOTANTE DUAL [ORBE + NEXUS IA] ARRASTRABLE (TOUCH & MOUSE CON PERSISTENCIA) ---
       initDraggableNexusFab() {
         const fab = document.getElementById('universal-nexus-fab');
+        const handle = document.getElementById('nexus-fab-handle') || fab;
         if (!fab) return;
 
         // Restaurar posición previa guardada si es válida
@@ -2442,10 +2518,10 @@
           try {
             const pos = JSON.parse(saved);
             if (typeof pos.left === 'number' && typeof pos.top === 'number') {
-              const maxLeft = Math.max(8, window.innerWidth - (fab.offsetWidth || 130) - 8);
-              const maxTop = Math.max(8, window.innerHeight - (fab.offsetHeight || 50) - 8);
-              const clampLeft = Math.max(8, Math.min(pos.left, maxLeft));
-              const clampTop = Math.max(8, Math.min(pos.top, maxTop));
+              const maxLeft = Math.max(16, window.innerWidth - (fab.offsetWidth || 180) - 16);
+              const maxTop = Math.max(16, window.innerHeight - (fab.offsetHeight || 50) - 16);
+              const clampLeft = Math.max(16, Math.min(pos.left, maxLeft));
+              const clampTop = Math.max(16, Math.min(pos.top, maxTop));
               fab.style.left = `${clampLeft}px`;
               fab.style.top = `${clampTop}px`;
               fab.style.right = 'auto';
@@ -2459,9 +2535,9 @@
         let initialLeft = 0, initialTop = 0;
         let hasMoved = false;
 
-        fab.onpointerdown = (e) => {
+        handle.onpointerdown = (e) => {
           if (e.button !== 0 && e.pointerType === 'mouse') return;
-          try { fab.setPointerCapture(e.pointerId); } catch(err) {}
+          try { handle.setPointerCapture(e.pointerId); } catch(err) {}
           isDragging = true;
           hasMoved = false;
           startX = e.clientX;
@@ -2472,21 +2548,21 @@
           initialTop = rect.top;
         };
 
-        fab.onpointermove = (e) => {
+        handle.onpointermove = (e) => {
           if (!isDragging) return;
           const dx = e.clientX - startX;
           const dy = e.clientY - startY;
 
-          if (Math.hypot(dx, dy) > 6) {
+          if (Math.hypot(dx, dy) > 4) {
             hasMoved = true;
             let newLeft = initialLeft + dx;
             let newTop = initialTop + dy;
 
-            const maxLeft = Math.max(8, window.innerWidth - fab.offsetWidth - 8);
-            const maxTop = Math.max(8, window.innerHeight - fab.offsetHeight - 8);
+            const maxLeft = Math.max(16, window.innerWidth - fab.offsetWidth - 16);
+            const maxTop = Math.max(16, window.innerHeight - fab.offsetHeight - 16);
 
-            newLeft = Math.max(8, Math.min(newLeft, maxLeft));
-            newTop = Math.max(8, Math.min(newTop, maxTop));
+            newLeft = Math.max(16, Math.min(newLeft, maxLeft));
+            newTop = Math.max(16, Math.min(newTop, maxTop));
 
             fab.style.left = `${newLeft}px`;
             fab.style.top = `${newTop}px`;
@@ -2498,24 +2574,22 @@
         const endFabDrag = (e) => {
           if (isDragging) {
             isDragging = false;
-            try { fab.releasePointerCapture(e.pointerId); } catch(err) {}
+            try { handle.releasePointerCapture(e.pointerId); } catch(err) {}
             if (hasMoved) {
               const rect = fab.getBoundingClientRect();
               localStorage.setItem('nexus_fab_pos', JSON.stringify({ left: rect.left, top: rect.top }));
-            } else {
-              this.openNexusVoice('streaming');
             }
           }
         };
 
-        fab.onpointerup = endFabDrag;
-        fab.onpointercancel = endFabDrag;
+        handle.onpointerup = endFabDrag;
+        handle.onpointercancel = endFabDrag;
 
         // Auto-clamp en caso de rotación o redimensionamiento de pantalla
         window.addEventListener('resize', () => {
           const rect = fab.getBoundingClientRect();
-          const maxLeft = Math.max(8, window.innerWidth - fab.offsetWidth - 8);
-          const maxTop = Math.max(8, window.innerHeight - fab.offsetHeight - 8);
+          const maxLeft = Math.max(16, window.innerWidth - fab.offsetWidth - 16);
+          const maxTop = Math.max(16, window.innerHeight - fab.offsetHeight - 16);
           if (rect.left > maxLeft || rect.top > maxTop) {
             fab.style.left = `${Math.min(rect.left, maxLeft)}px`;
             fab.style.top = `${Math.min(rect.top, maxTop)}px`;
@@ -2523,12 +2597,30 @@
         });
       }
 
-      // --- SPLASH INTRO CINEMÁTICA MÓVIL (NEXUSORB_NEON.MP4) ---
+      openDualWidgetModal() {
+        const modal = document.getElementById('modal-dual-widget');
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      // --- GESTIÓN DE SESIÓN PERSISTENTE & INTRO VIDEO (SOLO 1RA VEZ) ---
       initSplash() {
-        const isMobile = window.innerWidth < 768;
-        const alreadySeen = sessionStorage.getItem('nexus_intro_seen');
-        if (isMobile && !alreadySeen) {
+        const sessionToken = localStorage.getItem('nexus_session_token');
+        const sessionExpires = parseInt(localStorage.getItem('nexus_session_expires') || '0', 10);
+        const hasValidSession = sessionToken && Date.now() < sessionExpires;
+        const introSeen = localStorage.getItem('nexus_intro_seen_v1');
+
+        if (hasValidSession) {
+          // Sesión activa: entrar directo sin video ni login
+          this.applyUserSession();
+          return;
+        }
+
+        // Si nunca ha visto la intro en este navegador/app, mostrar video
+        if (!introSeen) {
           this.showSplash();
+        } else {
+          // Ya vio el video anteriormente: ir directo a la pantalla de login con diseño
+          this.showLogin();
         }
       }
 
@@ -2566,7 +2658,70 @@
             overlay.classList.add('hidden');
           }, 700);
         }
-        sessionStorage.setItem('nexus_intro_seen', 'true');
+        localStorage.setItem('nexus_intro_seen_v1', 'true');
+
+        // Si no hay sesión válida, pasar a la pantalla de login con diseño
+        const sessionToken = localStorage.getItem('nexus_session_token');
+        const sessionExpires = parseInt(localStorage.getItem('nexus_session_expires') || '0', 10);
+        if (!sessionToken || Date.now() >= sessionExpires) {
+          setTimeout(() => this.showLogin(), 250);
+        }
+      }
+
+      showLogin() {
+        const overlay = document.getElementById('nexus-login-overlay');
+        if (!overlay) return;
+        const userInput = document.getElementById('login-username-input');
+        if (userInput && this.state.settings?.userName) {
+          userInput.value = this.state.settings.userName;
+        }
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          overlay.classList.add('opacity-100');
+        }, 20);
+      }
+
+      handleLoginSubmit(e) {
+        if (e) e.preventDefault();
+        const userInput = document.getElementById('login-username-input');
+        const remember = document.getElementById('login-remember-session')?.checked ?? true;
+        const userName = (userInput && userInput.value.trim()) || 'Usuario';
+
+        if (!this.state.settings) this.state.settings = {};
+        this.state.settings.userName = userName;
+        this.saveState();
+
+        const durationDays = remember ? 30 : 1;
+        const expiresAt = Date.now() + durationDays * 24 * 60 * 60 * 1000;
+        localStorage.setItem('nexus_session_token', 'tok_' + this.uid());
+        localStorage.setItem('nexus_session_expires', expiresAt.toString());
+        localStorage.setItem('nexus_intro_seen_v1', 'true');
+
+        const overlay = document.getElementById('nexus-login-overlay');
+        if (overlay) {
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          overlay.classList.remove('opacity-100');
+          setTimeout(() => overlay.classList.add('hidden'), 500);
+        }
+
+        this.applyUserSession();
+        this.triggerDopamineReward();
+        if (this.shaderEngine) {
+          this.shaderEngine.pulseShockwave();
+        }
+      }
+
+      applyUserSession() {
+        const userName = this.state.settings?.userName || 'Usuario';
+        const userBadge = document.getElementById('header-username-badge');
+        if (userBadge) userBadge.textContent = userName;
+      }
+
+      logout() {
+        localStorage.removeItem('nexus_session_token');
+        localStorage.removeItem('nexus_session_expires');
+        this.showLogin();
       }
 
       // --- SÍNTESIS DE RUIDO MARRÓN FOCUS (WEB AUDIO API) ---
@@ -3094,7 +3249,6 @@
             </div>
           ` : ''}
 
-          <!-- Grid de Proyectos Activos -->
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-display font-bold uppercase tracking-wider theme-text-muted">
               Proyectos en Foco (${filteredProjects.length})
@@ -3104,9 +3258,20 @@
             </button>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            ${filteredProjects.map(p => this.renderProjectCard(p)).join('')}
-          </div>
+          ${filteredProjects.length === 0 ? `
+            <div class="p-10 text-center theme-card rounded-3xl border theme-border space-y-3">
+              <div class="text-4xl">🌱</div>
+              <h4 class="text-base font-bold text-white">Comienza con un lienzo limpio</h4>
+              <p class="text-xs theme-text-muted max-w-sm mx-auto">No hay proyectos activos todavía. Crea tu primer proyecto para empezar a registrar avances y organizar tus ideas.</p>
+              <button onclick="app.openProjectModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md shadow-brand-500/20 active:scale-95 transition">
+                + Crear Primer Proyecto
+              </button>
+            </div>
+          ` : `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${filteredProjects.map(p => this.renderProjectCard(p)).join('')}
+            </div>
+          `}
         `;
       }
 
@@ -3560,64 +3725,132 @@
 
       initOrbLongPress() {
         const wrapper = document.getElementById('nexus-core-wrapper');
-        if (!wrapper || wrapper._longPressAttached) return;
-        wrapper._longPressAttached = true;
+        if (!wrapper || wrapper._gesturesAttached) return;
+        wrapper._gesturesAttached = true;
 
         let pressTimer = null;
-        let isLongPress = false;
+        let isHoldingVoice = false;
+        let hasSwiped = false;
         let startX = 0, startY = 0;
+        let activeTranscript = '';
+
+        const speechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         const onDown = (e) => {
           if (e.button !== undefined && e.button !== 0) return;
-          isLongPress = false;
+          isHoldingVoice = false;
+          hasSwiped = false;
+          activeTranscript = '';
           this._suppressOrbClick = false;
+
           startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
           startY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
 
-          // Efecto visual de carga del orbe al presionar
-          wrapper.style.transform = 'scale(1.06)';
-          wrapper.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          wrapper.style.transform = 'scale(1.05)';
+          wrapper.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
           const glow = document.getElementById('nexus-orb-glow');
           if (glow) glow.style.opacity = '1';
 
+          // Timer de activación de grabación por voz Nexus IA (320ms hold)
           pressTimer = setTimeout(() => {
-            isLongPress = true;
+            if (hasSwiped) return;
+            isHoldingVoice = true;
             this._suppressOrbClick = true;
-            wrapper.style.transform = 'scale(1)';
 
-            // Vibración y onda expansiva de activación
+            // Feedback háptico
             if (navigator.vibrate) {
-              try { navigator.vibrate([70, 40, 100]); } catch(err){}
+              try { navigator.vibrate(60); } catch(err){}
             }
             this.triggerShockwave();
 
-            // Abrir captura directa de pensamiento al orbe
-            this.openOrbeQuickGadget();
-          }, 450);
+            // Activar HUD de grabación en vivo sobre el orbe
+            this.showOrbVoiceRecordingHUD(true);
+
+            // Iniciar reconocimiento por voz en streaming
+            if (speechRec) {
+              try {
+                this._orbHoldRecognition = new speechRec();
+                this._orbHoldRecognition.lang = 'es-ES';
+                this._orbHoldRecognition.continuous = true;
+                this._orbHoldRecognition.interimResults = true;
+
+                this._orbHoldRecognition.onresult = (evt) => {
+                  let str = '';
+                  for (let i = evt.resultIndex; i < evt.results.length; ++i) {
+                    str += evt.results[i][0].transcript;
+                  }
+                  if (str) {
+                    activeTranscript = str;
+                    const hudText = document.getElementById('orb-recording-transcript');
+                    if (hudText) hudText.textContent = str;
+                  }
+                };
+
+                this._orbHoldRecognition.onerror = (err) => {
+                  console.warn('Orb speech hold error:', err);
+                };
+
+                this._orbHoldRecognition.start();
+              } catch(err) {
+                console.warn('SpeechRec start failed:', err);
+              }
+            } else {
+              const hudText = document.getElementById('orb-recording-transcript');
+              if (hudText) hudText.textContent = 'Dictado no soportado en este navegador. Suelta para escribir tu pensamiento.';
+            }
+          }, 320);
         };
 
         const onMove = (e) => {
-          if (!pressTimer) return;
           const curX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
           const curY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
-          if (Math.hypot(curX - startX, curY - startY) > 12) {
-            cancel();
+          const dx = curX - startX;
+          const dy = curY - startY;
+
+          // Detección de DESLIZAMIENTO HORIZONTAL (SWIPE TOUCH) PARA CAMBIO DE COLOR
+          if (!isHoldingVoice && Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+            hasSwiped = true;
+            if (pressTimer) {
+              clearTimeout(pressTimer);
+              pressTimer = null;
+            }
+            this._suppressOrbClick = true;
+            startX = curX; // Evitar disparos múltiples en el mismo swipe
+            if (dx > 0) {
+              this.cycleOrbColor(-1); // Swipe derecha -> color anterior
+            } else {
+              this.cycleOrbColor(1);  // Swipe izquierda -> siguiente color
+            }
           }
         };
 
-        const cancel = () => {
+        const onUp = (e) => {
           if (pressTimer) {
             clearTimeout(pressTimer);
             pressTimer = null;
           }
+
           wrapper.style.transform = 'scale(1)';
           const glow = document.getElementById('nexus-orb-glow');
           if (glow) glow.style.opacity = '0.65';
-        };
 
-        const onUp = (e) => {
-          cancel();
-          if (isLongPress) {
+          if (isHoldingVoice) {
+            isHoldingVoice = false;
+            this.showOrbVoiceRecordingHUD(false);
+
+            if (this._orbHoldRecognition) {
+              try { this._orbHoldRecognition.stop(); } catch(err){}
+              this._orbHoldRecognition = null;
+            }
+
+            if (activeTranscript && activeTranscript.trim()) {
+              // Procesar el pensamiento o comando hablado con Nexus IA
+              this.processOrbVoiceInput(activeTranscript.trim());
+            } else {
+              // Si no se captó voz o no hay permisos de micro, abrir gadget rápido para escribir
+              this.openOrbeQuickGadget();
+            }
+
             if (e.preventDefault) e.preventDefault();
             if (e.stopPropagation) e.stopPropagation();
           }
@@ -3626,8 +3859,101 @@
         wrapper.addEventListener('pointerdown', onDown);
         wrapper.addEventListener('pointermove', onMove);
         wrapper.addEventListener('pointerup', onUp);
-        wrapper.addEventListener('pointercancel', cancel);
-        wrapper.addEventListener('pointerleave', cancel);
+        wrapper.addEventListener('pointercancel', onUp);
+        wrapper.addEventListener('pointerleave', onUp);
+      }
+
+      // HUD de grabación sobre el orbe
+      showOrbVoiceRecordingHUD(show) {
+        let hud = document.getElementById('orb-voice-recording-hud');
+        if (!hud) {
+          hud = document.createElement('div');
+          hud.id = 'orb-voice-recording-hud';
+          hud.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center transition-all duration-300 hidden';
+          hud.innerHTML = `
+            <div class="p-6 rounded-3xl bg-slate-900/95 border border-cyan-500/50 shadow-2xl max-w-sm w-full space-y-4">
+              <div class="relative w-16 h-16 mx-auto rounded-full bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center text-3xl animate-pulse">
+                🎙️
+              </div>
+              <div>
+                <h4 class="text-sm font-display font-bold text-white uppercase tracking-wider">Nexus IA Grabando</h4>
+                <p class="text-xs text-cyan-300 mt-1 font-mono">Habla tu pensamiento o indicación...</p>
+              </div>
+              <div id="orb-recording-transcript" class="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-200 min-h-[50px] flex items-center justify-center italic">
+                (Escuchando en tiempo real...)
+              </div>
+              <p class="text-[10px] text-slate-400 font-mono">Suelta el orbe cuando termines para depositar</p>
+            </div>
+          `;
+          document.body.appendChild(hud);
+        }
+
+        if (show) {
+          const transcriptEl = document.getElementById('orb-recording-transcript');
+          if (transcriptEl) transcriptEl.textContent = '(Escuchando en tiempo real...)';
+          hud.classList.remove('hidden');
+        } else {
+          hud.classList.add('hidden');
+        }
+      }
+
+      // Procesar voz del orbe (indicación a proyecto o pensamiento libre)
+      processOrbVoiceInput(text) {
+        if (!text || !text.trim()) return;
+        const clean = text.trim();
+        const lower = clean.toLowerCase();
+
+        // Feedback sonoro/háptico
+        this.triggerDopamineReward();
+        if (this.shaderEngine) {
+          this.shaderEngine.pulseShockwave();
+        }
+
+        // Verificar si es comando directo a un proyecto existente (ej: "mandar a cytohelix...", "agregar a cytocore...")
+        const projects = this.state.projects || [];
+        for (const p of projects) {
+          const pNameLower = p.name.toLowerCase();
+          if (lower.includes(pNameLower) || lower.includes(pNameLower.replace(' ', ''))) {
+            // Asignar directo a este proyecto
+            const cleanTitle = clean.replace(new RegExp('(mandar|agregar|mover|pasar)\s+(a|al\s+proyecto)\s+' + pNameLower, 'i'), '').trim() || clean;
+            if (!p.tasks) p.tasks = [];
+            p.tasks.push({
+              id: this.uid(),
+              title: cleanTitle,
+              column: 'buzon',
+              effort: 'S',
+              createdAt: new Date().toISOString()
+            });
+            this.saveState();
+            this.showToast(`🚀 Tarea enviada por voz a ${p.name}`, () => this.openKanbanProject(p.id));
+            return;
+          }
+        }
+
+        // Si no es comando de proyecto, depositar como pensamiento con autoclasificación
+        const currentCat = (this.pensaderoSmokeFilter && this.pensaderoSmokeFilter !== 'all') ? this.pensaderoSmokeFilter : 'humo_general';
+        this.quickDumpToOrbe(clean, currentCat);
+        this.showToast(`✨ Pensamiento depositado en el Orbe: "${clean.slice(0, 30)}..."`);
+      }
+
+      // Ciclar colores mediante deslizamiento (Swipe)
+      cycleOrbColor(direction = 1) {
+        const paletteKeys = Object.keys(SMOKE_PALETTE);
+        const current = this.pensaderoSmokeFilter || 'humo_general';
+        let idx = paletteKeys.indexOf(current);
+        if (idx === -1) idx = 0;
+
+        idx = (idx + direction + paletteKeys.length) % paletteKeys.length;
+        const nextCategory = paletteKeys[idx];
+
+        if (navigator.vibrate) {
+          try { navigator.vibrate(25); } catch(e){}
+        }
+
+        this.setOrbeColor(nextCategory);
+        if (this.shaderEngine) {
+          this.shaderEngine.pulseShockwave();
+        }
       }
 
       setOrbeColor(category) {
@@ -3750,6 +4076,74 @@
         }
       }
 
+      // --- GRABACIÓN RÁPIDA EN EL GADGET AISLADO ---
+      startGadgetHoldRecording() {
+        const hint = document.getElementById('gadget-recording-hint');
+        const icon = document.getElementById('gadget-orb-icon');
+        const glow = document.getElementById('gadget-orb-glow');
+        if (hint) hint.textContent = '🔴 Grabando... Suelta para depositar';
+        if (icon) icon.textContent = '🔊';
+        if (glow) glow.style.opacity = '1';
+
+        if (navigator.vibrate) {
+          try { navigator.vibrate(60); } catch(e){}
+        }
+
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this._gadgetTranscript = '';
+        if (SpeechRec) {
+          try {
+            this._gadgetRecognition = new SpeechRec();
+            this._gadgetRecognition.lang = 'es-ES';
+            this._gadgetRecognition.continuous = true;
+            this._gadgetRecognition.interimResults = true;
+            this._gadgetRecognition.onresult = (e) => {
+              let t = '';
+              for (let i = e.resultIndex; i < e.results.length; ++i) {
+                t += e.results[i][0].transcript;
+              }
+              if (t) {
+                this._gadgetTranscript = t;
+                const txt = document.getElementById('gadget-dump-text');
+                if (txt) txt.value = t;
+              }
+            };
+            this._gadgetRecognition.start();
+          } catch(err) {
+            console.warn('Gadget speech start failed:', err);
+          }
+        } else {
+          if (hint) hint.textContent = 'Dictado no activo en Firefox. Escribe abajo:';
+          const txt = document.getElementById('gadget-dump-text');
+          if (txt) txt.focus();
+        }
+      }
+
+      stopGadgetHoldRecording() {
+        const hint = document.getElementById('gadget-recording-hint');
+        const icon = document.getElementById('gadget-orb-icon');
+        const glow = document.getElementById('gadget-orb-glow');
+        if (hint) hint.textContent = 'Mantén presionado el Orbe para hablar';
+        if (icon) icon.textContent = '🎙️';
+        if (glow) glow.style.opacity = '0.7';
+
+        if (this._gadgetRecognition) {
+          try { this._gadgetRecognition.stop(); } catch(e){}
+          this._gadgetRecognition = null;
+        }
+
+        const text = (this._gadgetTranscript && this._gadgetTranscript.trim()) || 
+                     (document.getElementById('gadget-dump-text')?.value.trim()) || '';
+        if (text) {
+          const smoke = this.selectedGadgetSmoke || 'humo_general';
+          this.quickDumpToOrbe(text, smoke);
+          this.closeModal('nexus-orbe-quick-gadget-modal');
+          const txt = document.getElementById('gadget-dump-text');
+          if (txt) txt.value = '';
+          this.showToast(`✓ Pensamiento depositado desde Gadget: "${text.slice(0, 30)}..."`);
+        }
+      }
+
       // --- GADGET DE VACIADO RÁPIDO DIRECTO AL ORBE ---
       openOrbeQuickGadget() {
         const modal = document.getElementById('nexus-orbe-quick-gadget-modal');
@@ -3828,9 +4222,9 @@
           try { navigator.vibrate([40, 30, 40]); } catch(e){}
         }
 
-        // Si estamos en la vista Pensadero, refrescar la vista para mostrar la nueva tarjeta
+        // Si estamos en la vista Pensadero, actualizar solo tarjetas sin destruir el canvas WebGL
         if (this.currentView === 'pensadero') {
-          this.render();
+          this.renderPensaderoItemsOnly();
         }
 
         // Sincronizar en backend si está disponible
@@ -4162,20 +4556,101 @@
           createdAt: new Date().toISOString()
         });
 
-        // Eliminar del pensadero por su ID único
-        this.deletePensaderoItem(item.id);
+        // Eliminar del pensadero
+        const idx = this.getPensaderoIndex(item.id);
+        if (idx >= 0 && this.state.pensadero) {
+          this.state.pensadero.splice(idx, 1);
+        }
+
+        if (this.backendAvailable && item && item.id) {
+          fetch(`${this.API_BASE}/pensadero/${item.id}`, { method: 'DELETE' }).catch(() => {});
+        }
+
         this.saveState();
         this.closeModal('modal-dispatch-thought');
-        this.render();
+        this.renderPensaderoItemsOnly();
         this.triggerDopamineReward();
 
-        // Pulsar orbe y shader con color del proyecto
         if (this.shaderEngine) {
           this.shaderEngine.pulseShockwave();
         }
 
-        alert(`🚀 Pensamiento canalizado con éxito a "${project.name}" (${column === 'proximo' ? 'Próximo Paso' : 'Buzón'})`);
-        this.openKanbanProject(project.id);
+        // Toast moderno no bloqueante con acción
+        this.showToast(`🚀 Canalizado a ${project.name} (${column === 'proximo' ? 'Próximo Paso' : 'Buzón'})`, () => {
+          this.openKanbanProject(project.id);
+        }, 'Ver Tablero ➔');
+      }
+
+      // Renderiza únicamente la lista de pensamientos sin reiniciar el canvas WebGL ni causar parpadeo blanco
+      renderPensaderoItemsOnly() {
+        const list = document.getElementById('pensadero-list');
+        if (!list) {
+          this.render();
+          return;
+        }
+
+        const items = this.state.pensadero || [];
+        const activeFilter = this.pensaderoSmokeFilter || 'all';
+        const nowMs = Date.now();
+        const filteredItems = items.filter(it => {
+          if (activeFilter === 'all') {
+            if (it.category === 'humo_ceniza' && it.hibernatedUntil && it.hibernatedUntil > nowMs) return false;
+            return true;
+          }
+          if (activeFilter === 'humo_general' || activeFilter === 'general') return it.category === 'humo_general' || !it.category;
+          if (activeFilter === 'humo_blanco' || activeFilter === 'blanco') return it.category === 'humo_blanco' || it.category === 'descarga';
+          if (activeFilter === 'humo_rojo' || activeFilter === 'rojo') return it.category === 'humo_rojo' || it.category === 'duda';
+          if (activeFilter === 'humo_dorado' || activeFilter === 'dorado') return it.category === 'humo_dorado' || it.category === 'chispa';
+          if (activeFilter === 'humo_azul' || activeFilter === 'azul') return it.category === 'humo_azul';
+          if (activeFilter === 'humo_verde' || activeFilter === 'verde') return it.category === 'humo_verde';
+          if (activeFilter === 'humo_purpura' || activeFilter === 'purpura') return it.category === 'humo_purpura';
+          if (activeFilter === 'humo_naranja' || activeFilter === 'naranja') return it.category === 'humo_naranja';
+          if (activeFilter === 'humo_ceniza' || activeFilter === 'ceniza') return it.category === 'humo_ceniza';
+          return true;
+        });
+
+        list.innerHTML = filteredItems.length === 0 ? `
+          <div class="p-8 text-center rounded-3xl border border-dashed border-slate-800 bg-slate-950/40 text-slate-400">
+            <span class="text-3xl block mb-2">🔮</span>
+            <p class="font-semibold text-sm">Tu Pensadero está despejado en este filtro.</p>
+            <p class="text-xs mt-1 text-slate-500">Dicta o escribe arriba para almacenar y luego enviar a proyectos en 1 clic.</p>
+          </div>
+        ` : filteredItems.map((item, idx) => this.renderPensaderoCard(item, idx)).join('');
+
+        this.updateBadges();
+      }
+
+      // Sistema de Toast flotante no-bloqueante
+      showToast(message, actionCallback = null, actionText = 'Abrir') {
+        let toast = document.getElementById('nexus-global-toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'nexus-global-toast';
+          toast.className = 'fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/95 border border-cyan-500/40 text-white text-xs font-semibold shadow-2xl backdrop-blur-xl flex items-center gap-3 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none';
+          document.body.appendChild(toast);
+        }
+
+        toast.innerHTML = `
+          <span>${message}</span>
+          ${actionCallback ? `<button id="toast-action-btn" class="px-2.5 py-1 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 transition">${actionText}</button>` : ''}
+        `;
+
+        if (actionCallback) {
+          const btn = toast.querySelector('#toast-action-btn');
+          if (btn) btn.onclick = () => {
+            toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            actionCallback();
+          };
+        }
+
+        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        toast.classList.add('opacity-100', 'translate-y-0');
+
+        if (this._toastTimer) clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => {
+          toast.classList.remove('opacity-100', 'translate-y-0');
+          toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        }, 4000);
       }
 
       renderPensaderoCard(item, idx) {
@@ -4461,7 +4936,20 @@
       renderViewKanban(container) {
         const projects = this.state.projects || [];
         if (projects.length === 0) {
-          container.innerHTML = `<div class="p-8 text-center theme-text-muted">Crea un proyecto primero.</div>`;
+          container.innerHTML = `
+            <div class="max-w-md mx-auto p-10 text-center theme-card rounded-3xl border theme-border space-y-4 my-8">
+              <div class="w-16 h-16 mx-auto rounded-3xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-3xl">
+                ⚡
+              </div>
+              <div>
+                <h3 class="text-xl font-display font-extrabold text-white">Sin proyectos aún</h3>
+                <p class="text-xs theme-text-muted mt-1 max-w-xs mx-auto">Crea tu primer proyecto para desbloquear el tablero Kanban, descomponer metas con IA y activar el límite WIP de 3 tarjetas.</p>
+              </div>
+              <button onclick="app.openProjectModal()" class="px-5 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 active:scale-95 transition flex items-center gap-2 mx-auto">
+                <span>+</span> Crear Primer Proyecto
+              </button>
+            </div>
+          `;
           return;
         }
 
@@ -4983,6 +5471,7 @@
           // Audio chime suave y armónico con Web Audio API
           try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') { ctx.resume(); }
             const now = ctx.currentTime;
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
               const osc = ctx.createOscillator();
@@ -6086,6 +6575,7 @@
         if (this.state.settings?.sound) {
           try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') { ctx.resume(); }
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = 'triangle';
@@ -6943,6 +7433,7 @@
         if (this.state.settings?.sound) {
           try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') { ctx.resume(); }
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = 'sine';
