@@ -37,10 +37,20 @@ public class SyncService {
         return new SyncDataDTO(projects, inbox, pensadero);
     }
 
+    private static final java.util.Set<String> DEMO_PROJECT_IDS = java.util.Set.of(
+        "p-focusflow", "p-cytohelix", "p-cytocore", 
+        "proj_focusflow", "proj_cytohelix", "proj_cytocore"
+    );
+    private static final java.util.Set<String> DEMO_NAMES = java.util.Set.of(
+        "FocusFlow OS", "CytoHelix", "CytoCore"
+    );
+
     @Transactional
     public SyncDataDTO pushData(SyncDataDTO incoming) {
         if (incoming.getProjects() != null) {
             for (Project p : incoming.getProjects()) {
+                if (p.getId() != null && DEMO_PROJECT_IDS.contains(p.getId())) continue;
+                if (p.getName() != null && DEMO_NAMES.contains(p.getName().trim())) continue;
                 projectService.saveProject(p);
             }
         }

@@ -1286,9 +1286,8 @@
           </div>
         </div>
 
-        <div class="pt-2 text-center">
-          <button onclick="app.resetDemoData()" class="theme-text-muted hover:text-rose-400 underline text-[11px]">
-            Restaurar datos de demostración
+          <button onclick="app.clearAllUserData()" class="text-rose-400 hover:text-rose-300 font-semibold text-xs py-1.5 px-3 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 transition">
+            🗑️ Vaciar todo y empezar desde cero
           </button>
         </div>
       </div>
@@ -1868,158 +1867,71 @@
             return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
           }
 
-          // FBM de 4 octavas para volutas de humo orgánicas
-          float fbm(vec3 p) {
-            float f = 0.0;
-            float amp = 0.52;
-            float freq = 1.0;
-            for (int i = 0; i < 4; i++) {
-              f += amp * snoise(p * freq);
-              amp *= 0.5;
-              freq *= 2.05;
-            }
-            return f;
-          }
-
-          mat2 rot2D(float a) {
-            float c = cos(a), s = sin(a);
-            return mat2(c, -s, s, c);
-          }
-
           void main() {
-            // Normalizar coordenadas centradas en [-1.0, 1.0]
-            vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / (0.5 * min(u_resolution.x, u_resolution.y));
-            float d2d = length(uv);
+            vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / min(u_resolution.x, u_resolution.y);
+            float dist = length(uv);
 
-            // Cámara y dirección del rayo
-            vec3 ro = vec3(0.0, 0.0, 2.5);
-            vec3 rd = normalize(vec3(uv, -1.6));
+            // Paleta de humo seleccionada (reactiva dinámicamente a u_color y u_coreColor)
+            vec3 colSmoke = u_color;
+            vec3 colBase = u_coreColor;
+            vec3 colHighlight = mix(u_color, vec3(1.0), 0.72);
+            vec3 colDark = mix(colBase * 0.12, vec3(0.015, 0.022, 0.038), 0.78);
 
-            // ORBE DE CRISTAL FIJO (Radio R = 0.88)
-            float R = 0.88;
-            float b = dot(ro, rd);
-            float c = dot(ro, ro) - R * R;
-            float h = b * b - c;
+            // Deformación convectiva térmica del humo (Stitch Reactor Convective Model)
+            float t = u_time * (0.35 + u_turbulence * 0.32);
+            vec3 p = vec3(uv * (3.1 + u_expansion * 0.45), t);
+            p.y -= u_time * 0.18 * (1.0 - u_sink * 1.4);
 
-            // Halo suave y resplandor neón ambiental exterior
-            if (h < 0.0) {
-              float outerGlow = smoothstep(R + 0.35, R, d2d);
-              float pulseAura = 1.0 + 0.15 * u_pulse * sin(u_time * 6.0);
-              vec3 haloCol = u_color * outerGlow * 0.45 * pulseAura * (1.0 - u_sink * 0.5);
-              gl_FragColor = vec4(haloCol, outerGlow * 0.5);
-              return;
+            float n1 = snoise(p);
+            float n2 = snoise(p + vec3(n1 * 1.5, t * 0.6, 0.5));
+            float n3 = snoise(p + vec3(n2 * 2.0, -t * 0.4, n1));
+
+            // Esfera volumétrica con refracción de cristal
+            float sphereEdge = smoothstep(0.48, 0.42, dist);
+            float rim = smoothstep(0.35, 0.46, dist) * sphereEdge;
+            float innerGlow = smoothstep(0.44, 0.05, dist);
+
+            // Densidad de volutas de humo confinadas en la esfera
+            float smoke = smoothstep(-0.35 + (1.0 - u_density) * 0.35, 0.65, n3) * innerGlow;
+            smoke *= (1.0 - u_dissipation * 0.68);
+            float coreSpark = smoothstep(0.40, 0.82, n2) * smoothstep(0.25, 0.0, dist);
+
+            // Pulso y modulación
+            float pulseMod = 1.0 + 0.35 * u_pulse * sin(u_time * 8.0);
+
+            // Mezcla cromática del humo según el espectro seleccionado
+            vec3 smokeColor = mix(colDark, colSmoke, clamp(smoke * 1.45, 0.0, 1.0));
+            smokeColor = mix(smokeColor, colBase, clamp(n2 * 0.80, 0.0, 1.0));
+            smokeColor += colHighlight * (coreSpark * (1.25 + u_pulse * 1.6) * pulseMod);
+            smokeColor += colSmoke * (rim * (1.5 + u_pulse * 0.85));
+
+            // Destello de impacto
+            if (u_flash > 0.01) {
+              smokeColor += vec3(u_flash * 0.95);
             }
 
-            // Puntos de intersección del rayo con el cristal
-            float sqrtH = sqrt(h);
-            float tFront = -b - sqrtH;
-            float tBack = -b + sqrtH;
-
-            vec3 pFront = ro + rd * tFront;
-            vec3 N = normalize(pFront);
-
-            // ==========================================
-            // ÓPTICA REAL DE CRISTAL (ESFERA FIJA 3D)
-            // ==========================================
-            // 1. Borde Fresnel reflectante y cristalino
-            float fresnel = pow(1.0 - max(dot(-rd, N), 0.0), 2.8);
-            vec3 glassRim = mix(vec3(0.85, 0.95, 1.0), u_color, 0.35) * fresnel * 1.5;
-
-            // 2. Destellos especulares duales (luz de estudio superior y rebote)
-            vec3 Rfl = reflect(rd, N);
-            vec3 lightKey = normalize(vec3(-0.6, 0.8, 0.9));
-            vec3 lightFill = normalize(vec3(0.55, -0.65, 0.5));
-            
-            float spec1 = pow(max(dot(Rfl, lightKey), 0.0), 64.0);
-            float spec1Soft = pow(max(dot(Rfl, lightKey), 0.0), 18.0) * 0.35;
-            float spec2 = pow(max(dot(Rfl, lightFill), 0.0), 28.0) * 0.4;
-            vec3 glassSpecular = vec3(1.0) * (spec1 + spec1Soft) + (u_color * 0.6 + vec3(0.4)) * spec2;
-
-            // 3. Cáustica interna en la base curva del cristal
-            float bottomCaustic = smoothstep(-0.3, -0.85, N.y) * pow(1.0 - abs(N.z), 2.2) * 0.5;
-            vec3 glassCaustic = (u_color * 0.85 + vec3(0.45)) * bottomCaustic;
-
-            // ==========================================
-            // HUMO VOLUMÉTRICO DINÁMICO (INTERIOR FLUIDO)
-            // ==========================================
-            // Refracción del rayo al penetrar el orbe de cristal (IOR ~ 1.45)
-            vec3 refrRd = refract(rd, N, 1.0 / 1.45);
-            if (dot(refrRd, refrRd) < 0.001) refrRd = rd;
-
-            // Marcha volumétrica fluida optimizada (15 pasos rápidos sin sobrecalentar GPU)
-            float stepDist = (tBack - tFront) / 15.0;
-            vec3 p = pFront + refrRd * (stepDist * 0.35);
-
-            vec3 smokeAcc = vec3(0.0);
-            float transmission = 1.0;
-            float pulseMod = 1.0 + 0.25 * u_pulse * sin(u_time * 8.0);
-
-            for (int i = 0; i < 15; i++) {
-              float rNorm = length(p) / R;
-              if (rNorm < 0.94) {
-                vec3 q = p;
-                // Convección ascendente del humo
-                q.y -= u_time * 0.22 * (1.0 - u_sink * 1.3);
-
-                // Rotación toroidal y vórtice
-                float swirlAngle = u_time * (0.20 + u_turbulence * 0.22) * (1.1 - rNorm * 0.45);
-                q.xz = rot2D(swirlAngle) * q.xz;
-
-                // Deformación de dominio fluida de 1 pasada para máxima velocidad a 60 FPS
-                vec3 warp = vec3(
-                  snoise(q * 1.5 + vec3(0.0, u_time * 0.12, 0.0)),
-                  snoise(q * 1.5 + vec3(4.3, 0.0, u_time * 0.14)),
-                  snoise(q * 1.5 + vec3(1.2, u_time * 0.10, 3.4))
-                );
-
-                // Muestreo FBM deformado (produce volutas gaseosas vivas)
-                float noiseVal = fbm(q * 2.0 + warp * 0.55);
-
-                // Densidad volumétrica confinada en la esfera
-                float d = smoothstep(-0.10, 0.48, noiseVal);
-                d *= smoothstep(0.94, 0.58, rNorm);
-                d *= (u_density * 0.88 + 0.25);
-                d *= (1.0 - u_dissipation * 0.65);
-
-                if (d > 0.015) {
-                  // Paleta dinámica puramente reactiva al color seleccionado
-                  vec3 colBase = u_coreColor;
-                  vec3 colBody = u_color;
-                  vec3 colHighlight = mix(u_color, vec3(1.0), 0.52);
-
-                  vec3 colStep = mix(colBase, colBody, smoothstep(-0.05, 0.45, noiseVal));
-                  colStep = mix(colStep, colHighlight, smoothstep(0.26, 0.80, noiseVal));
-
-                  // Filamentos centrales luminosos
-                  float coreLuminance = pow(max(noiseVal, 0.0), 3.0) * 0.85;
-                  colStep += mix(u_color, vec3(1.0), 0.75) * coreLuminance;
-
-                  colStep *= pulseMod;
-                  if (u_flash > 0.01) colStep += vec3(u_flash * 0.85);
-
-                  float stepAlpha = clamp(d * 0.42, 0.0, 1.0);
-                  smokeAcc += colStep * stepAlpha * transmission;
-                  transmission *= (1.0 - stepAlpha);
-
-                  if (transmission < 0.04) break;
-                }
-              }
-              p += refrRd * stepDist;
-            }
-
-            // Satélites / Partículas orbitales resonantes
+            // Satélites o partículas de resonancia
             if (u_satellites > 0.01) {
-              float satNoise = snoise(vec3(uv * 4.0, u_time * 0.9));
-              float satGlow = smoothstep(0.08, 0.0, abs(d2d - 0.72)) * (0.6 + 0.4 * satNoise) * u_satellites;
-              smokeAcc += vec3(0.7, 0.4, 1.0) * satGlow * 1.2;
+              float satNoise = snoise(vec3(uv * 4.5, u_time * 0.9));
+              float satGlow = smoothstep(0.08, 0.0, abs(dist - 0.38)) * (0.6 + 0.4 * satNoise) * u_satellites;
+              smokeColor += mix(colHighlight, vec3(1.0), 0.5) * satGlow * 1.5;
             }
 
-            // Composición: Humo volumétrico fluido contenido dentro de la esfera fija de cristal
-            vec3 finalColor = smokeAcc + glassRim + glassSpecular + glassCaustic;
-            vec3 glassBg = vec3(0.03, 0.045, 0.075);
-            finalColor = mix(glassBg, finalColor, clamp(1.0 - transmission * 0.25 + fresnel * 0.9 + spec1, 0.0, 1.0));
+            // Halo ambiental exterior de plasma
+            float halo = exp(-dist * 4.2) * (0.42 + u_pulse * 0.38);
+            vec3 finalColor = smokeColor * sphereEdge + colSmoke * halo;
 
-            gl_FragColor = vec4(finalColor, 1.0);
+            // Reflejo especular primario en cristal
+            vec2 lightPos = vec2(-0.16, 0.18);
+            float spec = smoothstep(0.18, 0.0, length(uv - lightPos)) * 0.78;
+            finalColor += vec3(1.0) * spec * sphereEdge;
+
+            // Reflejo especular secundario sutil (rebote)
+            vec2 lightPos2 = vec2(0.20, -0.22);
+            float spec2 = smoothstep(0.24, 0.0, length(uv - lightPos2)) * 0.28;
+            finalColor += colHighlight * spec2 * sphereEdge;
+
+            gl_FragColor = vec4(finalColor, clamp(sphereEdge + halo * 0.7, 0.0, 1.0));
           }
         `;
 
@@ -2210,7 +2122,7 @@
      */
     class ProyectazoApp {
       constructor() {
-        this.STORAGE_KEY = 'nexus_orb_v2';
+        this.STORAGE_KEY = 'nexus_orb_v3';
         this.API_BASE = (window.location.port && window.location.port !== '80' && window.location.port !== '443' && window.location.port !== '8000') 
           ? `${window.location.protocol}//${window.location.hostname}:8081/api` 
           : '/api';
@@ -2272,22 +2184,23 @@
 
       // --- STATE & PERSISTENCE ---
       loadState() {
+        const DEMO_PROJECT_IDS = new Set([
+          'p-focusflow', 'p-cytohelix', 'p-cytocore', 
+          'proj_focusflow', 'proj_cytohelix', 'proj_cytocore'
+        ]);
+        const DEMO_NAMES = new Set(['FocusFlow OS', 'CytoHelix', 'CytoCore']);
+
+        // Eliminar claves legacy de versiones anteriores que contenían datos mock/demo
+        ['nexus_orb_v2', 'nexus_orb_v1', 'proyectazo_unified_v1', 'proyectazo_unified_v2', 'proyectazo_data'].forEach(k => {
+          try { localStorage.removeItem(k); } catch (e) {}
+        });
+
         try {
           const raw = localStorage.getItem(this.STORAGE_KEY);
           if (raw) {
             this.state = JSON.parse(raw);
           } else {
-            // Check legacy keys to avoid losing data
-            const legacyKeys = ['nexus_orb_v1', 'proyectazo_unified_v1', 'proyectazo_data'];
-            let foundLegacy = null;
-            for (const lk of legacyKeys) {
-              const leg = localStorage.getItem(lk);
-              if (leg) {
-                foundLegacy = JSON.parse(leg);
-                break;
-              }
-            }
-            this.state = foundLegacy || this.getSeedData();
+            this.state = this.getSeedData();
             this.saveState();
           }
         } catch (e) {
@@ -2295,26 +2208,47 @@
           this.state = this.getSeedData();
         }
 
-        if (!this.state.settings) {
-          this.state.settings = { sound: true, vibration: true, theme: 'theme-dark-soft', userName: 'Usuario' };
-        }
-        if (!this.state.pensadero) {
-          this.state.pensadero = this.getDefaultPensadero();
+        // Filtro riguroso: Eliminar cualquier proyecto o pensamiento de demostración heredado
+        if (this.state.projects && Array.isArray(this.state.projects)) {
+          this.state.projects = this.state.projects.filter(p => 
+            p && (!DEMO_PROJECT_IDS.has(p.id)) && (!p.name || !DEMO_NAMES.has(p.name.trim()))
+          );
+        } else {
+          this.state.projects = [];
         }
 
-        // Pensadero limpio e inicializado sin reset destructivo
-        if (!this.state.pensadero) {
+        if (this.state.pensadero && Array.isArray(this.state.pensadero)) {
+          this.state.pensadero = this.state.pensadero.filter(item => 
+            item && (!item.id || (!item.id.startsWith('pens_init_') && !item.id.startsWith('demo_')))
+          );
+        } else {
           this.state.pensadero = [];
         }
 
-        if (!this.state.projects) {
-          this.state.projects = [];
+        if (!this.state.settings) {
+          this.state.settings = { sound: true, vibration: true, theme: 'theme-dark-soft', userName: 'Usuario' };
         }
         if (!this.state.inbox) {
           this.state.inbox = [];
         }
         if (!this.state.freeformNotes) {
           this.state.freeformNotes = [];
+        }
+        this.saveState();
+      }
+
+      clearAllUserData() {
+        if (confirm("¿Deseas reiniciar todos los datos a cero para empezar completamente limpio? Se borrarán proyectos y pensamientos locales y en el servidor.")) {
+          this.state = this.getSeedData();
+          this.saveState();
+          if (this.backendAvailable) {
+            fetch(`${this.API_BASE}/sync`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ projects: [], inbox: [], pensadero: [] })
+            }).catch(() => {});
+          }
+          window.location.reload();
         }
       }
 
@@ -2903,17 +2837,21 @@
           if (res.ok) {
             const data = await res.json();
             if (data && data.projects && data.projects.length > 0) {
-              // Merge projects intelligently
+              // Merge projects intelligently (filtrando demo IDs y nombres)
+              const DEMO_PROJECT_IDS = new Set(['p-focusflow', 'p-cytohelix', 'p-cytocore', 'proj_focusflow', 'proj_cytohelix', 'proj_cytocore']);
+              const DEMO_NAMES = new Set(['FocusFlow OS', 'CytoHelix', 'CytoCore']);
               const existingIds = new Set((this.state.projects || []).map(p => p.id));
               for (const bp of data.projects) {
+                if (DEMO_PROJECT_IDS.has(bp.id) || DEMO_NAMES.has(bp.name?.trim())) continue;
                 if (!existingIds.has(bp.id)) {
                   this.state.projects.push(bp);
                 }
               }
-              // Merge thoughts
+              // Merge thoughts (filtrando demo)
               if (data.pensadero && Array.isArray(data.pensadero)) {
                 const existingPenIds = new Set((this.state.pensadero || []).map(p => p.id));
                 for (const bp of data.pensadero) {
+                  if (bp.id && (bp.id.startsWith('pens_init_') || bp.id.startsWith('demo_'))) continue;
                   if (!existingPenIds.has(bp.id)) {
                     this.state.pensadero.push(bp);
                   }
@@ -3556,10 +3494,22 @@
                   <!-- Resplandor Neón Ambiental Trasero reactivo al humo seleccionado -->
                   <div id="nexus-orb-glow" class="absolute inset-4 md:inset-8 rounded-full blur-3xl opacity-65 transition-all duration-700 pointer-events-none" style="background: radial-gradient(circle, ${activeMeta.hex} 0%, transparent 70%);"></div>
 
-                  <!-- Orbe de Cristal Nexus: Esfera 3D de Cristal con Humo Fluido Volumétrico Cambiante (100% WebGL, Sin Imagen Estática) -->
-                  <div id="nexus-core-wrapper" class="relative z-10 w-full h-full flex items-center justify-center select-none cursor-pointer" onclick="app.handleOrbClick(event)" title="Mantén presionado para vaciar un pensamiento al Orbe • Clic para pulso resonante">
-                    <!-- Canvas GLSL: Orbe de Cristal Fijo con Humo Neón Líquido Dinámico -->
-                    <canvas id="pensadero-glsl-canvas" class="w-full h-full block rounded-full select-none"></canvas>
+                  <!-- Anillo Graduado Exterior Estilo Stitch Sci-Fi con Marcadores Cyber-orgánicos Rotatorios -->
+                  <div class="relative w-full h-full rounded-full p-2 sm:p-2.5 md:p-3 bg-gradient-to-b from-cyan-500/20 via-slate-900/60 to-purple-500/20 border border-slate-700/50 shadow-[0_0_36px_-6px_rgba(76,215,246,0.35)] flex items-center justify-center transition-all duration-500 pointer-events-none">
+                    <div class="relative w-full h-full rounded-full p-1 bg-slate-950/80 flex items-center justify-center overflow-hidden">
+                      <!-- Marcadores radiales vectoriales cyber-orgánicos rotatorios -->
+                      <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40 animate-[spin_40s_linear_infinite]" viewBox="0 0 100 100">
+                        <circle class="text-cyan-400" cx="50" cy="50" fill="none" r="48" stroke="currentColor" stroke-dasharray="2 6" stroke-width="0.75"></circle>
+                        <circle class="text-purple-400" cx="50" cy="50" fill="none" r="44" stroke="currentColor" stroke-dasharray="1 10" stroke-width="0.5"></circle>
+                        <circle class="text-emerald-400" cx="50" cy="50" fill="none" r="40" stroke="currentColor" stroke-dasharray="6 24" stroke-width="1"></circle>
+                      </svg>
+                      
+                      <!-- Orbe de Cristal Nexus: Esfera 3D de Cristal con Humo Fluido Volumétrico Cambiante (100% WebGL, Sin Imagen Estática) -->
+                      <div id="nexus-core-wrapper" class="relative z-10 w-full h-full flex items-center justify-center select-none cursor-pointer rounded-full overflow-hidden pointer-events-auto" onclick="app.handleOrbClick(event)" title="Mantén presionado para vaciar un pensamiento al Orbe • Clic para pulso resonante">
+                        <!-- Canvas GLSL: Orbe de Cristal Fijo con Humo Neón Líquido Dinámico -->
+                        <canvas id="pensadero-glsl-canvas" class="w-full h-full block rounded-full select-none"></canvas>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
