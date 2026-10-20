@@ -12,7 +12,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -20,11 +20,18 @@
       theme: {
         extend: {
           fontFamily: {
-            display: ['"Bricolage Grotesque"', 'sans-serif'],
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['"Space Grotesk"', '"Bricolage Grotesque"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
+            'stitch-primary': '#4cd7f6',
+            'stitch-secondary': '#d0bcff',
+            'stitch-tertiary': '#4edea3',
+            'stitch-surface': '#0f131d',
+            'stitch-surface-container': '#1c1f2a',
+            'stitch-surface-high': '#262a35',
+            'stitch-surface-lowest': '#0a0e18',
             brand: {
               50: '#ecfdf5',
               100: '#d1fae5',
@@ -39,6 +46,22 @@
     }
   </script>
   <style>
+    /* Google Stitch Mobile Tokens & Micro-interactions */
+    .plasma-glow {
+      box-shadow: 0 0 24px -2px rgba(6, 182, 212, 0.35);
+    }
+    .pill-glow {
+      box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.7), 0 0 16px 0 rgba(6, 182, 212, 0.25);
+    }
+    .pulse-glow-tertiary {
+      box-shadow: 0 0 20px -2px rgba(78, 222, 163, 0.4);
+    }
+    .pb-safe {
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+    }
+    .pt-safe {
+      padding-top: max(env(safe-area-inset-top, 0px), 0px);
+    }
     * {
       -webkit-tap-highlight-color: transparent;
       box-sizing: border-box;
@@ -678,26 +701,25 @@
     </div>
   </div>
 
-  <!-- Top Header (Desktop & Mobile) -->
-  <header class="sticky top-0 z-40 backdrop-blur-md border-b theme-header transition-colors">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+  <!-- Top Header (Desktop & Mobile, Stitch Cyber-Organic) -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl border-b border-cyan-500/15 theme-header pt-safe transition-colors shadow-sm">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-3">
       
       <!-- Brand & Status -->
-      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none" onclick="app.navigate('pensadero')">
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-cyan-500/30 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none min-w-0" onclick="app.navigate('pensadero')">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
           <img src="assets/logo_dark.png" alt="Nexus N" class="w-full h-full object-cover app-logo-dynamic">
         </div>
-        <div>
+        <div class="min-w-0">
           <div class="flex items-center gap-1.5 sm:gap-2">
-            <span class="font-display font-extrabold text-base sm:text-xl tracking-tight text-white whitespace-nowrap">Nexus Orb</span>
-            <span class="text-[9px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 whitespace-nowrap">Cognitive OS</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <p class="text-[11px] theme-text-muted font-medium hidden sm:block">Ecosistema cognitivo y gestión sin fricción para TDAH</p>
-            <span id="sync-status-pill" class="text-[9px] font-mono font-bold px-2 py-0.2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 flex items-center gap-1" title="Estado de sincronización">
+            <span class="font-display font-extrabold text-base sm:text-xl tracking-tight text-white whitespace-nowrap truncate">Nexus Orb</span>
+            <span id="sync-status-pill" class="text-[9px] font-mono font-bold px-2 py-0.2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 flex items-center gap-1 shrink-0" title="Estado de sincronización">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span id="sync-status-text">Listo</span>
             </span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span id="header-view-subtitle" class="text-[10px] font-mono font-semibold text-cyan-300 truncate">🔮 Orbe & JARVIS</span>
           </div>
         </div>
       </div>
@@ -708,11 +730,14 @@
           <span>🔮</span> Nexus Orb
           <span id="pensadero-count-badge" class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500 text-slate-950 font-bold font-mono">0</span>
         </button>
-        <button onclick="app.navigate('hoy')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="hoy">
-          <span>🏠</span> Hoy & Foco
-        </button>
         <button onclick="app.navigate('kanban')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="kanban">
-          <span>📋</span> Kanban (WIP)
+          <span>⚡</span> Kanban
+        </button>
+        <button onclick="app.navigate('zen')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="zen">
+          <span>🧘</span> Modo Zen
+        </button>
+        <button onclick="app.navigate('hoy')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="hoy">
+          <span>💼</span> Proyectos
         </button>
         <button onclick="app.navigate('freeform')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="freeform">
           <span>🎨</span> Freeform
@@ -720,17 +745,13 @@
         <button onclick="app.navigate('bitacora')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="bitacora">
           <span>📜</span> Bitácora
         </button>
-        <button onclick="app.navigate('radar')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="radar">
-          <span>📡</span> Radar
-        </button>
       </nav>
 
-      <!-- Global Actions (Quick capture, Sprint Timer, Mobile App/WhatsApp, Theme & Settings) -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
-        <!-- Mobile App & WhatsApp Share -->
-        <button onclick="app.openMobileAppModal()" class="flex items-center gap-1 px-2 py-1.5 sm:px-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition" title="Instalar en Celular / Tablet o Enviar por WhatsApp">
-          <span>📲</span>
-          <span class="hidden sm:inline">Instalar App</span>
+      <!-- Global Actions (Quick Zen, Sprint Timer, Capture, Theme & Settings) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- Quick Zen Trigger Button (Stitch Plasma Glow) -->
+        <button onclick="app.navigate('zen')" aria-label="Modo Zen Hiperfoco" class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25 border border-cyan-500/30 transition plasma-glow active:scale-95" title="Modo Zen Hiperfoco & Ruido Marrón">
+          <span class="text-base sm:text-lg">🧘</span>
         </button>
 
         <!-- Sprint Timer Trigger (Visible on larger screens) -->
@@ -799,56 +820,55 @@
     </div>
   </main>
 
-  <!-- Mobile Bottom Navigation Bar -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg border-t theme-header pb-[env(safe-area-inset-bottom,0px)] transition-colors">
+  <!-- Mobile Bottom Navigation Bar (Stitch Cyber-Organic Layout) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl border-t border-cyan-500/20 bg-slate-950/90 pb-[env(safe-area-inset-bottom,0px)] transition-colors shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
     <div class="grid grid-cols-5 h-16 items-center px-1" id="mobile-nav">
-      <button onclick="app.navigate('pensadero')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="pensadero">
-        <div class="w-5 h-5 rounded-md overflow-hidden border border-cyan-500/40 shrink-0 mb-0.5">
-          <img src="assets/logo_dark.png" alt="Nexus" class="w-full h-full object-cover app-logo-dynamic">
-        </div>
-        <span class="text-[9px] font-semibold whitespace-nowrap">Nexus Orb</span>
+      <button onclick="app.navigate('pensadero')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="pensadero">
+        <span class="text-base sm:text-lg">🔮</span>
+        <span class="text-[10px] font-mono font-semibold whitespace-nowrap mt-0.5">Orbe</span>
       </button>
-      <button onclick="app.navigate('hoy')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="hoy">
-        <span class="text-base">🏠</span>
-        <span class="text-[9px] font-semibold mt-0.5">Hoy</span>
+      <button onclick="app.navigate('kanban')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="kanban">
+        <span class="text-base sm:text-lg">⚡</span>
+        <span class="text-[10px] font-mono font-semibold mt-0.5">Kanban</span>
       </button>
-      <button onclick="app.navigate('kanban')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="kanban">
-        <span class="text-base">📋</span>
-        <span class="text-[9px] font-semibold mt-0.5">Kanban</span>
+      <button onclick="app.navigate('zen')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="zen">
+        <span class="text-base sm:text-lg">🧘</span>
+        <span class="text-[10px] font-mono font-semibold mt-0.5">Zen</span>
       </button>
-      <button onclick="app.navigate('freeform')" class="bnav-btn flex flex-col items-center justify-center py-1 theme-text-muted transition" data-view="freeform">
-        <span class="text-base">🎨</span>
-        <span class="text-[9px] font-semibold mt-0.5">Lienzo</span>
+      <button onclick="app.navigate('hoy')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="hoy">
+        <span class="text-base sm:text-lg">💼</span>
+        <span class="text-[10px] font-mono font-semibold mt-0.5">Proyectos</span>
       </button>
-      <button onclick="app.openMobileAppModal()" class="bnav-btn flex flex-col items-center justify-center py-1 text-emerald-400 hover:text-emerald-300 transition">
-        <span class="text-base animate-pulse">📲</span>
-        <span class="text-[9px] font-bold mt-0.5 whitespace-nowrap">Instala Aquí</span>
+      <button onclick="app.navigate('freeform')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="freeform">
+        <span class="text-base sm:text-lg">🎨</span>
+        <span class="text-[10px] font-mono font-semibold mt-0.5">Lienzo</span>
       </button>
     </div>
   </nav>
 
-  <!-- Universal Floating Action Dock: DUAL WIDGET [ 🔮 Orbe | 🎙️ Nexus IA ] (MOVIBLE / DRAGGABLE) -->
-  <div id="universal-nexus-fab" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 flex items-center p-1 rounded-full bg-slate-900/95 border border-cyan-500/40 shadow-2xl shadow-cyan-500/30 backdrop-blur-xl select-none touch-none transition-transform" title="Widget Dual: Arrastra para mover por la pantalla">
-    <!-- Manija de arrastre táctil -->
-    <div id="nexus-fab-handle" class="px-2 py-1 text-slate-400 cursor-grab active:cursor-grabbing flex items-center justify-center text-xs font-mono select-none" title="Arrastra el widget por la pantalla">
-      ⋮⋮
+  <!-- Universal Floating Action Dock: DUAL WIDGET [ 🔮 Orbe | 🎙️ Nexus IA ] (Stitch Floating Pill Dock) -->
+  <aside class="fixed bottom-20 md:bottom-6 inset-x-0 z-40 flex justify-center pointer-events-none px-4">
+    <div id="universal-nexus-fab" class="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-slate-900/95 backdrop-blur-2xl border border-cyan-500/40 pill-glow shadow-2xl select-none touch-none transition-all" title="Widget Dual: Arrastra para mover por la pantalla">
+      <!-- Manija de arrastre táctil -->
+      <div id="nexus-fab-handle" class="flex items-center px-1.5 text-slate-400 opacity-60 cursor-grab active:cursor-grabbing text-xs font-mono select-none" title="Arrastra el widget por la pantalla">
+        ⋮⋮
+      </div>
+
+      <!-- Botón 1: Orbe Directo (Vaciado Rápido) -->
+      <button type="button" onclick="app.openOrbeQuickGadget()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-cyan-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Abrir Orbe de Cristal (Vaciado Mental Rápido)">
+        <span class="text-sm">🔮</span>
+        <span>ORBE</span>
+      </button>
+
+      <div class="w-px h-4 bg-slate-700/60"></div>
+
+      <!-- Botón 2: Nexus IA Directo (Voz e Inteligencia) -->
+      <button type="button" onclick="app.openNexusVoice('streaming')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-emerald-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Hablar con Nexus IA">
+        <span class="text-sm animate-pulse">🎙️</span>
+        <span>NEXUS IA</span>
+      </button>
     </div>
-
-    <!-- Botón 1: Orbe Directo (Vaciado Rápido) -->
-    <button type="button" onclick="app.openOrbeQuickGadget()" class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:brightness-110 text-white font-bold text-xs shadow-md active:scale-95 transition" title="Abrir Orbe de Cristal (Vaciado Mental Rápido)">
-      <span>🔮</span>
-      <span class="text-[11px] font-display hidden xs:inline font-bold">Orbe</span>
-    </button>
-
-    <div class="w-[1px] h-5 bg-slate-700 mx-1"></div>
-
-    <!-- Botón 2: Nexus IA Directo (Voz e Inteligencia) -->
-    <button type="button" onclick="app.openNexusVoice('streaming')" class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md active:scale-95 transition" title="Hablar con Nexus IA">
-      <span class="animate-pulse">🎙️</span>
-      <span class="text-[11px] font-display hidden xs:inline font-bold">Nexus IA</span>
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-    </button>
-  </div>
+  </aside>
 
   <!-- ================= GADGET: VACIADO DIRECTO AL ORBE (HUD FLOTANTE / MODAL) ================= -->
   <div id="nexus-orbe-quick-gadget-modal" class="hidden nexus-modal-wrapper">
@@ -924,6 +944,9 @@
             </button>
             <button type="button" onclick="app.selectGadgetSmoke('humo_ceniza')" class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-800/40 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_ceniza">
               <span>🔘</span> <span class="text-[10px]">Someday</span>
+            </button>
+            <button type="button" onclick="app.selectGadgetSmoke('humo_tarea')" class="gadget-smoke-btn p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_tarea">
+              <span>☑️</span> <span class="text-[10px]">Tarea</span>
             </button>
           </div>
           <input type="hidden" id="gadget-smoke-category" value="humo_general" />
@@ -1271,6 +1294,63 @@
           </div>
         </div>
 
+        <!-- Conexión a Google Mail (Gmail SMTP & Recordatorios de Tareas) -->
+        <div class="p-3.5 rounded-2xl theme-card-subtle border theme-border space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="text-base">📬</span>
+              <h4 class="font-bold">Conexión Google Mail (Gmail / Workspace)</h4>
+            </div>
+            <span id="google-mail-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-400">Verificando...</span>
+          </div>
+          <p class="theme-text-muted">
+            Conecta tu cuenta de Google para recibir recordatorios automáticos de tus tareas pendientes e híper-enfocadas por correo.
+          </p>
+
+          <div class="space-y-2 pt-1">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-300 mb-0.5">Tu cuenta de Gmail / Workspace:</label>
+              <input type="email" id="setting-gmail-user" placeholder="tu_cuenta@gmail.com" class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-700 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-indigo-500 outline-none" />
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <label class="block text-[11px] font-semibold text-slate-300">Contraseña de Aplicación de Google (16 letras):</label>
+                <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" class="text-[10px] text-indigo-400 hover:text-indigo-300 underline flex items-center gap-0.5">
+                  Generar en Google ↗
+                </a>
+              </div>
+              <input type="password" id="setting-gmail-app-password" placeholder="abcd efgh ijkl mnop" class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-700 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-indigo-500 outline-none font-mono" />
+              <p class="text-[10px] text-slate-500 mt-1">
+                Requiere 2FA activo en tu cuenta Google. Genera una contraseña con nombre "Nexus" en Seguridad &gt; Verificación en dos pasos &gt; Contraseñas de aplicaciones.
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-300 mb-0.5">Correo destino de recordatorios (opcional):</label>
+              <input type="email" id="setting-gmail-recipient" placeholder="Mismo de Gmail o alternativo" class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-700 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-indigo-500 outline-none" />
+            </div>
+
+            <div id="google-mail-feedback" class="hidden p-2 rounded-xl text-[11px] font-mono"></div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="app.saveGoogleMailConfig()" class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/30">
+                <span>💾</span> Guardar Credenciales
+              </button>
+              <button onclick="app.testGoogleMailConnection()" class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
+                <span>🧪</span> Probar Conexión
+              </button>
+            </div>
+
+            <div class="pt-1 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
+              <span class="text-slate-400">¿Envío rápido sin credenciales?</span>
+              <button onclick="app.openDirectGmailWeb()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                <span>🌐</span> Redactar en Gmail Web ↗
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Copia de Seguridad JSON -->
         <div class="p-3.5 rounded-2xl theme-card-subtle border theme-border space-y-2">
           <h4 class="font-bold">Copia de Seguridad y Portabilidad</h4>
@@ -1460,6 +1540,85 @@
 
       <div id="gap-filling-body" class="space-y-4 text-xs">
         <!-- Contenido inyectado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.1 MODAL: PROGRAMAR RECORDATORIO POR CORREO GOOGLE (GMAIL SMTP / WEB) -->
+  <div id="modal-schedule-email" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="theme-card border rounded-3xl max-w-md w-full p-6 shadow-2xl relative fade-enter text-left">
+      <div class="flex items-start justify-between mb-4 pb-3 border-b theme-border">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-indigo-500/30">
+            📧
+          </div>
+          <div>
+            <h3 class="text-base font-display font-extrabold flex items-center gap-2">
+              <span>Recordatorio Google Mail</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Humo Índigo</span>
+            </h3>
+            <p class="text-[11px] theme-text-muted">Aviso diferido por correo para tareas pendientes</p>
+          </div>
+        </div>
+        <button onclick="app.closeModal('modal-schedule-email')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <input type="hidden" id="schedule-email-task-id" />
+        <input type="hidden" id="schedule-email-project-id" />
+        
+        <div class="p-3 rounded-2xl bg-indigo-950/20 border border-indigo-500/30">
+          <span class="text-[10px] font-mono font-bold text-indigo-400 uppercase block mb-1">Tarea a Notificar</span>
+          <p id="schedule-email-task-title" class="font-semibold text-sm text-white leading-snug"></p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5">Atajos rápidos de tiempo:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="app.setScheduleEmailPreset(15)" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+              <span class="font-bold block text-xs">⏱️ En 15 minutos</span>
+              <span class="text-[10px] text-slate-400">Micro-pausa de café</span>
+            </button>
+            <button type="button" onclick="app.setScheduleEmailPreset(60)" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+              <span class="font-bold block text-xs">⏳ En 1 hora</span>
+              <span class="text-[10px] text-slate-400">Siguiente bloque</span>
+            </button>
+            <button type="button" onclick="app.setScheduleEmailPreset('tonight')" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+              <span class="font-bold block text-xs">🌙 Esta noche (8:00 PM)</span>
+              <span class="text-[10px] text-slate-400">Cierre del día</span>
+            </button>
+            <button type="button" onclick="app.setScheduleEmailPreset('tomorrow_9am')" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+              <span class="font-bold block text-xs">🌅 Mañana (9:00 AM)</span>
+              <span class="text-[10px] text-slate-400">Arranque matutino</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">O selecciona fecha y hora exacta:</label>
+          <input type="datetime-local" id="schedule-email-dt" class="w-full px-3 py-2 rounded-xl bg-slate-950/80 border border-slate-700 font-mono text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none" />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Correo destinatario:</label>
+          <input type="email" id="schedule-email-recipient" placeholder="tu_correo@gmail.com" class="w-full px-3 py-2 rounded-xl bg-slate-950/80 border border-slate-700 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-indigo-500 outline-none" />
+        </div>
+
+        <div id="schedule-email-feedback" class="hidden p-2 rounded-xl text-[11px] font-mono"></div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 mt-5 pt-3 border-t theme-border">
+        <button onclick="app.openDirectGmailWebFromModal()" class="px-3 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition" title="Redactar inmediatamente en Gmail Web">
+          <span>🌐</span> Abrir en Gmail Web
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="app.closeModal('modal-schedule-email')" class="px-3 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+            Cancelar
+          </button>
+          <button onclick="app.confirmScheduleEmail()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
+            <span>⚡</span> Programar Aviso
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1722,6 +1881,20 @@
         badgeClass: 'bg-slate-500/15 text-slate-300 border-slate-500/40',
         icon: '🔘',
         shader: { turbulence: 0.05, pulse: 0.0, density: 0.5, dissipation: 0.4, satellites: 0.0, sink: 1.0, expansion: 0.0, flash: 0.0 }
+      },
+      humo_tarea: {
+        name: 'Humo Índigo / Tarea Pendiente',
+        title: 'Tarea Pendiente / Tarea en General',
+        desc: 'Acciones pendientes, quehaceres cotidianos, to-dos y trámites listos para ejecutar.',
+        hex: '#6366F1',
+        vec3: [0.388, 0.400, 0.945],
+        coreVec3: [0.22, 0.20, 0.65],
+        category: 'humo_tarea',
+        module: 'tasks_general',
+        cognitiveWeight: 'medio',
+        badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/40',
+        icon: '☑️',
+        shader: { turbulence: 0.35, pulse: 0.2, density: 1.15, dissipation: 0.0, satellites: 0.0, sink: 0.0, expansion: 0.0, flash: 0.15 }
       }
     };
 
@@ -2180,6 +2353,7 @@
         this.renderColorPickers();
         this.navigate(this.currentView);
         this.checkBackendConnection();
+        this.initGoogleMailStatus();
       }
 
       // --- STATE & PERSISTENCE ---
@@ -2730,6 +2904,19 @@
           zenBtn.textContent = stateText;
           zenBtn.className = playing ? 'font-bold text-emerald-400' : 'font-bold text-slate-400';
         }
+        // Animated Frequency Wave bars in Stitch Zen view
+        const waveBars = document.getElementById('zen-wave-bars');
+        if (waveBars) {
+          waveBars.querySelectorAll('span').forEach(sp => {
+            if (playing) {
+              sp.classList.add('animate-pulse');
+              sp.classList.remove('opacity-30');
+            } else {
+              sp.classList.remove('animate-pulse');
+              sp.classList.add('opacity-30');
+            }
+          });
+        }
       }
 
       // --- MODO ZEN / HIPERFOCO ---
@@ -2951,17 +3138,50 @@
           window.history.pushState({ view: viewName }, '', `#${viewName}`);
         }
         this.currentView = viewName;
+
+        // Subtítulo dinámico en el Header móvil (Estilo Google Stitch)
+        const sub = document.getElementById('header-view-subtitle');
+        if (sub) {
+          const titles = {
+            pensadero: '🔮 Orbe & JARVIS',
+            kanban: '⚡ Kanban ADHD',
+            zen: '🧘 Modo Zen & Hiperfoco',
+            hoy: '💼 Proyectos & CRM',
+            freeform: '🎨 Lienzo Freeform',
+            bitacora: '📜 Bitácora & Log',
+            radar: '📡 Radar de Enfoque'
+          };
+          sub.textContent = titles[viewName] || 'FocusFlow OS';
+        }
         
-        document.querySelectorAll('.nav-btn, .bnav-btn').forEach(btn => {
+        // Destacar botones en Desktop Nav
+        document.querySelectorAll('.nav-btn').forEach(btn => {
           const v = btn.getAttribute('data-view');
           if (v === viewName) {
-            btn.classList.add('bg-brand-600', 'text-white');
+            btn.classList.add('bg-cyan-500/20', 'text-cyan-300', 'border-cyan-500/40');
             btn.classList.remove('theme-text-muted');
           } else {
-            btn.classList.remove('bg-brand-600', 'text-white');
+            btn.classList.remove('bg-cyan-500/20', 'text-cyan-300', 'border-cyan-500/40');
             btn.classList.add('theme-text-muted');
           }
         });
+
+        // Destacar botones en Barra Inferior Móvil (Estilo Stitch Cyber-Organic)
+        document.querySelectorAll('.bnav-btn').forEach(btn => {
+          const v = btn.getAttribute('data-view');
+          if (v === viewName) {
+            btn.classList.add('text-cyan-400', 'font-bold', 'scale-105');
+            btn.classList.remove('text-slate-400', 'opacity-70');
+          } else {
+            btn.classList.remove('text-cyan-400', 'font-bold', 'scale-105');
+            btn.classList.add('text-slate-400', 'opacity-70');
+          }
+        });
+
+        // Vibración háptica en móvil
+        if ('vibrate' in navigator && this.state?.settings?.vibration) {
+          try { navigator.vibrate(12); } catch(e) {}
+        }
 
         this.render();
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -2973,11 +3193,11 @@
 
         const mainContainer = document.querySelector('main');
         if (mainContainer) {
-          if (this.currentView === 'pensadero') {
-            mainContainer.className = "flex-1 w-full max-w-full overflow-x-hidden p-2 sm:p-4 pb-20 md:pb-4 min-h-[calc(100vh-4.25rem)] md:min-h-[calc(100vh-4.5rem)] flex flex-col";
+          if (this.currentView === 'pensadero' || this.currentView === 'zen') {
+            mainContainer.className = "flex-1 w-full max-w-full overflow-x-hidden p-2 sm:p-4 pb-24 md:pb-6 min-h-[calc(100vh-4.25rem)] md:min-h-[calc(100vh-4.5rem)] flex flex-col";
             container.className = "flex-1 flex flex-col h-full w-full max-w-full overflow-x-hidden fade-enter";
           } else {
-            mainContainer.className = "flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 pb-24 md:pb-8 overflow-x-hidden";
+            mainContainer.className = "flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 pb-28 md:pb-8 overflow-x-hidden";
             container.className = "w-full max-w-full overflow-x-hidden fade-enter";
           }
         }
@@ -2987,6 +3207,9 @@
         switch (this.currentView) {
           case 'pensadero':
             this.renderViewPensadero(container);
+            break;
+          case 'zen':
+            this.renderViewZen(container);
             break;
           case 'hoy':
             this.renderViewHoy(container);
@@ -3005,6 +3228,332 @@
             break;
           default:
             this.renderViewPensadero(container);
+        }
+      }
+
+      // ==========================================
+      // VISTA STITCH: 🧘 MODO ZEN HIPERFOCO & RUIDO MARRÓN
+      // ==========================================
+      renderViewZen(container) {
+        const projects = this.state.projects || [];
+        const activeProject = projects.find(p => p.id === this.selectedKanbanProjectId) || projects[0] || {
+          id: 'focus-temp',
+          name: 'Sesión de Enfoque',
+          emoji: '🎯',
+          color: '#4cd7f6',
+          tasks: []
+        };
+
+        const pendingTasks = (activeProject.tasks || []).filter(t => t.column !== 'victorias');
+        const activeTask = pendingTasks.find(t => t.column === 'enfoco') || pendingTasks[0] || {
+          id: 'task-temp',
+          title: activeProject.nextAction || 'Avanzar en el próximo micro-paso de tu proyecto',
+          notes: ''
+        };
+
+        const m = Math.floor(this.timer.secondsLeft / 60).toString().padStart(2, '0');
+        const s = (this.timer.secondsLeft % 60).toString().padStart(2, '0');
+        const totalSecs = (this.timer.durationMinutes || 25) * 60;
+        const progressFrac = Math.max(0, Math.min(1, this.timer.secondsLeft / totalSecs));
+        const ringCircumference = 540.35; // 2 * Math.PI * 86
+        const ringOffset = ringCircumference * (1 - progressFrac);
+
+        container.innerHTML = `
+          <div class="max-w-xl mx-auto flex flex-col space-y-4 sm:space-y-5 py-2 px-1 relative select-none">
+            <!-- Ambient Glows -->
+            <div class="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+            <div class="pointer-events-none absolute top-72 right-0 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl -z-10"></div>
+
+            <!-- 1. CONTEXTO DE SPRINT & HERO MONO-TAREA -->
+            <section class="flex flex-col items-center text-center space-y-2 pt-1">
+              <!-- Pill de Proyecto Activo -->
+              <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/90 border border-slate-700/60 shadow-sm text-xs">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span class="font-mono text-cyan-300 font-bold uppercase tracking-wider">${activeProject.emoji || '🎯'} ${activeProject.name}</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-400 font-medium">Sprint Mono-Tarea</span>
+              </div>
+
+              <!-- Título de Tarea Singular -->
+              <div class="flex flex-col items-center px-2 max-w-md">
+                <h1 class="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight leading-snug">
+                  ${activeTask.title}
+                </h1>
+                <div class="mt-2.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/30 text-xs shadow-sm">
+                  <span class="text-emerald-400">⚡</span>
+                  <span class="text-slate-300 truncate">
+                    Paso activo: <strong class="text-emerald-400 font-semibold font-mono">Enfócate solo en esto ahora</strong>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <!-- 2. MEDIDOR CIRCULAR DE PROGRESO & TEMPORIZADOR (STITCH GAUGE) -->
+            <section class="flex flex-col items-center justify-center relative py-2">
+              <div class="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center">
+                <!-- Neon Circular Progress Gauge (SVG) -->
+                <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 200 200">
+                  <!-- Pista de Fondo -->
+                  <circle class="text-slate-800/80 fill-none" cx="100" cy="100" r="86" stroke="currentColor" stroke-width="7"></circle>
+                  <!-- Anillo Neón Activo -->
+                  <circle class="text-cyan-400 fill-none transition-all duration-1000" cx="100" cy="100" id="zen-view-timer-ring"
+                    r="86" stroke="currentColor" stroke-dasharray="540.35" stroke-dashoffset="${ringOffset}"
+                    stroke-linecap="round" stroke-width="8" style="filter: drop-shadow(0 0 12px rgba(76, 215, 246, 0.65));"></circle>
+                </svg>
+
+                <!-- Cuenta Regresiva Central -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span class="text-4xl sm:text-5xl font-display font-black text-white tracking-tighter tabular-nums" id="zen-view-timer-display">
+                    ${m}:${s}
+                  </span>
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-bold">Flujo Alfa</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Controles de Temporizador -->
+              <div class="flex items-center gap-3 mt-4">
+                <button onclick="app.startPauseTimer()" class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-display font-bold text-sm shadow-lg shadow-cyan-500/25 active:scale-95 transition" id="zen-view-toggle-btn">
+                  <span>${this.timer.isRunning ? '⏸️' : '▶️'}</span>
+                  <span id="zen-view-toggle-label">${this.timer.isRunning ? 'Pausar' : 'Iniciar'}</span>
+                </button>
+                <button onclick="app.addTimerMinutes(5)" class="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-slate-900 border border-purple-500/40 hover:bg-slate-800 text-purple-300 font-display font-semibold text-xs shadow-sm active:scale-95 transition" title="Extender sprint 5 minutos">
+                  <span>✨</span>
+                  <span>+5 min</span>
+                </button>
+                <button onclick="app.resetTimer()" class="p-2.5 rounded-full bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white transition" title="Reiniciar temporizador">
+                  <span>🔄</span>
+                </button>
+              </div>
+            </section>
+
+            <!-- 3. MÓDULO DE RUIDO MARRÓN & ACÚSTICA NEURAL (STITCH AUDIO) -->
+            <section class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl flex flex-col space-y-3.5 backdrop-blur-md">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                  <button onclick="app.toggleBrownNoise()" class="w-10 h-10 rounded-2xl ${this.isNoisePlaying ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/30' : 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'} flex items-center justify-center shrink-0 active:scale-90 transition">
+                    <span class="text-lg">${this.isNoisePlaying ? '🔊' : '🔈'}</span>
+                  </button>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-display font-bold text-sm sm:text-base text-white truncate">Ruido Marrón Profundo</span>
+                    <span class="text-[11px] text-slate-400 truncate">Enmascara ruidos de entorno y silencia el diálogo interno (1/f²)</span>
+                  </div>
+                </div>
+
+                <!-- Animated Frequency Waves (Stitch Style) -->
+                <div class="flex items-end gap-1 h-5 shrink-0 px-2" id="zen-wave-bars">
+                  <span class="w-1 bg-cyan-400 rounded-full ${this.isNoisePlaying ? 'animate-pulse' : 'opacity-30'} h-3"></span>
+                  <span class="w-1 bg-cyan-400 rounded-full ${this.isNoisePlaying ? 'animate-pulse' : 'opacity-30'} h-5" style="animation-delay: 150ms;"></span>
+                  <span class="w-1 bg-cyan-400 rounded-full ${this.isNoisePlaying ? 'animate-pulse' : 'opacity-30'} h-4" style="animation-delay: 300ms;"></span>
+                  <span class="w-1 bg-cyan-400 rounded-full ${this.isNoisePlaying ? 'animate-pulse' : 'opacity-30'} h-2" style="animation-delay: 450ms;"></span>
+                </div>
+              </div>
+
+              <!-- Presets Acústicos -->
+              <div class="grid grid-cols-3 gap-2 pt-1 text-xs">
+                <button type="button" onclick="app.setNoisePreset('brown')" class="noise-preset-btn flex flex-col items-center justify-center p-2 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold text-center transition" data-preset="brown">
+                  <span>🌊</span>
+                  <span class="text-[10px] font-mono mt-1 font-bold">Marrón TDAH</span>
+                </button>
+                <button type="button" onclick="app.setNoisePreset('rain')" class="noise-preset-btn flex flex-col items-center justify-center p-2 rounded-2xl bg-slate-950/60 text-slate-400 hover:text-white border border-slate-800 font-semibold text-center transition" data-preset="rain">
+                  <span>🌧️</span>
+                  <span class="text-[10px] font-mono mt-1 font-bold">Lluvia Zen</span>
+                </button>
+                <button type="button" onclick="app.setNoisePreset('binaural')" class="noise-preset-btn flex flex-col items-center justify-center p-2 rounded-2xl bg-slate-950/60 text-slate-400 hover:text-white border border-slate-800 font-semibold text-center transition" data-preset="binaural">
+                  <span>🧠</span>
+                  <span class="text-[10px] font-mono mt-1 font-bold">40Hz Gamma</span>
+                </button>
+              </div>
+
+              <!-- Control de Volumen Táctil -->
+              <div class="flex items-center gap-3 pt-1">
+                <span class="text-xs text-slate-400">🔈</span>
+                <input type="range" min="0" max="1" step="0.02" value="0.65" id="zen-volume-slider" oninput="app.setNoiseVolume(this.value)"
+                  class="w-full h-1.5 bg-slate-800 rounded-full appearance-none accent-cyan-400 cursor-pointer" />
+                <span class="text-xs text-cyan-400">🔊</span>
+              </div>
+            </section>
+
+            <!-- 4. CONTROLES DE EMERGENCIA COGNITIVA & CIERRE (STITCH) -->
+            <section class="flex flex-col space-y-2.5 pt-1">
+              <!-- Desahogar Pensamiento Intrusivo Drawer Trigger -->
+              <button onclick="app.toggleThoughtDrain()" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/90 border border-purple-500/30 hover:border-purple-500/50 text-white shadow-sm active:scale-[0.99] transition" id="btn-open-thought-drain">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
+                    🧠
+                  </div>
+                  <div class="flex flex-col text-left min-w-0">
+                    <span class="font-display font-bold text-xs sm:text-sm text-white truncate">Desahogar pensamiento intrusivo</span>
+                    <span class="text-[11px] text-slate-400 truncate">Sácalo de tu cabeza en 1 seg sin perder el ritmo</span>
+                  </div>
+                </div>
+                <span class="text-sm text-purple-400 font-mono font-bold shrink-0">⚡ Vaciado</span>
+              </button>
+
+              <!-- Panel Desplegable de Desahogo -->
+              <div id="thought-drain-panel" class="hidden flex-col bg-slate-950/90 border border-purple-500/40 rounded-2xl p-3.5 space-y-2.5 shadow-2xl transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-mono font-bold text-purple-300 uppercase tracking-wider">Volcado Rápido al Orbe</span>
+                  <button onclick="app.toggleThoughtDrain()" class="text-slate-400 hover:text-white text-xs">✕</button>
+                </div>
+                <input type="text" id="zen-thought-input" placeholder="Ej: Pagar hosting mañana a las 10:00..."
+                  onkeydown="if(event.key==='Enter') app.saveIntrusiveThought()"
+                  class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-inner" />
+                <div class="flex justify-end gap-2">
+                  <button onclick="app.saveIntrusiveThought()" class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-mono text-xs font-bold shadow-sm active:scale-95 transition">
+                    <span>🔮</span>
+                    <span>Archivar al Orbe</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Concluir Sprint & Registrar Victoria Button (Stitch Style) -->
+              <button onclick="app.completeSprintAndRegisterVictory('${activeProject.id}', '${activeTask.id}', '${encodeURIComponent(activeTask.title)}')"
+                class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-display font-extrabold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+                <span>🏆</span>
+                <span>Concluir Sprint & Registrar Victoria</span>
+              </button>
+            </section>
+          </div>
+        `;
+      }
+
+      addTimerMinutes(min) {
+        this.timer.secondsLeft += min * 60;
+        this.updateTimerDisplay();
+        this.updateZenViewProgress();
+      }
+
+      updateZenViewProgress() {
+        const m = Math.floor(this.timer.secondsLeft / 60).toString().padStart(2, '0');
+        const s = (this.timer.secondsLeft % 60).toString().padStart(2, '0');
+        const disp = document.getElementById('zen-view-timer-display');
+        if (disp) disp.textContent = `${m}:${s}`;
+        const ring = document.getElementById('zen-view-timer-ring');
+        if (ring) {
+          const totalSecs = (this.timer.durationMinutes || 25) * 60;
+          const progressFrac = Math.max(0, Math.min(1, this.timer.secondsLeft / totalSecs));
+          const ringCircumference = 540.35;
+          ring.style.strokeDashoffset = (ringCircumference * (1 - progressFrac)).toString();
+        }
+      }
+
+      toggleThoughtDrain() {
+        const p = document.getElementById('thought-drain-panel');
+        if (p) {
+          p.classList.toggle('hidden');
+          p.classList.toggle('flex');
+          if (!p.classList.contains('hidden')) {
+            const inp = document.getElementById('zen-thought-input');
+            if (inp) inp.focus();
+          }
+        }
+      }
+
+      saveIntrusiveThought() {
+        const inp = document.getElementById('zen-thought-input');
+        if (!inp || !inp.value.trim()) return;
+        const text = inp.value.trim();
+        inp.value = '';
+        this.toggleThoughtDrain();
+
+        const newItem = {
+          id: this.uid(),
+          content: text,
+          category: 'humo_blanco',
+          createdAt: new Date().toISOString(),
+          isPinned: false
+        };
+        if (!this.state.pensadero) this.state.pensadero = [];
+        this.state.pensadero.unshift(newItem);
+        this.saveState();
+
+        if (this.shaderEngine) {
+          this.shaderEngine.setSmokeState('humo_blanco');
+          this.shaderEngine.pulseShockwave();
+        }
+
+        if (this.backendAvailable) {
+          fetch(`${this.API_BASE}/pensadero`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: text, category: 'humo_blanco' })
+          }).catch(() => {});
+        }
+
+        if ('vibrate' in navigator && this.state?.settings?.vibration) {
+          try { navigator.vibrate([20, 30]); } catch(e) {}
+        }
+        alert("✓ Pensamiento intrusivo archivado en el Orbe como Humo Blanco (Soltar). ¡Continúa enfocado!");
+      }
+
+      setNoisePreset(preset) {
+        document.querySelectorAll('.noise-preset-btn').forEach(b => {
+          if (b.getAttribute('data-preset') === preset) {
+            b.className = 'noise-preset-btn flex flex-col items-center justify-center p-2 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold text-center transition';
+          } else {
+            b.className = 'noise-preset-btn flex flex-col items-center justify-center p-2 rounded-2xl bg-slate-950/60 text-slate-400 hover:text-white border border-slate-800 font-semibold text-center transition';
+          }
+        });
+        if (!this.isNoisePlaying) {
+          this.playBrownNoise();
+        }
+      }
+
+      setNoiseVolume(val) {
+        if (this.audioCtx && this.brownGainNode) {
+          this.brownGainNode.gain.setValueAtTime(parseFloat(val) * 0.12, this.audioCtx.currentTime);
+        }
+      }
+
+      completeSprintAndRegisterVictory(projectId, taskId, taskTitle) {
+        this.stopBrownNoise();
+        const decodedTitle = decodeURIComponent(taskTitle || 'Tarea completada');
+        
+        // 1. Acorde de victoria dopamínico (Stitch C Major)
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.08);
+            osc.stop(ctx.currentTime + idx * 0.08 + 0.4);
+          });
+        } catch(e) {}
+
+        this.triggerDopamineReward();
+
+        // Mover tarea a victorias si existe
+        const p = (this.state.projects || []).find(x => x.id === projectId);
+        if (p && p.tasks) {
+          const t = p.tasks.find(x => x.id === taskId);
+          if (t) {
+            t.column = 'victorias';
+            t.updatedAt = new Date().toISOString();
+            this.saveState();
+            if (this.backendAvailable) {
+              fetch(`${this.API_BASE}/tasks/${taskId}/move`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ column: 'victorias' })
+              }).catch(() => {});
+            }
+          }
+        }
+
+        if (projectId && projectId !== 'focus-temp') {
+          setTimeout(() => this.openCheckout(projectId), 400);
+        } else {
+          alert(`🎉 ¡Victoria registrada! Has completado: "${decodedTitle}". Tómate 2 minutos para recargar energía.`);
         }
       }
 
@@ -3210,7 +3759,81 @@
               ${filteredProjects.map(p => this.renderProjectCard(p)).join('')}
             </div>
           `}
+
+          <!-- Módulo de Vínculos & CRM Personal (Humo Púrpura 🟣 - Stitch Screen 4) -->
+          <div class="mt-8 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(208,188,255,0.8)]"></span>
+                <h3 class="font-display font-bold text-base sm:text-lg text-white">Vínculos & CRM Personal</h3>
+              </div>
+              <span class="font-mono text-[10px] text-purple-300 font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30">Humo Púrpura 🟣</span>
+            </div>
+
+            ${this.renderCrmPersonalSection()}
+          </div>
         `;
+      }
+
+      renderCrmPersonalSection() {
+        const crmItems = (this.state.pensadero || []).filter(item => item.category === 'humo_purpura');
+        if (crmItems.length === 0) {
+          return `
+            <div class="p-5 rounded-3xl bg-slate-900/60 border border-purple-500/20 text-center space-y-2">
+              <p class="text-xs text-slate-300">
+                Tus relaciones y personas clave protegidas contra la amnesia del TDAH.
+              </p>
+              <p class="text-[11px] text-slate-500">
+                Dicta al Orbe o añade una nota: <em>"Hablar con Elena para coordinar feedback"</em>.
+              </p>
+              <button onclick="app.quickAddCrmContact()" class="px-3.5 py-1.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 border border-purple-500/30 font-semibold text-xs transition">
+                + Añadir Contacto o Nota de Vínculo
+              </button>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${crmItems.map(item => `
+              <div class="p-4 rounded-3xl bg-slate-900/90 border border-purple-500/30 shadow-md relative overflow-hidden flex flex-col justify-between">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-base shrink-0">
+                    🟣
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-white leading-snug break-words">${item.content}</p>
+                    <span class="text-[10px] font-mono text-purple-400 mt-1 block">${new Date(item.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
+                  <button onclick="app.openDispatchThoughtModal('${item.id}')" class="px-2.5 py-1 rounded-xl bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25 text-xs font-semibold transition" title="Mandar a Proyecto">
+                    🚀 Proyecto
+                  </button>
+                  <button onclick="app.deletePensaderoItem('${item.id}')" class="px-2 py-1 rounded-xl bg-slate-800 text-slate-400 hover:text-rose-400 text-xs transition" title="Archivar">
+                    ✕
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      quickAddCrmContact() {
+        const text = prompt("Nombre o nota del contacto / relación (Humo Púrpura):");
+        if (!text || !text.trim()) return;
+        const newItem = {
+          id: this.uid(),
+          content: text.trim(),
+          category: 'humo_purpura',
+          createdAt: new Date().toISOString(),
+          isPinned: false
+        };
+        if (!this.state.pensadero) this.state.pensadero = [];
+        this.state.pensadero.unshift(newItem);
+        this.saveState();
+        this.render();
       }
 
       getStreakHistory() {
@@ -3297,71 +3920,82 @@
       renderProjectCard(project) {
         const fresh = this.getFreshness(project);
         const latestLog = (project.logs && project.logs.length > 0) ? project.logs[0] : null;
+        const d = this.daysSince(project.lastActivity);
+        const healthPct = Math.max(15, Math.min(100, Math.round(100 - (d * 12))));
 
         return `
-          <div class="p-5 rounded-2xl theme-card border-l-4 ${fresh.class} border-t border-r border-b theme-border shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div class="p-4 sm:p-5 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-md hover:shadow-xl transition-all flex flex-col justify-between relative overflow-hidden backdrop-blur-md"
+               style="border-left: 5px solid ${project.color || '#4cd7f6'};">
             <div>
-              <div class="flex items-start justify-between gap-2 mb-3">
-                <div class="flex items-center gap-2.5">
-                  <span class="text-2xl">${project.emoji}</span>
-                  <div>
-                    <h4 class="font-display font-bold text-base leading-tight">${project.name}</h4>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full border ${fresh.badge}">
+              <div class="flex items-start justify-between gap-2 mb-2.5">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="text-2xl shrink-0">${project.emoji || '🎯'}</span>
+                  <div class="min-w-0">
+                    <h4 class="font-display font-bold text-base sm:text-lg leading-tight text-white truncate">${project.name}</h4>
+                    <span class="text-[10px] font-mono px-2 py-0.2 rounded-full border ${fresh.badge} inline-block mt-0.5">
                       ${fresh.label}
                     </span>
                   </div>
                 </div>
-                <button onclick="app.openProjectModal('${project.id}')" class="theme-text-muted hover:text-white p-1 text-xs" title="Editar">
+                <button onclick="app.openProjectModal('${project.id}')" class="text-slate-400 hover:text-white p-1 text-xs shrink-0" title="Editar">
                   ⚙️
                 </button>
               </div>
 
-              <!-- Próximo paso -->
-              <div class="my-3 p-3 rounded-xl theme-card-subtle border theme-border">
-                <div class="flex items-center justify-between text-[10px] font-mono theme-text-muted mb-1">
-                  <span class="font-bold uppercase tracking-wider text-emerald-400">Próximo paso</span>
-                  <span class="uppercase theme-card px-1.5 py-0.2 rounded border theme-border">${project.nextActionType || 'hacer'}</span>
+              <!-- Medidor de Frescura / Salud (Stitch Screen 4) -->
+              <div class="my-2.5">
+                <div class="flex items-center justify-between text-[11px] font-mono mb-1 text-slate-400">
+                  <span>Frescura: <strong class="text-white">${healthPct}% Salud</strong></span>
+                  <span class="text-cyan-400 font-semibold">${d === 0 ? 'Tocado hoy 🔥' : (d <= 3 ? 'Listo para Ejecución' : 'Enfriándose')}</span>
                 </div>
-                <p class="text-xs font-semibold leading-snug">
-                  ${project.nextAction || '<span class="italic theme-text-muted">No definido</span>'}
-                </p>
+                <div class="w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500" style="width: ${healthPct}%; background: ${project.color || '#4cd7f6'};"></div>
+                </div>
+              </div>
+
+              <!-- Próximo paso fijado (Stitch Style) -->
+              <div class="my-2.5 p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-start gap-2">
+                <span class="text-cyan-400 text-sm shrink-0 mt-0.5">🚩</span>
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[10px] font-mono text-cyan-300 uppercase tracking-wider font-semibold">Próximo paso:</span>
+                    <span class="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-slate-950 text-slate-400 border border-slate-800">${project.nextActionType || 'hacer'}</span>
+                  </div>
+                  <p class="text-xs font-bold text-white mt-0.5 leading-snug">
+                    ${project.nextAction || '<span class="italic text-slate-500">No definido aún</span>'}
+                  </p>
+                </div>
               </div>
 
               ${latestLog ? `
-                <p class="text-[11px] theme-text-muted mb-2 line-clamp-1">
-                  <strong>Último:</strong> ${latestLog.achievement}
+                <p class="text-[11px] text-slate-400 mb-2 line-clamp-1">
+                  <strong>Último avance:</strong> ${latestLog.achievement}
                 </p>
               ` : ''}
 
               ${project.originThoughtContent ? `
-                <div class="mb-3 text-[10px] text-amber-300/90 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-xl flex items-center gap-1.5 truncate" title="Pensamiento original en El Pensadero: ${project.originThoughtContent}">
+                <div class="mb-2 text-[10px] text-amber-300/90 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-xl flex items-center gap-1.5 truncate" title="Pensamiento original en El Pensadero: ${project.originThoughtContent}">
                   <span>🔮</span>
                   <span class="truncate italic font-mono">"${project.originThoughtContent}"</span>
                 </div>
               ` : ''}
             </div>
 
-            <!-- Botones de Acción -->
-            <div class="pt-3 border-t theme-border flex items-center justify-between gap-1.5">
-              <button onclick="app.openCheckout('${project.id}')" class="flex-1 py-2 px-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-sm active:scale-95 transition text-center" title="Registrar avance">
+            <!-- Botones de Acción Táctiles (Stitch Mobile) -->
+            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-1.5 flex-wrap">
+              <button onclick="app.openCheckout('${project.id}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-display font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition text-center" title="Registrar avance">
                 ▶ Avancé
+              </button>
+              <button onclick="app.launchZenForTask('${project.id}', '', '${encodeURIComponent(project.nextAction || project.name)}')" class="py-2 px-2.5 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25 font-semibold text-xs transition" title="Llevar a Modo Zen">
+                🧘 Zen
               </button>
               <button onclick="app.openOneThingMode('${project.id}')" class="py-2 px-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 font-semibold text-xs transition" title="Modo Solo 1 Cosa (Filtro de Ruido)">
                 👁️
               </button>
-              <button onclick="app.openDeconstructModal('${project.id}')" class="py-2 px-2 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/25 hover:bg-amber-500/20 font-semibold text-xs transition" title="Desglose Atómico Gemini">
-                🪄
-              </button>
-              <button onclick="app.reactivateProjectWithGemini('${project.id}')" class="py-2 px-2 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/25 hover:bg-purple-500/20 font-semibold text-xs transition" title="Resumen de Reactivación con IA">
-                🌱
-              </button>
-              <button onclick="app.openKanbanProject('${project.id}')" class="py-2 px-2 rounded-xl theme-card-subtle hover:brightness-110 font-semibold text-xs border theme-border transition" title="Ver Kanban">
+              <button onclick="app.openKanbanProject('${project.id}')" class="py-2 px-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-semibold text-xs border border-slate-700 transition" title="Ver Kanban">
                 📋
               </button>
-              <button onclick="app.hibernateProjectWithoutGuilt('${project.id}')" class="py-2 px-1.5 rounded-xl theme-card-subtle hover:brightness-110 text-sky-400 hover:text-sky-300 text-xs border theme-border transition" title="Pausa sin culpa (hibernar)">
-                ❄️
-              </button>
-              <button onclick="app.skipProjectWithoutGuilt('${project.id}')" class="py-2 px-1.5 rounded-xl theme-card-subtle hover:brightness-110 theme-text-muted hover:text-white text-xs border theme-border transition" title="Saltar sin culpa (+3 días)">
+              <button onclick="app.skipProjectWithoutGuilt('${project.id}')" class="py-2 px-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white text-xs border border-slate-700/60 transition" title="Saltar sin culpa (+3 días)">
                 ⏭
               </button>
             </div>
@@ -3397,6 +4031,7 @@
         const purpleCount = items.filter(x => x.category === 'humo_purpura').length;
         const orangeCount = items.filter(x => x.category === 'humo_naranja').length;
         const ashCount = items.filter(x => x.category === 'humo_ceniza').length;
+        const taskCount = items.filter(x => x.category === 'humo_tarea').length;
 
         const activeFilter = this.pensaderoSmokeFilter || 'all';
         const nowMs = Date.now();
@@ -3416,6 +4051,7 @@
           if (activeFilter === 'humo_purpura' || activeFilter === 'purpura') return it.category === 'humo_purpura';
           if (activeFilter === 'humo_naranja' || activeFilter === 'naranja') return it.category === 'humo_naranja';
           if (activeFilter === 'humo_ceniza' || activeFilter === 'ceniza') return it.category === 'humo_ceniza';
+          if (activeFilter === 'humo_tarea' || activeFilter === 'tarea') return it.category === 'humo_tarea';
           return true;
         });
 
@@ -3547,6 +4183,7 @@
                 <button onclick="app.setOrbeColor('humo_purpura')" data-smoke="humo_purpura" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-500 border-2 border-purple-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟣 Humo Púrpura: CRM Personal">🟣</button>
                 <button onclick="app.setOrbeColor('humo_naranja')" data-smoke="humo_naranja" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-500 border-2 border-orange-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🟠 Humo Naranja: Fricción Dinero">🟠</button>
                 <button onclick="app.setOrbeColor('humo_ceniza')" data-smoke="humo_ceniza" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-500 border-2 border-slate-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="🔘 Humo Ceniza: Hibernación Someday">🔘</button>
+                <button onclick="app.setOrbeColor('humo_tarea')" data-smoke="humo_tarea" class="smoke-reactor-btn w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-600 border-2 border-indigo-400 hover:scale-110 active:scale-95 transition shadow-lg flex items-center justify-center text-xs" title="☑️ Humo Índigo: Tarea Pendiente / General">☑️</button>
               </div>
 
               <!-- Indicador de Deslizamiento Suave (Sólo en Móvil / App) -->
@@ -3594,6 +4231,7 @@
                   <button type="button" onclick="app.selectPensaderoCat('humo_purpura')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_purpura">🟣 CRM</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_naranja')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_naranja">🟠 Fricción $</button>
                   <button type="button" onclick="app.selectPensaderoCat('humo_ceniza')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_ceniza">🔘 Someday</button>
+                  <button type="button" onclick="app.selectPensaderoCat('humo_tarea')" class="pcat-chip px-2.5 py-1 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white" data-cat="humo_tarea">☑️ Tarea</button>
                   <input type="hidden" id="pensadero-cat-val" value="humo_general" />
                 </div>
 
@@ -3626,6 +4264,9 @@
                   </button>
                   <button onclick="app.filterPensaderoSmoke('humo_blanco')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_blanco' ? 'bg-white/20 text-white border border-white/50' : 'bg-slate-900/60 text-slate-400 hover:text-white'}">
                     ⚪ Vaciado (${whiteCount})
+                  </button>
+                  <button onclick="app.filterPensaderoSmoke('humo_tarea')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_tarea' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-indigo-300'}">
+                    ☑️ Tarea (${taskCount})
                   </button>
                 </div>
 
@@ -4343,6 +4984,7 @@
         else if (lower.includes('crm') || lower.includes('llamar') || lower.includes('púrpura') || lower.includes('morado')) cat = 'humo_purpura';
         else if (lower.includes('dinero') || lower.includes('gasto') || lower.includes('naranja')) cat = 'humo_naranja';
         else if (lower.includes('congelar') || lower.includes('ceniza') || lower.includes('algún día')) cat = 'humo_ceniza';
+        else if (lower.includes('tarea') || lower.includes('pendiente') || lower.includes('quehacer') || lower.includes('to-do') || lower.includes('todo') || lower.includes('índigo') || lower.includes('indigo')) cat = 'humo_tarea';
         else if (lower.includes('general') || lower.includes('libre')) cat = 'humo_general';
 
         if (cat) {
@@ -4697,7 +5339,16 @@
                 </button>
               ` : ''}
 
-              ${(item.category === 'humo_dorado' || item.category === 'chispa' || item.category === 'tarea') ? `
+              ${(item.category === 'humo_tarea') ? `
+                <button onclick="app.openScheduleEmailModal('${item.id}', '${encodeURIComponent(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Programar recordatorio por Google Mail (Gmail)">
+                  <span>📧</span> Correo
+                </button>
+                <button onclick="app.chewGoldSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Masticar en 3 micro-pasos de 15 min">
+                  <span>🍴</span> 15m
+                </button>
+              ` : ''}
+
+              ${(item.category === 'humo_dorado' || item.category === 'chispa') ? `
                 <button onclick="app.chewGoldSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Masticar en 3 micro-pasos de 15 min">
                   <span>🍴</span> 15m
                 </button>
@@ -5108,16 +5759,16 @@
             </div>
           </div>
 
-          <!-- TARJETA TINDER-LIKE -->
-          <div class="max-w-md mx-auto relative select-none">
-            <div class="p-6 rounded-3xl theme-card border-2 shadow-2xl transition-all relative overflow-hidden ${isCooling ? 'task-cooling' : ''}"
-                 style="border-color: ${project.color || '#10b981'}; min-height: 360px; display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- TARJETA TINDER-LIKE (STITCH FOCUS CARD) -->
+          <div class="max-w-md mx-auto relative select-none" id="dopamine-canvas-wrapper">
+            <div id="active-tinder-card" class="p-6 rounded-3xl bg-slate-900/90 border-2 shadow-2xl transition-all relative overflow-hidden backdrop-blur-xl ${isCooling ? 'task-cooling' : ''}"
+                 style="border-color: ${project.color || '#4cd7f6'}; min-height: 380px; display: flex; flex-direction: column; justify-content: space-between;">
               
               <div>
-                <!-- Tags de Cabecera -->
+                <!-- Tags de Cabecera (Stitch Style) -->
                 <div class="flex items-center justify-between gap-2 mb-3">
-                  <span class="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                    Columna: ${task.column.toUpperCase()}
+                  <span class="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-800 text-cyan-300 border border-cyan-500/30">
+                    ${project.emoji} ${project.name} • ${task.column.toUpperCase()}
                   </span>
                   <span class="text-xs font-mono font-bold text-emerald-400">
                     ${this.tinderCardIndex + 1} de ${total}
@@ -5127,32 +5778,44 @@
                 ${isCooling ? `<div class="mb-2"><span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-300 border border-slate-600/50">❄️ Perdiendo inercia (${ageDays} días estancada)</span></div>` : ''}
                 ${task.isBureaucratic ? `<div class="mb-2"><span class="badge-bureaucracy text-[10px] font-bold px-2 py-0.5 rounded-md">📑 Tarea Administrativa (Doble recompensa)</span></div>` : ''}
 
-                <h2 class="text-xl font-display font-extrabold text-white leading-snug mb-3 cursor-pointer" onclick="app.openDeepWork('${project.id}', '${task.id}')">
+                <h2 class="text-xl sm:text-2xl font-display font-black text-white leading-snug mb-3 cursor-pointer hover:text-cyan-300 transition" onclick="app.openDeepWork('${project.id}', '${task.id}')">
                   ${task.title}
                 </h2>
 
-                ${task.notes ? `<p class="text-xs text-slate-300 line-clamp-3 mb-2 font-mono bg-slate-900/50 p-2.5 rounded-xl border border-slate-800">${task.notes}</p>` : ''}
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/70 border border-slate-800 text-[11px] font-mono text-slate-300 mb-3">
+                  <span>⏱️</span> <span>Micro-paso: ~10 min</span>
+                  <span class="text-slate-600">•</span>
+                  <span class="text-emerald-400 font-semibold">Dificultad Mínima</span>
+                </div>
+
+                ${task.notes ? `<p class="text-xs text-slate-300 line-clamp-3 mb-2 font-mono bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">${task.notes}</p>` : ''}
                 ${task.codeSnippet ? `<p class="text-[11px] text-emerald-400 font-mono bg-slate-950 p-2 rounded-lg border border-slate-800 truncate">💻 Snippet de código adjunto</p>` : ''}
               </div>
 
-              <!-- Acciones Swipe/Botones -->
-              <div class="pt-4 border-t theme-border space-y-3">
+              <!-- Acciones Táctiles Dopamínicas (Stitch Screen 2) -->
+              <div class="pt-4 border-t border-slate-800 space-y-2.5">
                 <div class="grid grid-cols-3 gap-2">
-                  <button onclick="app.swipeTinderAction('icebox', '${project.id}', '${task.id}')" class="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95" title="Mover al Congelador sin culpa">
-                    <span class="text-xl">❄️</span> Congelar
+                  <!-- Saltar sin culpa -->
+                  <button onclick="app.nextTinderCard()" class="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95" title="Saltar sin culpa: Cero remordimientos, conserva momentum">
+                    <span class="text-lg">⏭️</span>
+                    <span class="text-[10px] whitespace-nowrap">Sin culpa</span>
                   </button>
-                  <button onclick="app.swipeTinderAction('enfoco', '${project.id}', '${task.id}')" class="p-3 rounded-2xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95 border border-amber-500/30" title="Mover a En Foco">
-                    <span class="text-xl">⚡</span> A Foco
+                  <!-- Llevar a Modo Zen -->
+                  <button onclick="app.launchZenForTask('${project.id}', '${task.id}', '${encodeURIComponent(task.title)}')" class="p-3 rounded-2xl bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95 border border-cyan-500/40 plasma-glow" title="Entrar en Modo Zen Hiperfoco">
+                    <span class="text-lg">🧘</span>
+                    <span class="text-[10px] whitespace-nowrap">Modo Zen</span>
                   </button>
-                  <button onclick="app.swipeTinderAction('done', '${project.id}', '${task.id}')" class="p-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95 shadow-lg shadow-emerald-500/20" title="Marcar como Victoria">
-                    <span class="text-xl">🏆</span> Hecho
+                  <!-- ¡Victoria lograda! -->
+                  <button onclick="app.completeTinderVictory('${project.id}', '${task.id}', '${encodeURIComponent(task.title)}')" class="p-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-display font-extrabold flex flex-col items-center gap-1 transition active:scale-95 shadow-lg shadow-emerald-500/25 pulse-glow-tertiary" title="Marcar como Victoria y recibir dopamina">
+                    <span class="text-lg">🎉</span>
+                    <span class="text-[10px] whitespace-nowrap">¡Victoria!</span>
                   </button>
                 </div>
 
                 <div class="flex items-center justify-between text-xs theme-text-muted pt-1">
-                  <button onclick="app.prevTinderCard()" class="px-3 py-1 rounded-lg hover:text-white">← Anterior</button>
-                  <button onclick="app.openDeepWork('${project.id}', '${task.id}')" class="text-sky-400 font-semibold hover:underline">💻 Notas & Código</button>
-                  <button onclick="app.nextTinderCard()" class="px-3 py-1 rounded-lg hover:text-white">Saltar →</button>
+                  <button onclick="app.prevTinderCard()" class="px-2.5 py-1 rounded-lg hover:text-white">← Anterior</button>
+                  <button onclick="app.openDeepWork('${project.id}', '${task.id}')" class="text-sky-400 font-semibold hover:underline">💻 Notas & Detalle</button>
+                  <button onclick="app.swipeTinderAction('icebox', '${project.id}', '${task.id}')" class="text-slate-400 hover:text-cyan-300">❄️ Congelar</button>
                 </div>
               </div>
             </div>
@@ -5184,6 +5847,47 @@
           } else {
             this.moveTaskToColumn(projectId, taskId, 'victorias');
           }
+        }
+        this.tinderCardIndex++;
+        this.render();
+      }
+
+      launchZenForTask(projectId, taskId, taskTitle) {
+        this.selectedKanbanProjectId = projectId;
+        const decoded = decodeURIComponent(taskTitle || '');
+        this.currentOneThingTask = { projectId, taskId, title: decoded };
+        this.navigate('zen');
+      }
+
+      completeTinderVictory(projectId, taskId, taskTitle) {
+        const decoded = decodeURIComponent(taskTitle || '');
+        
+        // Acorde dopamínico C Major
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.08);
+            osc.stop(ctx.currentTime + idx * 0.08 + 0.4);
+          });
+        } catch(e) {}
+
+        this.triggerDopamineReward();
+
+        const p = this.state.projects.find(x => x.id === projectId);
+        const t = (p?.tasks || []).find(x => x.id === taskId);
+        if (t?.isBureaucratic) {
+          this.completeBureaucraticTask(projectId, taskId);
+        } else {
+          this.moveTaskToColumn(projectId, taskId, 'victorias');
         }
         this.tinderCardIndex++;
         this.render();
@@ -5262,6 +5966,9 @@
                 </button>
                 <button onclick="app.openDeconstructModal('${projectId}', '${task.title.replace(/'/g, "\\'")}')" class="text-[9px] theme-text-muted hover:text-amber-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Desglose Atómico Gemini (micro-pasos de 15m)">
                   🪄
+                </button>
+                <button onclick="app.openScheduleEmailModal('${task.id}', '${task.title.replace(/'/g, "\\'")}', '${projectId}')" class="text-[9px] theme-text-muted hover:text-indigo-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Programar recordatorio por Google Mail (Gmail)">
+                  📧
                 </button>
                 <button onclick="app.openDeepWork('${projectId}', '${task.id}')" class="text-[9px] theme-text-muted hover:text-sky-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Abrir notas y fragmentos de código (Deep Work)">
                   💻
@@ -5826,6 +6533,288 @@
       }
 
       // ==========================================
+      // INTEGRACIÓN GOOGLE MAIL (GMAIL SMTP & RECORDATORIOS)
+      // ==========================================
+      async initGoogleMailStatus() {
+        const badge = document.getElementById('google-mail-status-badge');
+        const userInp = document.getElementById('setting-gmail-user');
+        const recipInp = document.getElementById('setting-gmail-recipient');
+
+        try {
+          const res = await fetch(`${this.NEXUS_API_BASE}/mail/status`, { method: 'GET' });
+          if (res.ok) {
+            const data = await res.json();
+            this.googleMailStatus = data;
+            if (badge) {
+              if (data.configured) {
+                badge.textContent = `🟢 Conectado (${data.gmail_user_masked})`;
+                badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+              } else {
+                badge.textContent = '⚪ Sin Configurar';
+                badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700';
+              }
+            }
+            if (userInp && !userInp.value && data.gmail_user) userInp.value = data.gmail_user;
+            if (recipInp && !recipInp.value && data.default_recipient) recipInp.value = data.default_recipient;
+            return;
+          }
+        } catch (e) {
+          console.warn('No se pudo verificar estado de Google Mail:', e);
+        }
+
+        if (badge) {
+          badge.textContent = '⚪ Desconectado';
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        }
+      }
+
+      async saveGoogleMailConfig() {
+        const userInp = document.getElementById('setting-gmail-user');
+        const pwdInp = document.getElementById('setting-gmail-app-password');
+        const recipInp = document.getElementById('setting-gmail-recipient');
+        const fb = document.getElementById('google-mail-feedback');
+
+        const user = userInp ? userInp.value.trim() : '';
+        const pwd = pwdInp ? pwdInp.value.trim().replace(/\s+/g, '') : '';
+        const recip = recipInp ? recipInp.value.trim() : '';
+
+        if (!user || !pwd) {
+          if (fb) {
+            fb.textContent = '❌ El correo Gmail y la Contraseña de Aplicación de 16 caracteres son obligatorios.';
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+          return;
+        }
+
+        if (fb) {
+          fb.textContent = '⏳ Guardando y verificando credenciales con Google...';
+          fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 block';
+        }
+
+        try {
+          const res = await fetch(`${this.NEXUS_API_BASE}/mail/config`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gmail_user: user,
+              gmail_app_password: pwd,
+              default_recipient: recip || user
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            this.googleMailStatus = data;
+            if (fb) {
+              fb.textContent = '✓ Credenciales guardadas exitosamente en Nexus.';
+              fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 block';
+            }
+            this.initGoogleMailStatus();
+            this.showNotification('📬 Configuración de Google Mail guardada.', 'success');
+          } else {
+            throw new Error(`Status ${res.status}`);
+          }
+        } catch (err) {
+          if (fb) {
+            fb.textContent = `❌ Error guardando configuración: ${err.message}`;
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+        }
+      }
+
+      async testGoogleMailConnection() {
+        const userInp = document.getElementById('setting-gmail-user');
+        const pwdInp = document.getElementById('setting-gmail-app-password');
+        const recipInp = document.getElementById('setting-gmail-recipient');
+        const fb = document.getElementById('google-mail-feedback');
+
+        const user = userInp ? userInp.value.trim() : '';
+        const pwd = pwdInp ? pwdInp.value.trim().replace(/\s+/g, '') : '';
+        const recip = recipInp ? recipInp.value.trim() : '';
+
+        if (fb) {
+          fb.textContent = '⏳ Probando conexión SMTP segura con smtp.gmail.com:587...';
+          fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 block';
+        }
+
+        try {
+          const res = await fetch(`${this.NEXUS_API_BASE}/mail/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user: user,
+              app_password: pwd,
+              to_email: recip || user
+            })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            if (fb) {
+              fb.textContent = `🟢 ${data.message}`;
+              fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 block';
+            }
+            this.initGoogleMailStatus();
+            this.showNotification('✨ Conexión con Google Mail exitosa. Correo de prueba enviado.', 'success');
+          } else {
+            if (fb) {
+              fb.textContent = `❌ ${data.error || 'Fallo en la prueba de conexión'}`;
+              fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+            }
+          }
+        } catch (err) {
+          if (fb) {
+            fb.textContent = `❌ Error contactando microservicio: ${err.message}`;
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+        }
+      }
+
+      openDirectGmailWeb(taskTitle = '', body = '') {
+        const recipInp = document.getElementById('setting-gmail-recipient') || document.getElementById('setting-gmail-user');
+        const to = recipInp?.value || this.googleMailStatus?.default_recipient || '';
+        const su = taskTitle ? `[Nexus Tarea] ${taskTitle}` : 'Recordatorio Hive Brain';
+        const b = body || 'Micro-paso programado para romper la inercia cognitiva.\n\nAcceso a Hive Brain: http://localhost:8000';
+        const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(su)}&body=${encodeURIComponent(b)}`;
+        window.open(url, '_blank');
+      }
+
+      openScheduleEmailModal(taskId, taskTitle = '', projectId = null) {
+        let cleanTitle = taskTitle;
+        if (!cleanTitle) {
+          const item = this.getPensaderoItem(taskId);
+          if (item) cleanTitle = item.content;
+          else {
+            const p = projectId ? this.state.projects.find(x => x.id === projectId) : null;
+            const t = p?.tasks?.find(x => x.id === taskId);
+            if (t) cleanTitle = t.title;
+          }
+        }
+        if (!cleanTitle) cleanTitle = 'Tarea Pendiente';
+
+        const titleEl = document.getElementById('schedule-email-task-title');
+        const idEl = document.getElementById('schedule-email-task-id');
+        const projEl = document.getElementById('schedule-email-project-id');
+        const dtEl = document.getElementById('schedule-email-dt');
+        const recipEl = document.getElementById('schedule-email-recipient');
+        const fb = document.getElementById('schedule-email-feedback');
+
+        if (titleEl) titleEl.textContent = decodeURIComponent(cleanTitle);
+        if (idEl) idEl.value = taskId;
+        if (projEl) projEl.value = projectId || '';
+        if (fb) {
+          fb.textContent = '';
+          fb.classList.add('hidden');
+        }
+
+        const d = new Date(Date.now() + 60 * 60 * 1000);
+        d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0);
+        const pad = n => String(n).padStart(2, '0');
+        const iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        if (dtEl) dtEl.value = iso;
+
+        if (recipEl) {
+          recipEl.value = this.googleMailStatus?.default_recipient || this.googleMailStatus?.gmail_user || '';
+        }
+
+        this.openModal('modal-schedule-email');
+      }
+
+      setScheduleEmailPreset(preset) {
+        const dtEl = document.getElementById('schedule-email-dt');
+        if (!dtEl) return;
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+
+        if (typeof preset === 'number') {
+          const d = new Date(now.getTime() + preset * 60 * 1000);
+          dtEl.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        } else if (preset === 'tonight') {
+          const d = new Date();
+          d.setHours(20, 0, 0, 0);
+          if (d <= now) d.setDate(d.getDate() + 1);
+          dtEl.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        } else if (preset === 'tomorrow_9am') {
+          const d = new Date();
+          d.setDate(d.getDate() + 1);
+          d.setHours(9, 0, 0, 0);
+          dtEl.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+      }
+
+      openDirectGmailWebFromModal() {
+        const titleEl = document.getElementById('schedule-email-task-title');
+        const recipEl = document.getElementById('schedule-email-recipient');
+        const dtEl = document.getElementById('schedule-email-dt');
+        const title = titleEl ? titleEl.textContent : 'Tarea Pendiente';
+        const to = recipEl ? recipEl.value.trim() : '';
+        const when = dtEl ? dtEl.value : '';
+        const body = `Hola,\n\nRecordatorio de tarea programada:\n"${title}"\nProgramada para: ${when}\n\nIngresar a Hive Brain:\nhttp://localhost:8000\n\nSaludos,\nNexus AI`;
+        const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent('☑️ [Nexus Recordatorio] ' + title)}&body=${encodeURIComponent(body)}`;
+        window.open(url, '_blank');
+        this.closeModal('modal-schedule-email');
+      }
+
+      async confirmScheduleEmail() {
+        const idEl = document.getElementById('schedule-email-task-id');
+        const titleEl = document.getElementById('schedule-email-task-title');
+        const dtEl = document.getElementById('schedule-email-dt');
+        const recipEl = document.getElementById('schedule-email-recipient');
+        const fb = document.getElementById('schedule-email-feedback');
+
+        const taskId = idEl ? idEl.value : '';
+        const title = titleEl ? titleEl.textContent : 'Tarea Pendiente';
+        const scheduledTime = dtEl ? dtEl.value : '';
+        const recipient = recipEl ? recipEl.value.trim() : '';
+
+        if (!scheduledTime) {
+          if (fb) {
+            fb.textContent = '❌ Por favor selecciona la fecha y hora para el aviso.';
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+          return;
+        }
+
+        if (fb) {
+          fb.textContent = '⏳ Programando recordatorio en el microservicio...';
+          fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 block';
+        }
+
+        try {
+          const res = await fetch(`${this.NEXUS_API_BASE}/mail/schedule`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              taskId: taskId,
+              taskTitle: title,
+              scheduledTime: scheduledTime,
+              recipient: recipient
+            })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            this.closeModal('modal-schedule-email');
+            this.showNotification(`📧 Recordatorio programado para ${new Date(scheduledTime).toLocaleString('es-ES')}.`, 'success');
+            if (this.shaderEngine) {
+              this.shaderEngine.setSmokeState('humo_tarea');
+              this.shaderEngine.pulseShockwave();
+            }
+          } else {
+            if (fb) {
+              fb.textContent = `❌ ${data.error || 'No se pudo programar el aviso'}`;
+              fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+            }
+          }
+        } catch (err) {
+          if (fb) {
+            fb.textContent = `❌ Error conectando al servicio: ${err.message}`;
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+        }
+      }
+
+      // ==========================================
       // SISTEMA ANTI-ABANDONO: RESUMEN DE REACTIVACIÓN CON IA & PAUSA SIN CULPA
       // ==========================================
       async reactivateProjectWithGemini(projectId) {
@@ -6253,6 +7242,9 @@
         } else if (lower.includes('algún día') || lower.includes('algun dia') || lower.includes('someday') || lower.includes('futuro') || lower.includes('quizás') || lower.includes('quizas') || lower.includes('congelar') || lower.includes('ceniza')) {
           cat = 'humo_ceniza';
           weight = 'ligero';
+        } else if (lower.includes('tarea') || lower.includes('pendiente') || lower.includes('quehacer') || lower.includes('to-do') || lower.includes('todo') || lower.includes('hacer') || lower.includes('mandar') || lower.includes('enviar') || lower.includes('trámite') || lower.includes('tramite') || lower.includes('revisar') || lower.includes('índigo') || lower.includes('indigo')) {
+          cat = 'humo_tarea';
+          weight = 'medio';
         } else {
           cat = 'humo_dorado';
           weight = 'medio';
@@ -7322,11 +8314,15 @@
           document.getElementById('timer-toggle-btn').textContent = 'Continuar';
           const zenBtn = document.getElementById('zen-timer-btn');
           if (zenBtn) zenBtn.textContent = 'Continuar';
+          const zenViewLabel = document.getElementById('zen-view-toggle-label');
+          if (zenViewLabel) zenViewLabel.textContent = 'Continuar';
         } else {
           this.timer.isRunning = true;
           document.getElementById('timer-toggle-btn').textContent = 'Pausar';
           const zenBtn = document.getElementById('zen-timer-btn');
           if (zenBtn) zenBtn.textContent = 'Pausar';
+          const zenViewLabel = document.getElementById('zen-view-toggle-label');
+          if (zenViewLabel) zenViewLabel.textContent = 'Pausar';
           this.timer.intervalId = setInterval(() => {
             this.timer.secondsLeft--;
             this.updateTimerDisplay();
@@ -7346,6 +8342,8 @@
         document.getElementById('timer-toggle-btn').textContent = 'Iniciar';
         const zenBtn = document.getElementById('zen-timer-btn');
         if (zenBtn) zenBtn.textContent = 'Iniciar';
+        const zenViewLabel = document.getElementById('zen-view-toggle-label');
+        if (zenViewLabel) zenViewLabel.textContent = 'Iniciar';
         this.updateTimerDisplay();
       }
 
@@ -7359,6 +8357,7 @@
         if (headerEl) headerEl.textContent = timeStr;
         if (barEl) barEl.textContent = timeStr;
         if (zenEl) zenEl.textContent = timeStr;
+        this.updateZenViewProgress();
       }
 
       onTimerComplete() {

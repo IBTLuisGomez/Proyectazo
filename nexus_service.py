@@ -6,6 +6,13 @@ Handles thought classification, atomic goal deconstruction, gap filling, and dor
 
 import os
 import json
+import smtplib
+import ssl
+import threading
+import time
+from datetime import datetime, timezone
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from enum import Enum
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pydantic import BaseModel, Field
@@ -36,6 +43,7 @@ class SmokeColor(str, Enum):
     PURPURA = "#A855F7"  # CRM Personal
     NARANJA = "#F97316"  # Finanzas
     CENIZA = "#64748B"   # Hibernación (Someday)
+    INDIGO = "#6366F1"   # Tarea Pendiente / Tarea en General
 
 class ModuleTarget(str, Enum):
     PENSADERO = "pensadero"
@@ -174,6 +182,16 @@ def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
             first_step="",
             cognitive_weight="ligero"
         )
+    elif any(k in lower for k in ['tarea', 'pendiente', 'quehacer', 'to-do', 'todo', 'hacer', 'mandar', 'enviar', 'trámite', 'tramite', 'revisar', 'índigo', 'indigo']):
+        return ThoughtClassification(
+            raw_thought=user_text,
+            thought_type="tarea",
+            smoke_color=SmokeColor.INDIGO,
+            target_module=ModuleTarget.TASKS,
+            suggested_action="Registrar en lista de tareas pendientes y programar aviso por correo",
+            first_step="Despejar 10 minutos o fijar recordatorio en Gmail",
+            cognitive_weight="medio"
+        )
     else:
         return ThoughtClassification(
             raw_thought=user_text,
@@ -268,6 +286,312 @@ def generate_reactivation_briefing(project_name: str, context: str, logs: list) 
     )
 
 
+# --- GESTOR DE CONEXIÓN CON CORREO GOOGLE (GMAIL SMTP & RECORDATORIOS) ---
+
+class GoogleMailManager:
+    """
+    Gestor de integración con Google Mail (Gmail SMTP / Google Workspace)
+    para recordatorios automáticos de tareas y notificaciones programadas.
+    """
+    def __init__(self, storage_dir: str = "data"):
+        self.storage_dir = storage_dir
+        os.makedirs(self.storage_dir, exist_ok=True)
+        self.config_file = os.path.join(self.storage_dir, "google_mail_config.json")
+        self.reminders_file = os.path.join(self.storage_dir, "scheduled_emails.json")
+        self.lock = threading.Lock()
+        self.config = self._load_config()
+        self.reminders = self._load_reminders()
+        self._start_scheduler()
+
+    def _load_config(self) -> dict:
+        cfg = {
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "gmail_user": os.getenv("GMAIL_USER", ""),
+            "gmail_app_password": os.getenv("GMAIL_APP_PASSWORD", ""),
+            "default_recipient": os.getenv("GMAIL_RECIPIENT", ""),
+            "sender_name": "Nexus Assistant"
+        }
+        if os.path.exists(self.config_file):
+            try:
+                with open(self.config_file, "r", encoding="utf-8") as f:
+                    saved = json.load(f)
+                    cfg.update(saved)
+            except Exception as e:
+                print(f"[GoogleMailManager] Error cargando config: {e}")
+        return cfg
+
+    def save_config(self, new_cfg: dict) -> dict:
+        with self.lock:
+            for k in ["smtp_server", "smtp_port", "gmail_user", "gmail_app_password", "default_recipient", "sender_name"]:
+                if k in new_cfg and new_cfg[k] is not None:
+                    self.config[k] = new_cfg[k]
+            try:
+                with open(self.config_file, "w", encoding="utf-8") as f:
+                    json.dump(self.config, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                print(f"[GoogleMailManager] Error guardando config: {e}")
+        return self.get_status()
+
+    def _load_reminders(self) -> list:
+        if os.path.exists(self.reminders_file):
+            try:
+                with open(self.reminders_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"[GoogleMailManager] Error cargando recordatorios: {e}")
+        return []
+
+    def _save_reminders(self):
+        try:
+            with open(self.reminders_file, "w", encoding="utf-8") as f:
+                json.dump(self.reminders, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"[GoogleMailManager] Error guardando recordatorios: {e}")
+
+    def get_status(self) -> dict:
+        user = self.config.get("gmail_user", "").strip()
+        pwd = self.config.get("gmail_app_password", "").strip()
+        configured = bool(user and pwd)
+        masked_user = (user[:3] + "***@" + user.split("@")[-1]) if ("@" in user and len(user) > 6) else user
+        pending_count = sum(1 for r in self.reminders if r.get("status") == "pending")
+        return {
+            "configured": configured,
+            "smtp_server": self.config.get("smtp_server", "smtp.gmail.com"),
+            "smtp_port": self.config.get("smtp_port", 587),
+            "gmail_user": user,
+            "gmail_user_masked": masked_user,
+            "default_recipient": self.config.get("default_recipient", user),
+            "sender_name": self.config.get("sender_name", "Nexus Assistant"),
+            "pending_reminders": pending_count,
+            "total_reminders": len(self.reminders)
+        }
+
+    def test_connection(self, user=None, app_password=None, to_email=None) -> dict:
+        gmail_user = (user or self.config.get("gmail_user", "")).strip()
+        pwd = (app_password or self.config.get("gmail_app_password", "")).strip().replace(" ", "")
+        recipient = (to_email or self.config.get("default_recipient") or gmail_user).strip()
+
+        if not gmail_user or not pwd:
+            return {
+                "success": False,
+                "error": "Faltan credenciales: Correo Gmail y Contraseña de Aplicación de 16 caracteres son requeridos."
+            }
+
+        server_host = self.config.get("smtp_server", "smtp.gmail.com")
+        server_port = int(self.config.get("smtp_port", 587))
+
+        try:
+            server = smtplib.SMTP(server_host, server_port, timeout=12)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(gmail_user, pwd)
+
+            if recipient:
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = "✨ [Nexus AI] Conexión de Correo Google Verificada con Éxito"
+                msg["From"] = f"{self.config.get('sender_name', 'Nexus Assistant')} <{gmail_user}>"
+                msg["To"] = recipient
+
+                html_body = f"""
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b0f19; color: #f8fafc; padding: 24px; border-radius: 16px; max-width: 580px; margin: auto; border: 1px solid #312e81;">
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px;">⚡</div>
+                    <div>
+                      <h2 style="margin: 0; font-size: 18px; color: #ffffff; letter-spacing: -0.02em;">Nexus Cognitive Assistant</h2>
+                      <span style="font-size: 12px; color: #818cf8;">Hive Brain &bull; TDAH Executive System</span>
+                    </div>
+                  </div>
+                  <div style="background-color: #1e1b4b; border: 1px solid #4338ca; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                    <div style="color: #a5b4fc; font-size: 13px; text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">🟢 Conexión Google Mail Activa</div>
+                    <p style="margin: 0; font-size: 15px; color: #e0e7ff; line-height: 1.5;">
+                      Tu cuenta <strong>{gmail_user}</strong> está correctamente conectada a Nexus mediante el protocolo seguro de Google Mail.
+                    </p>
+                  </div>
+                  <p style="font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
+                    A partir de ahora, cada vez que programes una tarea con <strong>Humo Índigo</strong> o solicites un aviso diferido, Nexus te enviará un recordatorio atómico con los micro-pasos de 15 minutos para vencer la inercia y disfunción ejecutiva.
+                  </p>
+                  <div style="text-align: center; margin-top: 24px;">
+                    <a href="http://localhost:8000" style="display: inline-block; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 10px; font-size: 13px; font-weight: 600;">
+                      Abrir Hive Brain
+                    </a>
+                  </div>
+                  <div style="border-top: 1px solid #1e293b; margin-top: 24px; padding-top: 14px; text-align: center; font-size: 11px; color: #64748b;">
+                    Enviado automáticamente por el servicio de recordatorios de Proyectazo / Nexus.
+                  </div>
+                </div>
+                """
+                msg.attach(MIMEText(html_body, "html"))
+                server.sendmail(gmail_user, [recipient], msg.as_string())
+
+            server.quit()
+            return {
+                "success": True,
+                "message": f"Conexión exitosa con Google Mail ({gmail_user}). Correo de verificación enviado a {recipient}."
+            }
+        except smtplib.SMTPAuthenticationError as auth_err:
+            return {
+                "success": False,
+                "error": f"Error de autenticación Google: Contraseña de Aplicación incorrecta o 2FA requerido. Recuerda crear una contraseña de app en https://myaccount.google.com/apppasswords. Detalle: {auth_err}"
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"No se pudo conectar al servidor Google Mail: {str(e)}"
+            }
+
+    def schedule_task_reminder(self, task_id: str, task_title: str, scheduled_time, recipient: str = "", steps: list = None, notes: str = "") -> dict:
+        with self.lock:
+            try:
+                if isinstance(scheduled_time, (int, float)):
+                    dt = datetime.fromtimestamp(scheduled_time / 1000.0, tz=timezone.utc)
+                elif isinstance(scheduled_time, str):
+                    # Manejar formatos ISO o '2026-10-20T10:00'
+                    clean_ts = scheduled_time.replace('Z', '+00:00')
+                    dt = datetime.fromisoformat(clean_ts)
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                else:
+                    dt = datetime.now(timezone.utc)
+            except Exception as parse_e:
+                print(f"[GoogleMailManager] Error parseando fecha {scheduled_time}: {parse_e}")
+                dt = datetime.now(timezone.utc)
+
+            recip = (recipient or self.config.get("default_recipient") or self.config.get("gmail_user", "")).strip()
+
+            reminder_id = f"rem_{int(time.time()*1000)}"
+            item = {
+                "id": reminder_id,
+                "task_id": str(task_id),
+                "task_title": task_title or "Tarea Pendiente",
+                "scheduled_time": dt.isoformat(),
+                "scheduled_epoch": dt.timestamp(),
+                "recipient": recip,
+                "steps": steps or [],
+                "notes": notes or "",
+                "status": "pending",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            self.reminders.append(item)
+            self._save_reminders()
+
+            return {
+                "success": True,
+                "reminder": item,
+                "message": f"Recordatorio programado para {dt.strftime('%d/%m/%Y %H:%M UTC')} hacia {recip}."
+            }
+
+    def cancel_reminder(self, reminder_id: str) -> dict:
+        with self.lock:
+            for r in self.reminders:
+                if r.get("id") == reminder_id or r.get("task_id") == str(reminder_id):
+                    r["status"] = "cancelled"
+                    self._save_reminders()
+                    return {"success": True, "message": "Recordatorio cancelado"}
+            return {"success": False, "error": "Recordatorio no encontrado"}
+
+    def get_reminders(self) -> list:
+        return self.reminders
+
+    def _start_scheduler(self):
+        t = threading.Thread(target=self._scheduler_loop, daemon=True)
+        t.start()
+
+    def _scheduler_loop(self):
+        while True:
+            try:
+                time.sleep(20)
+                now_epoch = time.time()
+                to_send = []
+                with self.lock:
+                    for r in self.reminders:
+                        if r.get("status") == "pending" and r.get("scheduled_epoch", 0) <= now_epoch:
+                            to_send.append(r)
+
+                for r in to_send:
+                    self._send_scheduled_email(r)
+            except Exception as e:
+                print(f"[GoogleMailManager] Error en bucle del planificador: {e}")
+
+    def _send_scheduled_email(self, reminder: dict):
+        gmail_user = self.config.get("gmail_user", "").strip()
+        pwd = self.config.get("gmail_app_password", "").strip().replace(" ", "")
+        recipient = (reminder.get("recipient") or self.config.get("default_recipient") or gmail_user).strip()
+
+        if not gmail_user or not pwd or not recipient:
+            with self.lock:
+                reminder["status"] = "failed"
+                reminder["error"] = "Credenciales Google Mail no configuradas"
+                self._save_reminders()
+            return
+
+        try:
+            server = smtplib.SMTP(self.config.get("smtp_server", "smtp.gmail.com"), int(self.config.get("smtp_port", 587)), timeout=15)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(gmail_user, pwd)
+
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"☑️ Recordatorio Nexus: {reminder.get('task_title', 'Tarea Pendiente')}"
+            msg["From"] = f"{self.config.get('sender_name', 'Nexus Assistant')} <{gmail_user}>"
+            msg["To"] = recipient
+
+            steps_html = ""
+            if reminder.get("steps"):
+                steps_html = "<div style='margin-top: 14px;'><strong style='font-size:12px; color:#818cf8; text-transform:uppercase;'>Micro-pasos de 15 min recomendados:</strong><ul style='margin-top: 8px; padding-left: 20px; color:#cbd5e1; font-size:14px;'>"
+                for s in reminder["steps"]:
+                    steps_html += f"<li style='margin-bottom: 6px;'>{s}</li>"
+                steps_html += "</ul></div>"
+
+            notes_html = f"<p style='color:#94a3b8; font-size:13px; font-style:italic;'>{reminder.get('notes')}</p>" if reminder.get('notes') else ""
+
+            html_body = f"""
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b0f19; color: #f8fafc; padding: 24px; border-radius: 16px; max-width: 580px; margin: auto; border: 1px solid #4338ca;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 24px;">☑️</span>
+                  <div>
+                    <h3 style="margin: 0; font-size: 16px; color: #e0e7ff;">Tarea Programada Activada</h3>
+                    <span style="font-size: 11px; color: #6366f1; font-weight: 600;">HUMO ÍNDIGO &bull; VENCIMIENTO / ACCIÓN</span>
+                  </div>
+                </div>
+              </div>
+              <div style="background-color: #1e1b4b; border: 1px solid #6366f1; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+                <h2 style="margin: 0 0 8px 0; font-size: 20px; color: #ffffff;">{reminder.get('task_title')}</h2>
+                {notes_html}
+                {steps_html}
+              </div>
+              <p style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
+                No necesitas terminarlo todo ahora mismo. Tu único objetivo en este momento es realizar los primeros <strong>2 a 5 minutos</strong> para romper la inercia.
+              </p>
+              <div style="text-align: center; margin-top: 22px;">
+                <a href="http://localhost:8000" style="display: inline-block; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 10px; font-size: 13px; font-weight: 600;">
+                  Abrir Hive Brain y Marcar Hecho
+                </a>
+              </div>
+            </div>
+            """
+            msg.attach(MIMEText(html_body, "html"))
+            server.sendmail(gmail_user, [recipient], msg.as_string())
+            server.quit()
+
+            with self.lock:
+                reminder["status"] = "sent"
+                reminder["sent_at"] = datetime.now(timezone.utc).isoformat()
+                self._save_reminders()
+                print(f"[GoogleMailManager] Recordatorio '{reminder.get('task_title')}' enviado a {recipient}")
+        except Exception as e:
+            print(f"[GoogleMailManager] Error enviando correo programado: {e}")
+            with self.lock:
+                reminder["status"] = "failed"
+                reminder["error"] = str(e)
+                self._save_reminders()
+
+# Instancia global del gestor de correo Google
+mail_manager = GoogleMailManager()
+
 # --- SERVIDOR HTTP NEXUS CON CORS (PUERTO 8002) ---
 
 class NexusRequestHandler(BaseHTTPRequestHandler):
@@ -295,6 +619,20 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
                 "model": "gemini-3.8-flash"
             }
             self.wfile.write(json.dumps(status).encode('utf-8'))
+        elif clean_path in ('/api/nexus/mail/status', '/nexus/mail/status', '/mail/status'):
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            res = mail_manager.get_status()
+            self.wfile.write(json.dumps(res).encode('utf-8'))
+        elif clean_path in ('/api/nexus/mail/scheduled', '/nexus/mail/scheduled', '/mail/scheduled'):
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            res = mail_manager.get_reminders()
+            self.wfile.write(json.dumps(res).encode('utf-8'))
         else:
             self.send_response(404)
             self.end_headers()
@@ -340,6 +678,55 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(res.model_dump_json().encode('utf-8'))
+
+        elif clean_path in ('/api/nexus/mail/config', '/nexus/mail/config', '/mail/config'):
+            status = mail_manager.save_config(payload)
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(status).encode('utf-8'))
+
+        elif clean_path in ('/api/nexus/mail/test', '/nexus/mail/test', '/mail/test'):
+            user = payload.get('user') or payload.get('gmail_user')
+            app_pwd = payload.get('app_password') or payload.get('gmail_app_password')
+            to_email = payload.get('to_email') or payload.get('recipient')
+            res = mail_manager.test_connection(user=user, app_password=app_pwd, to_email=to_email)
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode('utf-8'))
+
+        elif clean_path in ('/api/nexus/mail/schedule', '/nexus/mail/schedule', '/mail/schedule'):
+            task_id = payload.get('taskId') or payload.get('task_id') or payload.get('id')
+            task_title = payload.get('taskTitle') or payload.get('title') or payload.get('text', 'Tarea Pendiente')
+            scheduled_time = payload.get('scheduledTime') or payload.get('scheduled_time') or payload.get('dueDate') or payload.get('due_date')
+            recipient = payload.get('recipient') or payload.get('to_email', '')
+            steps = payload.get('steps') or payload.get('subtasks') or []
+            notes = payload.get('notes') or payload.get('desc', '')
+            res = mail_manager.schedule_task_reminder(
+                task_id=task_id,
+                task_title=task_title,
+                scheduled_time=scheduled_time,
+                recipient=recipient,
+                steps=steps,
+                notes=notes
+            )
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode('utf-8'))
+
+        elif clean_path in ('/api/nexus/mail/cancel', '/nexus/mail/cancel', '/mail/cancel'):
+            rem_id = payload.get('reminderId') or payload.get('reminder_id') or payload.get('taskId') or payload.get('task_id')
+            res = mail_manager.cancel_reminder(str(rem_id))
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode('utf-8'))
 
         else:
             self.send_response(404)
