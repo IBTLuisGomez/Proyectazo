@@ -124,50 +124,57 @@
 
 
     /* ==========================================================================
-       SISTEMA DE TEMAS: CLARO vs OSCURO SUAVE (COLORES MÁS CLAROS) vs NOCHE
+       SISTEMA DE TEMAS: CLARO (STITCH) vs OSCURO SUAVE (MEDIA CYBER-SLATE) vs NOCHE
        ========================================================================== */
     html.theme-light {
-      --bg-page: #f8fafc;
+      --bg-page: #f0f4f9;         /* Stitch Light Canvas Background */
       --bg-header: rgba(255, 255, 255, 0.94);
       --bg-card: #ffffff;
-      --bg-card-subtle: #f1f5f9;
+      --bg-card-subtle: #edf2f7;
       --bg-card-hover: #e2e8f0;
       --border-color: #e2e8f0;
       --border-highlight: #cbd5e1;
       --text-main: #0f172a;
-      --text-muted: #64748b;
-      --text-subtle: #94a3b8;
+      --text-muted: #475569;
+      --text-subtle: #64748b;
+      --primary: #0891b2;
+      --secondary: #7c3aed;
     }
 
     html.theme-dark-soft {
-      --bg-page: #1e293b;         /* Slate 800 - Suave, sin negro absoluto */
-      --bg-header: rgba(30, 41, 59, 0.94);
-      --bg-card: #273549;         /* Slate 750 / Steel blue suave */
-      --bg-card-subtle: #314158;  /* Más claro para inputs y secciones */
-      --bg-card-hover: #3a4d68;
-      --border-color: #3b4c68;
-      --border-highlight: #4a5e7e;
-      --text-main: #f8fafc;
-      --text-muted: #cbd5e1;      /* Mucho más legible y claro */
-      --text-subtle: #94a3b8;
+      --bg-page: #171b26;         /* Stitch Cyber-Slate: surface-container-low */
+      --bg-header: rgba(23, 27, 38, 0.94);
+      --bg-card: #1c1f2a;         /* Stitch surface-container */
+      --bg-card-subtle: #262a35;  /* Stitch surface-container-high */
+      --bg-card-hover: #313540;   /* Stitch surface-container-highest */
+      --border-color: #3d494c;    /* Stitch outline-variant */
+      --border-highlight: #869397;/* Stitch outline */
+      --text-main: #dfe2f1;       /* Stitch on-surface */
+      --text-muted: #bcc9cd;      /* Stitch on-surface-variant */
+      --text-subtle: #869397;
+      --primary: #4cd7f6;
+      --secondary: #d0bcff;
     }
 
     html.theme-dark-deep {
-      --bg-page: #0d1322;
-      --bg-header: rgba(13, 19, 34, 0.94);
-      --bg-card: #141c2e;
-      --bg-card-subtle: #1c263c;
-      --bg-card-hover: #26344f;
+      --bg-page: #0a0e18;         /* Stitch surface-container-lowest / Deep Obsidian */
+      --bg-header: rgba(10, 14, 24, 0.94);
+      --bg-card: #0f131d;
+      --bg-card-subtle: #171b26;
+      --bg-card-hover: #1c1f2a;
       --border-color: #243048;
       --border-highlight: #334363;
-      --text-main: #f8fafc;
+      --text-main: #dfe2f1;
       --text-muted: #94a3b8;
       --text-subtle: #64748b;
+      --primary: #4cd7f6;
+      --secondary: #d0bcff;
     }
 
     body {
       background-color: var(--bg-page);
       color: var(--text-main);
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
     .theme-header {
       background-color: var(--bg-header);
@@ -187,6 +194,170 @@
     }
     .theme-text-muted {
       color: var(--text-muted);
+    }
+
+    /* --- ADAPTACIONES ESPECÍFICAS PARA GOOGLE STITCH LIGHT (VERSIÓN CLARA) --- */
+    html.theme-light body {
+      background-color: #f0f4f9;
+      color: #0f172a;
+    }
+    html.theme-light .theme-header {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-bottom-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.theme-light header span.text-white,
+    html.theme-light .theme-header span.text-white,
+    html.theme-light #header-view-subtitle {
+      color: #0f172a !important;
+    }
+    html.theme-light nav.md\:hidden.fixed.bottom-0 {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-top-color: #e2e8f0 !important;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
+    }
+    html.theme-light .bnav-btn {
+      color: #475569 !important;
+    }
+    html.theme-light .bnav-btn.active,
+    html.theme-light .bnav-btn:hover {
+      color: #0891b2 !important;
+    }
+    html.theme-light #universal-nexus-fab {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-color: rgba(8, 145, 178, 0.35) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+    html.theme-light #universal-nexus-fab button {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light #universal-nexus-fab #nexus-fab-handle {
+      color: #64748b !important;
+    }
+    html.theme-light #pensadero-deck {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.theme-light #pensadero-jarvis-input,
+    html.theme-light #pensadero-direct-dump-input,
+    html.theme-light #gadget-dump-text,
+    html.theme-light #nexus-input,
+    html.theme-light #login-username-input {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light #pensadero-jarvis-input::placeholder,
+    html.theme-light #pensadero-direct-dump-input::placeholder,
+    html.theme-light #gadget-dump-text::placeholder,
+    html.theme-light #nexus-input::placeholder,
+    html.theme-light #login-username-input::placeholder {
+      color: #94a3b8 !important;
+    }
+    html.theme-light .pcat-chip {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+      color: #475569 !important;
+    }
+    html.theme-light .pcat-chip:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light .nexus-modal-container {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+    }
+    html.theme-light .nexus-modal-header,
+    html.theme-light .nexus-modal-footer {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.theme-light .nexus-modal-header h3,
+    html.theme-light .nexus-modal-header h4,
+    html.theme-light .nexus-modal-header span.font-bold {
+      color: #0f172a !important;
+    }
+    html.theme-light .p-4.rounded-2xl.theme-card button.bg-slate-900,
+    html.theme-light .p-4.rounded-2xl.theme-card select.bg-slate-900 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+
+    /* --- ADAPTACIONES ESPECÍFICAS PARA GOOGLE STITCH OSCURO SUAVE (VERSIÓN MEDIA) --- */
+    html.theme-dark-soft body {
+      background-color: #171b26;
+      color: #dfe2f1;
+    }
+    html.theme-dark-soft .theme-header {
+      background-color: rgba(23, 27, 38, 0.94) !important;
+      border-bottom-color: #3d494c !important;
+    }
+    html.theme-dark-soft nav.md\:hidden.fixed.bottom-0 {
+      background-color: rgba(23, 27, 38, 0.95) !important;
+      border-top-color: #3d494c !important;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6) !important;
+    }
+    html.theme-dark-soft .bnav-btn {
+      color: #bcc9cd !important;
+    }
+    html.theme-dark-soft .bnav-btn.active,
+    html.theme-dark-soft .bnav-btn:hover {
+      color: #4cd7f6 !important;
+    }
+    html.theme-dark-soft #universal-nexus-fab {
+      background-color: rgba(28, 31, 42, 0.95) !important;
+      border-color: rgba(76, 215, 246, 0.4) !important;
+    }
+    html.theme-dark-soft #universal-nexus-fab button {
+      background-color: #171b26 !important;
+      color: #dfe2f1 !important;
+    }
+    html.theme-dark-soft #universal-nexus-fab button:hover {
+      background-color: #262a35 !important;
+    }
+    html.theme-dark-soft #pensadero-deck {
+      background-color: rgba(28, 31, 42, 0.92) !important;
+      border-color: #3d494c !important;
+    }
+    html.theme-dark-soft #pensadero-jarvis-input,
+    html.theme-dark-soft #pensadero-direct-dump-input,
+    html.theme-dark-soft #gadget-dump-text,
+    html.theme-dark-soft #nexus-input,
+    html.theme-dark-soft #login-username-input {
+      background-color: #171b26 !important;
+      border-color: #3d494c !important;
+      color: #dfe2f1 !important;
+    }
+    html.theme-dark-soft #pensadero-jarvis-input::placeholder,
+    html.theme-dark-soft #pensadero-direct-dump-input::placeholder,
+    html.theme-dark-soft #gadget-dump-text::placeholder,
+    html.theme-dark-soft #nexus-input::placeholder,
+    html.theme-dark-soft #login-username-input::placeholder {
+      color: #869397 !important;
+    }
+    html.theme-dark-soft .pcat-chip {
+      background-color: #1c1f2a !important;
+      border-color: #3d494c !important;
+      color: #bcc9cd !important;
+    }
+    html.theme-dark-soft .pcat-chip:hover {
+      background-color: #262a35 !important;
+      color: #dfe2f1 !important;
+    }
+    html.theme-dark-soft .nexus-modal-container {
+      background-color: #1c1f2a !important;
+      border-color: #3d494c !important;
+      color: #dfe2f1 !important;
+    }
+    html.theme-dark-soft .nexus-modal-header,
+    html.theme-dark-soft .nexus-modal-footer {
+      background-color: #171b26 !important;
+      border-color: #3d494c !important;
     }
 
     /* Semáforo de frescura */
@@ -1253,14 +1424,17 @@
           <h4 class="font-bold mb-1">Paleta de Interfaz (Temas)</h4>
           <p class="theme-text-muted mb-2.5">Elige el contraste que mejor se adapte a tu nivel de energía sensorial:</p>
           <div class="grid grid-cols-3 gap-2">
-            <button onclick="app.setTheme('theme-light')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-slate-100 text-slate-800 border-slate-300">
-              <span>☀️</span> Claro
+            <button onclick="app.setTheme('theme-light')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-white text-slate-800 border-slate-300 hover:border-cyan-500 shadow-sm transition">
+              <span class="text-base">☀️</span> <span>Versión Clara</span>
+              <span class="text-[9px] font-mono text-cyan-600 font-bold">Stitch</span>
             </button>
-            <button onclick="app.setTheme('theme-dark-soft')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-slate-800 text-slate-200 border-emerald-500">
-              <span>🌙</span> Oscuro Suave
+            <button onclick="app.setTheme('theme-dark-soft')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-[#1c1f2a] text-[#dfe2f1] border-cyan-500/50 shadow-sm transition">
+              <span class="text-base">🌙</span> <span>Versión Media</span>
+              <span class="text-[9px] font-mono text-cyan-400 font-bold">Cyber-Slate</span>
             </button>
-            <button onclick="app.setTheme('theme-dark-deep')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-slate-950 text-slate-400 border-slate-700">
-              <span>🌌</span> Noche
+            <button onclick="app.setTheme('theme-dark-deep')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-[#0a0e18] text-slate-400 border-slate-800 hover:border-slate-600 shadow-sm transition">
+              <span class="text-base">🌌</span> <span>Noche Profunda</span>
+              <span class="text-[9px] font-mono text-slate-500 font-bold">Void</span>
             </button>
           </div>
         </div>
@@ -2296,12 +2470,17 @@
     class ProyectazoApp {
       constructor() {
         this.STORAGE_KEY = 'nexus_orb_v3';
-        this.API_BASE = (window.location.port && window.location.port !== '80' && window.location.port !== '443' && window.location.port !== '8000') 
-          ? `${window.location.protocol}//${window.location.hostname}:8081/api` 
-          : '/api';
-        this.NEXUS_API_BASE = (window.location.port && window.location.port !== '80' && window.location.port !== '443' && window.location.port !== '8000')
-          ? `${window.location.protocol}//${window.location.hostname}:8002/api/nexus`
-          : '/nexus/api/nexus';
+        const isHttp = window.location.protocol.startsWith('http');
+        const port = window.location.port;
+        const host = window.location.hostname || 'localhost';
+
+        this.API_BASE = (isHttp && (port === '8000' || port === '80' || port === '443')) 
+          ? '/api' 
+          : `http://${host}:8081/api`;
+
+        this.NEXUS_API_BASE = (isHttp && (port === '8000' || port === '80' || port === '443'))
+          ? '/nexus/api/nexus'
+          : `http://${host}:8002/api/nexus`;
         this.currentView = 'pensadero';
         this.activeFilterEnergy = 'all'; // 'all' | 'baja' | 'media' | 'alta'
         this.batteryLevel = 100; // 100 | 50 | 20
@@ -2395,6 +2574,7 @@
           this.state.pensadero = this.state.pensadero.filter(item => 
             item && (!item.id || (!item.id.startsWith('pens_init_') && !item.id.startsWith('demo_')))
           );
+          this.cleanDuplicateThoughts();
         } else {
           this.state.pensadero = [];
         }
@@ -2409,6 +2589,20 @@
           this.state.freeformNotes = [];
         }
         this.saveState();
+      }
+
+      cleanDuplicateThoughts() {
+        if (!this.state.pensadero || !Array.isArray(this.state.pensadero)) return;
+        const seen = new Set();
+        this.state.pensadero = this.state.pensadero.filter(item => {
+          if (!item || !item.content) return false;
+          const contentKey = `${(item.content || '').trim().toLowerCase()}__${item.category || ''}`;
+          if (seen.has(contentKey)) {
+            return false;
+          }
+          seen.add(contentKey);
+          return true;
+        });
       }
 
       clearAllUserData() {
@@ -2513,18 +2707,23 @@
           img.src = activeLogo;
         });
 
+        const themeBtn = document.getElementById('theme-btn');
+
         if (isLight) {
           html.classList.add('theme-light');
           if (icon) icon.textContent = '☀️';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#f8fafc');
+          if (themeBtn) themeBtn.title = 'Tema: Versión Clara (Stitch)';
+          if (themeColorMeta) themeColorMeta.setAttribute('content', '#f0f4f9');
         } else if (themeName === 'theme-dark-deep') {
           html.classList.add('theme-dark-deep', 'dark');
           if (icon) icon.textContent = '🌌';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#0d1322');
+          if (themeBtn) themeBtn.title = 'Tema: Noche Profunda (Void)';
+          if (themeColorMeta) themeColorMeta.setAttribute('content', '#0a0e18');
         } else {
           html.classList.add('theme-dark-soft', 'dark');
           if (icon) icon.textContent = '🌙';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#1e293b');
+          if (themeBtn) themeBtn.title = 'Tema: Versión Media (Cyber-Slate)';
+          if (themeColorMeta) themeColorMeta.setAttribute('content', '#171b26');
           themeName = 'theme-dark-soft';
         }
 
@@ -3034,15 +3233,26 @@
                   this.state.projects.push(bp);
                 }
               }
-              // Merge thoughts (filtrando demo)
+              // Merge thoughts (filtrando demo y duplicados)
               if (data.pensadero && Array.isArray(data.pensadero)) {
-                const existingPenIds = new Set((this.state.pensadero || []).map(p => p.id));
                 for (const bp of data.pensadero) {
                   if (bp.id && (bp.id.startsWith('pens_init_') || bp.id.startsWith('demo_'))) continue;
-                  if (!existingPenIds.has(bp.id)) {
+                  const cleanBpContent = (bp.content || '').trim().toLowerCase();
+                  if (!cleanBpContent) continue;
+
+                  const existing = (this.state.pensadero || []).find(p => 
+                    p.id === bp.id || 
+                    ((p.content || '').trim().toLowerCase() === cleanBpContent && p.category === bp.category)
+                  );
+
+                  if (!existing) {
                     this.state.pensadero.push(bp);
+                  } else if (existing.id !== bp.id && (existing.id.startsWith('t-') || !existing.id)) {
+                    // Reconciliar ID local temporal con ID persistente del backend
+                    existing.id = bp.id;
                   }
                 }
+                this.cleanDuplicateThoughts();
               }
               this.saveState();
               this.render();
@@ -4162,7 +4372,7 @@
                   <span>🔮</span>
                 </button>
                 <input type="text" id="pensadero-direct-dump-input" placeholder="Vaciar pensamiento o idea..." 
-                  onkeydown="if(event.key==='Enter') app.quickDumpToOrbe(this.value)"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();app.quickDumpToOrbe(this.value);}"
                   class="flex-1 min-w-0 bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none px-1" />
                 <button onclick="app.dictateField('pensadero-direct-dump-input')" class="p-1.5 text-slate-400 hover:text-cyan-400 transition shrink-0" title="Dictar por voz">
                   🎙️
@@ -4203,7 +4413,7 @@
                 
                 <!-- Input de Comando Inmediato -->
                 <input id="pensadero-jarvis-input" type="text" placeholder="Escribe o dicta cualquier idea..."
-                  onkeydown="if(event.key==='Enter') app.submitPensaderoJARVIS()"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();app.submitPensaderoJARVIS();}"
                   class="flex-1 min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-950/80 border border-slate-700/80 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/60 transition shadow-inner font-sans" />
 
                 <!-- Botón de Depositar en Orbe -->
@@ -4622,11 +4832,25 @@
       }
 
       submitPensaderoJARVIS() {
+        if (this._isSubmittingThought) return;
         const input = document.getElementById('pensadero-jarvis-input');
         if (!input) return;
         const text = input.value.trim();
         if (!text) return;
+
+        this._isSubmittingThought = true;
+        setTimeout(() => { this._isSubmittingThought = false; }, 400);
+
         const cat = document.getElementById('pensadero-cat-val')?.value || 'humo_dorado';
+        input.value = ''; // Limpiar de inmediato para prevenir re-envíos por doble evento Enter/Touch
+
+        // Protección contra duplicados en ventana corta (3 seg)
+        const isDuplicate = (this.state.pensadero || []).some(p => 
+          (p.content || '').trim().toLowerCase() === text.toLowerCase() && 
+          p.category === cat && 
+          (Date.now() - new Date(p.createdAt).getTime() < 3000)
+        );
+        if (isDuplicate) return;
         
         const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_dorado;
         const newItem = {
@@ -4645,7 +4869,7 @@
 
         if (!this.state.pensadero) this.state.pensadero = [];
         this.state.pensadero.unshift(newItem);
-        input.value = '';
+        this.cleanDuplicateThoughts();
         this.saveState();
         this.render();
 
@@ -4662,7 +4886,15 @@
           fetch(`${this.API_BASE}/pensadero`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: text, category: cat })
+            body: JSON.stringify({ id: newItem.id, content: text, category: cat })
+          }).then(async r => {
+            if (r.ok) {
+              const saved = await r.json();
+              if (saved && saved.id && saved.id !== newItem.id) {
+                newItem.id = saved.id;
+                this.saveState();
+              }
+            }
           }).catch(() => {});
         }
       }
@@ -4777,11 +5009,29 @@
 
       quickDumpToOrbe(text, customCategory = null) {
         if (!text || !text.trim()) return;
+        if (this._isSubmittingThought) return;
+
         const cleanText = text.trim();
+        this._isSubmittingThought = true;
+        setTimeout(() => { this._isSubmittingThought = false; }, 400);
+
+        // Limpiar inputs embebidos inmediatamente
+        const directInput = document.getElementById('pensadero-direct-dump-input');
+        if (directInput) directInput.value = '';
+        const jarvisInput = document.getElementById('pensadero-jarvis-input');
+        if (jarvisInput && jarvisInput.value.trim() === cleanText) jarvisInput.value = '';
 
         let cat = customCategory || this.selectedGadgetSmoke || 'humo_general';
-        const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_general;
 
+        // Prevención de duplicados en ventana corta (3 seg)
+        const isDuplicate = (this.state.pensadero || []).some(p => 
+          (p.content || '').trim().toLowerCase() === cleanText.toLowerCase() && 
+          p.category === cat && 
+          (Date.now() - new Date(p.createdAt).getTime() < 3000)
+        );
+        if (isDuplicate) return;
+
+        const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_general;
         const newItem = {
           id: this.uid(),
           content: cleanText,
@@ -4798,11 +5048,8 @@
 
         if (!this.state.pensadero) this.state.pensadero = [];
         this.state.pensadero.unshift(newItem);
+        this.cleanDuplicateThoughts();
         this.saveState();
-
-        // Limpiar input embebido si existe
-        const directInput = document.getElementById('pensadero-direct-dump-input');
-        if (directInput) directInput.value = '';
 
         // Feedback visual inmediato en el Shader 3D (humo + pulso)
         this.setOrbeColor(cat);
@@ -4823,7 +5070,15 @@
           fetch(`${this.API_BASE}/pensadero`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: cleanText, category: cat })
+            body: JSON.stringify({ id: newItem.id, content: cleanText, category: cat })
+          }).then(async r => {
+            if (r.ok) {
+              const saved = await r.json();
+              if (saved && saved.id && saved.id !== newItem.id) {
+                newItem.id = saved.id;
+                this.saveState();
+              }
+            }
           }).catch(() => {});
         }
       }
@@ -5035,6 +5290,7 @@
         };
         if (!this.state.pensadero) this.state.pensadero = [];
         this.state.pensadero.unshift(newItem);
+        this.cleanDuplicateThoughts();
         if (jarvisInput) jarvisInput.value = '';
         if (directInput) directInput.value = '';
         this.saveState();
@@ -5243,6 +5499,10 @@
           toast.classList.remove('opacity-100', 'translate-y-0');
           toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
         }, 4000);
+      }
+
+      showNotification(message, type = 'info') {
+        this.showToast(message);
       }
 
       renderPensaderoCard(item, idx) {
@@ -6535,13 +6795,34 @@
       // ==========================================
       // INTEGRACIÓN GOOGLE MAIL (GMAIL SMTP & RECORDATORIOS)
       // ==========================================
+      async fetchNexus(endpoint, options = {}) {
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        const primaryUrl = `${this.NEXUS_API_BASE}${cleanEndpoint}`;
+        const host = window.location.hostname || 'localhost';
+        const fallbackUrl = `http://${host}:8002/api/nexus${cleanEndpoint}`;
+
+        try {
+          const res = await fetch(primaryUrl, options);
+          if (res.ok) return res;
+          if (res.status === 404 || res.status >= 500) {
+            return await fetch(fallbackUrl, options);
+          }
+          return res;
+        } catch (primaryErr) {
+          if (primaryUrl !== fallbackUrl) {
+            return await fetch(fallbackUrl, options);
+          }
+          throw primaryErr;
+        }
+      }
+
       async initGoogleMailStatus() {
         const badge = document.getElementById('google-mail-status-badge');
         const userInp = document.getElementById('setting-gmail-user');
         const recipInp = document.getElementById('setting-gmail-recipient');
 
         try {
-          const res = await fetch(`${this.NEXUS_API_BASE}/mail/status`, { method: 'GET' });
+          const res = await this.fetchNexus('/mail/status', { method: 'GET' });
           if (res.ok) {
             const data = await res.json();
             this.googleMailStatus = data;
@@ -6587,12 +6868,12 @@
         }
 
         if (fb) {
-          fb.textContent = '⏳ Guardando y verificando credenciales con Google...';
+          fb.textContent = '⏳ Guardando credenciales en Nexus...';
           fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 block';
         }
 
         try {
-          const res = await fetch(`${this.NEXUS_API_BASE}/mail/config`, {
+          const res = await this.fetchNexus('/mail/config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -6610,9 +6891,9 @@
               fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 block';
             }
             this.initGoogleMailStatus();
-            this.showNotification('📬 Configuración de Google Mail guardada.', 'success');
+            this.showToast('📬 Configuración de Google Mail guardada con éxito.');
           } else {
-            throw new Error(`Status ${res.status}`);
+            throw new Error(`HTTP ${res.status}`);
           }
         } catch (err) {
           if (fb) {
@@ -6632,13 +6913,22 @@
         const pwd = pwdInp ? pwdInp.value.trim().replace(/\s+/g, '') : '';
         const recip = recipInp ? recipInp.value.trim() : '';
 
+        if (!user || !pwd) {
+          if (fb) {
+            fb.textContent = '❌ Ingresa tu correo Gmail y contraseña de aplicación de 16 caracteres para probar la conexión.';
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+          return;
+        }
+
         if (fb) {
-          fb.textContent = '⏳ Probando conexión SMTP segura con smtp.gmail.com:587...';
+          fb.textContent = '⏳ Probando conexión con Google Mail (smtp.gmail.com)...';
           fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 block';
         }
 
+        let data = null;
         try {
-          const res = await fetch(`${this.NEXUS_API_BASE}/mail/test`, {
+          const res = await this.fetchNexus('/mail/test', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -6647,24 +6937,25 @@
               to_email: recip || user
             })
           });
-
-          const data = await res.json();
-          if (data.success) {
-            if (fb) {
-              fb.textContent = `🟢 ${data.message}`;
-              fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 block';
-            }
-            this.initGoogleMailStatus();
-            this.showNotification('✨ Conexión con Google Mail exitosa. Correo de prueba enviado.', 'success');
-          } else {
-            if (fb) {
-              fb.textContent = `❌ ${data.error || 'Fallo en la prueba de conexión'}`;
-              fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
-            }
-          }
-        } catch (err) {
+          data = await res.json();
+        } catch (netErr) {
           if (fb) {
-            fb.textContent = `❌ Error contactando microservicio: ${err.message}`;
+            fb.textContent = `❌ Error de red con microservicio Nexus: ${netErr.message}`;
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+          }
+          return;
+        }
+
+        if (data && data.success) {
+          if (fb) {
+            fb.textContent = `🟢 ${data.message}`;
+            fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 block';
+          }
+          this.initGoogleMailStatus();
+          this.showToast('✨ Conexión con Google Mail exitosa. Correo de prueba enviado.');
+        } else {
+          if (fb) {
+            fb.textContent = `❌ ${data?.error || 'No se pudo conectar a Google Mail'}`;
             fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
           }
         }
@@ -6781,7 +7072,7 @@
         }
 
         try {
-          const res = await fetch(`${this.NEXUS_API_BASE}/mail/schedule`, {
+          const res = await this.fetchNexus('/mail/schedule', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -6795,7 +7086,7 @@
           const data = await res.json();
           if (data.success) {
             this.closeModal('modal-schedule-email');
-            this.showNotification(`📧 Recordatorio programado para ${new Date(scheduledTime).toLocaleString('es-ES')}.`, 'success');
+            this.showToast(`📧 Recordatorio programado para ${new Date(scheduledTime).toLocaleString('es-ES')}.`);
             if (this.shaderEngine) {
               this.shaderEngine.setSmokeState('humo_tarea');
               this.shaderEngine.pulseShockwave();

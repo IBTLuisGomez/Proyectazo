@@ -15,6 +15,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from enum import Enum
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
@@ -378,16 +379,60 @@ class GoogleMailManager:
                 "error": "Faltan credenciales: Correo Gmail y Contraseña de Aplicación de 16 caracteres son requeridos."
             }
 
-        server_host = self.config.get("smtp_server", "smtp.gmail.com")
-        server_port = int(self.config.get("smtp_port", 587))
+        server_host = "smtp.gmail.com"
+        connected = False
+        server = None
+        last_error = ""
 
+        # Intento 1: Puerto 587 (STARTTLS)
         try:
-            server = smtplib.SMTP(server_host, server_port, timeout=12)
+            server = smtplib.SMTP(server_host, 587, timeout=8)
             server.ehlo()
             server.starttls()
             server.ehlo()
             server.login(gmail_user, pwd)
+            connected = True
+            self.config["smtp_port"] = 587
+        except (smtplib.SMTPAuthenticationError, smtplib.SMTPServerDisconnected) as auth_err:
+            return {
+                "success": False,
+                "error": f"Google Mail rechazó las credenciales. Causa habitual: La contraseña de aplicación de 16 caracteres no coincide con la cuenta '{gmail_user}', o tu cuenta Google no tiene la 'Verificación en dos pasos' (2FA) activada. Genera una contraseña de app en https://myaccount.google.com/apppasswords seleccionando 'Otra (nombre personalizado)'."
+            }
+        except Exception as e587:
+            last_error = str(e587)
 
+        # Intento 2: Puerto 465 (SSL Directo) como alternativa
+        if not connected:
+            try:
+                context = ssl.create_default_context()
+                server = smtplib.SMTP_SSL(server_host, 465, timeout=8, context=context)
+                server.ehlo()
+                server.login(gmail_user, pwd)
+                connected = True
+                self.config["smtp_port"] = 465
+            except (smtplib.SMTPAuthenticationError, smtplib.SMTPServerDisconnected) as auth_err:
+                return {
+                    "success": False,
+                    "error": f"Google Mail rechazó las credenciales. Causa habitual: La contraseña de aplicación de 16 caracteres no coincide con la cuenta '{gmail_user}', o tu cuenta Google no tiene la 'Verificación en dos pasos' (2FA) activada. Genera una contraseña de app en https://myaccount.google.com/apppasswords seleccionando 'Otra (nombre personalizado)'."
+                }
+            except Exception as e465:
+                last_error = f"Puerto 587 ({last_error}) y Puerto 465 ({str(e465)})"
+
+        if not connected or not server:
+            return {
+                "success": False,
+                "error": f"No se pudo conectar a los servidores de Google Mail (smtp.gmail.com:587/465): {last_error}"
+            }
+
+        # Guardar credenciales validadas
+        self.save_config({
+            "gmail_user": gmail_user,
+            "gmail_app_password": pwd,
+            "default_recipient": recipient or gmail_user,
+            "smtp_port": self.config.get("smtp_port", 587)
+        })
+
+        try:
             if recipient:
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = "✨ [Nexus AI] Conexión de Correo Google Verificada con Éxito"
@@ -430,15 +475,14 @@ class GoogleMailManager:
                 "success": True,
                 "message": f"Conexión exitosa con Google Mail ({gmail_user}). Correo de verificación enviado a {recipient}."
             }
-        except smtplib.SMTPAuthenticationError as auth_err:
+        except Exception as send_err:
+            try:
+                server.quit()
+            except Exception:
+                pass
             return {
-                "success": False,
-                "error": f"Error de autenticación Google: Contraseña de Aplicación incorrecta o 2FA requerido. Recuerda crear una contraseña de app en https://myaccount.google.com/apppasswords. Detalle: {auth_err}"
-            }
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"No se pudo conectar al servidor Google Mail: {str(e)}"
+                "success": True,
+                "message": f"Conexión y autenticación con Google Mail exitosa ({gmail_user}). Nota sobre el envío de prueba: {str(send_err)}"
             }
 
     def schedule_task_reminder(self, task_id: str, task_title: str, scheduled_time, recipient: str = "", steps: list = None, notes: str = "") -> dict:
@@ -732,10 +776,13 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+
 def run_server(port=8002):
     server_address = ('', port)
-    httpd = HTTPServer(server_address, NexusRequestHandler)
-    print(f"[Nexus] Microservicio cognitivo escuchando en http://localhost:{port}")
+    httpd = ThreadingHTTPServer(server_address, NexusRequestHandler)
+    print(f"[Nexus] Microservicio cognitivo multihilo escuchando en http://localhost:{port}")
     httpd.serve_forever()
 
 if __name__ == '__main__':
