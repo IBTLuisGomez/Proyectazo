@@ -3,3 +3,10 @@ backend/data/
 .env
 __pycache__/
 *.pyc
+android/.gradle/
+android/build/
+.gradle/
+build/
+backend/target/classes/
+backend/target/maven-status/
+

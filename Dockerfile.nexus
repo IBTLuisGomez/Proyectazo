@@ -5,8 +5,15 @@ WORKDIR /app
 # Install dependencies
 RUN pip install --no-cache-dir pydantic python-dotenv google-genai
 
+# Create non-root user and data directory with correct permissions
+RUN useradd -m -u 1000 appuser && \
+    mkdir -p /app/data && \
+    chown -R appuser:appuser /app
+
 # Copy service script
-COPY nexus_service.py .
+COPY --chown=appuser:appuser nexus_service.py .
+
+USER appuser
 
 EXPOSE 8002
 

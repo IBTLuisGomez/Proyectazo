@@ -36,6 +36,18 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/api/tasks/{taskId}")
+    public ResponseEntity<?> updateTask(@PathVariable String taskId, @RequestBody Task task) {
+        try {
+            Task updated = taskService.updateTask(taskId, task);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PatchMapping("/api/tasks/{taskId}/move")
     public ResponseEntity<?> moveTask(@PathVariable String taskId, @Valid @RequestBody TaskMoveRequest request) {
         try {

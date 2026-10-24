@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexus-orb-v3.1';
+const CACHE_NAME = 'nexus-orb-v3.3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -38,10 +38,25 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  const isDocument = event.request.mode === 'navigate'
+    || url.pathname.endsWith('.html')
+    || url.pathname.endsWith('/');
+  if (isDocument) {
+    event.respondWith(
+      fetch(event.request).then(networkResponse => {
+        if (networkResponse && networkResponse.status === 200) {
+          const copy = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        }
+        return networkResponse;
+      }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
-        // Fetch background update for cache
         fetch(event.request).then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse));
@@ -52,4 +67,45 @@ self.addEventListener('fetch', event => {
       return fetch(event.request).catch(() => caches.match('./index.html'));
     })
   );
+});
+
+// Soporte de Notificaciones del Sistema (PC y Móvil)
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) ? event.notification.data.url : './index.html';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (let client of windowClients) {
+        if (client.url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
+
+self.addEventListener('push', event => {
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      event.waitUntil(
+        self.registration.showNotification(data.title || 'Nexus Orb', {
+          body: data.body || 'Recordatorio de enfoque',
+          icon: './assets/logo_icon_sin_bk.png',
+          badge: './favicon.svg',
+          data: data.data || { url: './index.html' }
+        })
+      );
+    } catch (e) {
+      event.waitUntil(
+        self.registration.showNotification('Nexus Orb', {
+          body: event.data.text(),
+          icon: './assets/logo_icon_sin_bk.png'
+        })
+      );
+    }
+  }
 });

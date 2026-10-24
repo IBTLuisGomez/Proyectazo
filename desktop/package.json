@@ -1,0 +1,36 @@
+{
+  "name": "focusflow-os-desktop",
+  "version": "3.2.0",
+  "description": "Nexus Orb — Ecosistema Cognitivo y Multiproyecto TDAH para Escritorio",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "tdah",
+    "adhd",
+    "focus",
+    "kanban",
+    "productivity",
+    "electron"
+  ],
+  "author": "Nexus Cognitive OS",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.nexusorb.focusflow",
+    "productName": "FocusFlow OS",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "../assets/logo_icon_sin_bk.png"
+    }
+  }
+}

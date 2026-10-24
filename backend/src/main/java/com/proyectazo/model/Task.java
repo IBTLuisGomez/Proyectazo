@@ -22,11 +22,24 @@ public class Task {
     private String title;
 
     @Column(name = "column_key", length = 32, nullable = false)
-    private String column = "buzon"; // buzon, proximo, enfoco, esperando, victorias
+    private String column = "buzon"; // buzon, proximo, enfoco, esperando, victorias, congelador
 
     @Column(length = 8)
-    private String effort = "S"; // S, M, L
+    private String effort = "S"; // XS, S, M, L
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
+    @Column(columnDefinition = "TEXT")
+    private String originThoughtContent;
+
+    @Column(length = 64)
+    private String originThoughtId;
+
+    @Column(columnDefinition = "TEXT")
+    private String codeSnippet;
+
+    private Boolean isBureaucratic = false;
     private Boolean isMicroStep = false;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -36,6 +49,8 @@ public class Task {
         LocalDateTime now = LocalDateTime.now();
         if (createdAt == null) createdAt = now;
         if (updatedAt == null) updatedAt = now;
+        if (isBureaucratic == null) isBureaucratic = false;
+        if (isMicroStep == null) isMicroStep = false;
     }
 
     @PreUpdate
@@ -64,6 +79,21 @@ public class Task {
 
     public String getEffort() { return effort; }
     public void setEffort(String effort) { this.effort = effort; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public String getOriginThoughtContent() { return originThoughtContent; }
+    public void setOriginThoughtContent(String originThoughtContent) { this.originThoughtContent = originThoughtContent; }
+
+    public String getOriginThoughtId() { return originThoughtId; }
+    public void setOriginThoughtId(String originThoughtId) { this.originThoughtId = originThoughtId; }
+
+    public String getCodeSnippet() { return codeSnippet; }
+    public void setCodeSnippet(String codeSnippet) { this.codeSnippet = codeSnippet; }
+
+    public Boolean getIsBureaucratic() { return isBureaucratic; }
+    public void setIsBureaucratic(Boolean bureaucratic) { isBureaucratic = bureaucratic; }
 
     public Boolean getIsMicroStep() { return isMicroStep; }
     public void setIsMicroStep(Boolean microStep) { isMicroStep = microStep; }

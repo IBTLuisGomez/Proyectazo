@@ -38,6 +38,15 @@ public class PensaderoController {
                 .body(pensaderoService.addItem(content.trim(), category));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PensaderoItem> updatePensaderoItem(@PathVariable String id, @RequestBody PensaderoItem item) {
+        try {
+            return ResponseEntity.ok(pensaderoService.updateItem(id, item));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @PatchMapping("/{id}/pin")
     public ResponseEntity<PensaderoItem> togglePin(@PathVariable String id) {
         return ResponseEntity.ok(pensaderoService.togglePin(id));

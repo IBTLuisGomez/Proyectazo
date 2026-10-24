@@ -1,6 +1,7 @@
 package com.nexus.orb
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -39,5 +40,21 @@ class NexusNativeBridge(private val context: Context) {
     fun isNativeApp(): Boolean = true
 
     @JavascriptInterface
-    fun getNativeVersion(): String = "1.0.0-kotlin"
+    fun getNativeVersion(): String = "1.1.0-kotlin"
+
+    @JavascriptInterface
+    fun isTablet(): Boolean {
+        return context.resources.configuration.smallestScreenWidthDp >= 600
+    }
+
+    @JavascriptInterface
+    fun getFormFactor(): String {
+        val sw = context.resources.configuration.smallestScreenWidthDp
+        val landscape = context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        return when {
+            sw >= 600 -> "tablet"
+            landscape && sw >= 480 -> "tablet"
+            else -> "phone"
+        }
+    }
 }

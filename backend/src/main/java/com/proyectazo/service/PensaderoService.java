@@ -43,10 +43,28 @@ public class PensaderoService {
         PensaderoItem item = new PensaderoItem();
         item.setId("pen-" + UUID.randomUUID().toString().substring(0, 8));
         item.setContent(content);
-        item.setCategory(category != null ? category : "chispa");
+        item.setCategory(category != null ? category : "humo_general");
         item.setIsPinned(false);
+        item.setIsResolved(false);
         item.setCreatedAt(LocalDateTime.now());
+        item.setUpdatedAt(LocalDateTime.now());
         return pensaderoItemRepository.save(item);
+    }
+
+    @Transactional
+    public PensaderoItem updateItem(String id, PensaderoItem itemData) {
+        PensaderoItem existing = pensaderoItemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
+
+        if (itemData.getContent() != null) existing.setContent(itemData.getContent());
+        if (itemData.getCategory() != null) existing.setCategory(itemData.getCategory());
+        if (itemData.getCognitiveWeight() != null) existing.setCognitiveWeight(itemData.getCognitiveWeight());
+        if (itemData.getContactName() != null) existing.setContactName(itemData.getContactName());
+        if (itemData.getAmount() != null) existing.setAmount(itemData.getAmount());
+        if (itemData.getIsPinned() != null) existing.setIsPinned(itemData.getIsPinned());
+        if (itemData.getIsResolved() != null) existing.setIsResolved(itemData.getIsResolved());
+        existing.setUpdatedAt(LocalDateTime.now());
+        return pensaderoItemRepository.save(existing);
     }
 
     @Transactional
@@ -54,6 +72,7 @@ public class PensaderoService {
         PensaderoItem item = pensaderoItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
         item.setIsPinned(!Boolean.TRUE.equals(item.getIsPinned()));
+        item.setUpdatedAt(LocalDateTime.now());
         return pensaderoItemRepository.save(item);
     }
 
@@ -76,7 +95,10 @@ public class PensaderoService {
         task.setTitle(item.getContent());
         task.setColumn("buzon");
         task.setEffort("S");
+        task.setOriginThoughtId(item.getId());
+        task.setOriginThoughtContent(item.getContent());
         task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
 
         Task saved = taskRepository.save(task);
         pensaderoItemRepository.deleteById(id);
@@ -91,7 +113,7 @@ public class PensaderoService {
         Project project = new Project();
         project.setId("p-" + UUID.randomUUID().toString().substring(0, 8));
         project.setName(projectName != null && !projectName.isBlank() ? projectName : item.getContent().substring(0, Math.min(30, item.getContent().length())));
-        project.setEmoji("💡");
+        project.setEmoji("⚡");
         project.setColor("#10b981");
         project.setStatus("activo");
         project.setEnergy("media");

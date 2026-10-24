@@ -15,16 +15,36 @@ public class PensaderoItem {
     private String content;
 
     @Column(length = 32)
-    private String category = "chispa"; // chispa, tarea, duda, descarga
+    private String category = "humo_general";
+
+    @Column(length = 16)
+    private String cognitiveWeight = "medio"; // ligero, medio, pesado, fuego
+
+    @Column(length = 128)
+    private String contactName;
+
+    @Column(length = 32)
+    private String amount;
 
     private Boolean isPinned = false;
+    private Boolean isResolved = false;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void onPrePersist() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-        if (category == null) category = "chispa";
+        LocalDateTime now = LocalDateTime.now();
+        if (createdAt == null) createdAt = now;
+        if (updatedAt == null) updatedAt = now;
+        if (category == null) category = "humo_general";
+        if (cognitiveWeight == null) cognitiveWeight = "medio";
         if (isPinned == null) isPinned = false;
+        if (isResolved == null) isResolved = false;
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public PensaderoItem() {}
@@ -33,8 +53,11 @@ public class PensaderoItem {
         this.id = id;
         this.content = content;
         this.category = category;
+        this.cognitiveWeight = "medio";
         this.isPinned = false;
+        this.isResolved = false;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public String getId() { return id; }
@@ -46,9 +69,24 @@ public class PensaderoItem {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
+    public String getCognitiveWeight() { return cognitiveWeight; }
+    public void setCognitiveWeight(String cognitiveWeight) { this.cognitiveWeight = cognitiveWeight; }
+
+    public String getContactName() { return contactName; }
+    public void setContactName(String contactName) { this.contactName = contactName; }
+
+    public String getAmount() { return amount; }
+    public void setAmount(String amount) { this.amount = amount; }
+
     public Boolean getIsPinned() { return isPinned; }
     public void setIsPinned(Boolean pinned) { isPinned = pinned; }
 
+    public Boolean getIsResolved() { return isResolved; }
+    public void setIsResolved(Boolean resolved) { isResolved = resolved; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

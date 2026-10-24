@@ -92,7 +92,7 @@ def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
     )
 
     if gemini_client:
-        for model_name in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-flash"]:
+        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]:
             try:
                 from google.genai import types
                 response = gemini_client.models.generate_content(
@@ -214,7 +214,7 @@ def deconstruct_goal_with_gemini(goal_text: str) -> GoalDeconstruction:
     )
 
     if gemini_client:
-        for model_name in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-flash"]:
+        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]:
             try:
                 from google.genai import types
                 response = gemini_client.models.generate_content(
@@ -259,7 +259,7 @@ def generate_reactivation_briefing(project_name: str, context: str, logs: list) 
     prompt = f"Proyecto: {project_name}\nContexto: {context}\nÚltimos logs: {json.dumps(logs, ensure_ascii=False)}"
 
     if gemini_client:
-        for model_name in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-flash"]:
+        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]:
             try:
                 from google.genai import types
                 response = gemini_client.models.generate_content(
@@ -642,7 +642,11 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
+        self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -687,6 +691,16 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             content_length = int(length_header)
         except Exception:
             content_length = 0
+
+        # Blindaje de seguridad: Límite estricto de carga útil (2MB) para prevenir ataques de saturación de memoria
+        if content_length > 2 * 1024 * 1024:
+            self.send_response(413)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"error": "Payload too large (max 2MB)"}')
+            return
+
         post_data = self.rfile.read(content_length).decode('utf-8', errors='replace') if content_length > 0 else ""
         try:
             payload = json.loads(post_data) if post_data else {}

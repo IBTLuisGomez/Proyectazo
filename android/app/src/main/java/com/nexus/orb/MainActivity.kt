@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.webkit.PermissionRequest
@@ -66,8 +68,17 @@ class MainActivity : AppCompatActivity() {
         settings.allowFileAccess = true
         settings.allowContentAccess = true
         settings.useWideViewPort = true
-        settings.loadWithOverviewMode = true
+        settings.loadWithOverviewMode = false
+        settings.setSupportZoom(false)
+        settings.builtInZoomControls = false
+        settings.displayZoomControls = false
+        settings.textZoom = 100
         settings.cacheMode = WebSettings.LOAD_DEFAULT
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            settings.safeBrowsingEnabled = true
+        }
+        webView.setInitialScale(0)
 
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
@@ -81,6 +92,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 progressBar.visibility = View.GONE
+                injectFormFactor()
             }
 
             override fun onReceivedError(
@@ -123,6 +135,19 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun injectFormFactor() {
+        val form = if (resources.configuration.smallestScreenWidthDp >= 600) "tablet" else "phone"
+        val js = "document.documentElement.dataset.native='android';" +
+            "document.documentElement.dataset.form='$form';" +
+            "if(window.app&&app.applyFormFactor)app.applyFormFactor();"
+        webView.evaluateJavascript(js, null)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        injectFormFactor()
     }
 
     private fun setupBackNavigation() {

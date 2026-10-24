@@ -1,0 +1,18 @@
+.git
+.github
+target/
+**/target/
+data/
+**/data/
+*.db
+*.log
+.idea/
+.vscode/
+node_modules/
+**/node_modules/
+dist/
+build/
+android/
+desktop/dist/
+código original de v1.1/
+README*.md

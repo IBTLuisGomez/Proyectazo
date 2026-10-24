@@ -51,6 +51,34 @@ public class TaskService {
     }
 
     @Transactional
+    public Task updateTask(String taskId, Task taskData) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada: " + taskId));
+
+        if (taskData.getTitle() != null && !taskData.getTitle().isBlank()) {
+            task.setTitle(taskData.getTitle().trim());
+        }
+        if (taskData.getColumn() != null && !taskData.getColumn().isBlank()) {
+            String targetCol = taskData.getColumn().toLowerCase();
+            if ("enfoco".equals(targetCol) && !targetCol.equals(task.getColumn())) {
+                long currentEnfoco = taskRepository.countByProject_IdAndColumn(task.getProject().getId(), "enfoco");
+                if (currentEnfoco >= 3) {
+                    throw new IllegalStateException("Límite de Foco TDAH alcanzado: No puedes tener más de 3 tareas en 'En Foco'");
+                }
+            }
+            task.setColumn(targetCol);
+        }
+        if (taskData.getEffort() != null) task.setEffort(taskData.getEffort());
+        if (taskData.getNotes() != null) task.setNotes(taskData.getNotes());
+        if (taskData.getCodeSnippet() != null) task.setCodeSnippet(taskData.getCodeSnippet());
+        if (taskData.getIsBureaucratic() != null) task.setIsBureaucratic(taskData.getIsBureaucratic());
+        if (taskData.getIsMicroStep() != null) task.setIsMicroStep(taskData.getIsMicroStep());
+
+        task.setUpdatedAt(LocalDateTime.now());
+        return taskRepository.save(task);
+    }
+
+    @Transactional
     public Task moveTask(String taskId, TaskMoveRequest request) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada: " + taskId));
