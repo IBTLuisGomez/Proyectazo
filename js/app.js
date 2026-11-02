@@ -8220,16 +8220,22 @@ class ProyectazoApp {
   deleteCurrentProject() {
     const id = document.getElementById('project-form-id').value;
     if (!id) return;
-    if (confirm("¿Seguro que deseas eliminar este proyecto y todo su historial?")) {
-      this.state.projects = this.state.projects.filter(p => p.id !== id);
-      this.saveState();
-      this.closeModal('modal-project');
-      this.render();
+    if (this.deleteProject(id)) this.closeModal('modal-project');
+  }
 
-      if (this.backendAvailable) {
-        fetch(`${this.API_BASE}/projects/${id}`, { method: 'DELETE' }).catch(() => {});
-      }
+  // También lo usa el botón 🗑️ de los proyectos del Baúl
+  deleteProject(id) {
+    const p = (this.state.projects || []).find(x => x.id === id);
+    if (!p) return false;
+    if (!confirm(`¿Seguro que deseas eliminar "${p.name}" y todo su historial?`)) return false;
+    this.state.projects = this.state.projects.filter(x => x.id !== id);
+    this.saveState();
+    this.render();
+
+    if (this.backendAvailable) {
+      fetch(`${this.API_BASE}/projects/${id}`, { method: 'DELETE' }).catch(() => {});
     }
+    return true;
   }
 
   // ==========================================
@@ -8999,7 +9005,8 @@ class ProyectazoApp {
     el.setAttribute('aria-modal', 'true');
     const heading = el.querySelector('h2, h3');
     if (heading) {
-      if (!heading.id) heading.id = `${id}-title`;
+      // No usar el prefijo "modal-": closeAllModals oculta todo [id^="modal-"]
+      if (!heading.id) heading.id = `dlg-title-${id}`;
       el.setAttribute('aria-labelledby', heading.id);
     }
     el.classList.remove('hidden');
