@@ -10,3 +10,14 @@ build/
 backend/target/classes/
 backend/target/maven-status/
 
+# Artefactos de build y datos locales
+backend/target/
+data/
+*.mv.db
+*.trace.db
+*.tar.gz
+node_modules/
+.pytest_cache/
+# Volcados de la JVM
+hs_err_pid*.log
+replay_pid*.log

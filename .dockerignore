@@ -16,3 +16,7 @@ android/
 desktop/dist/
 código original de v1.1/
 README*.md
+docs/
+archive/
+tests/
+.github/
