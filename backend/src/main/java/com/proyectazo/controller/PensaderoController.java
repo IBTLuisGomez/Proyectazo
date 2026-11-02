@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pensadero")
-@CrossOrigin(origins = "*")
 public class PensaderoController {
 
     private final PensaderoService pensaderoService;

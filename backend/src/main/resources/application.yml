@@ -26,4 +26,20 @@ spring:
 
 app:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8080,http://127.0.0.1:5173,*}
+    # Lista blanca separada por comas. Evita "*" en producción.
+    # "null" es el origen de la app de escritorio (Electron carga index.html con file://).
+    # Es seguro porque la API se autentica con Bearer token, no con cookies.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080,http://localhost:5173,http://localhost:3000,null}
+  auth:
+    # Usuario inicial (solo se crea si no existe ninguno). Sin contraseña se genera una temporal y se imprime en el log.
+    admin-user: ${NEXUS_ADMIN_USER:admin}
+    admin-password: ${NEXUS_ADMIN_PASSWORD:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

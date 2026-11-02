@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/logs")
-@CrossOrigin(origins = "*")
 public class SessionLogController {
 
     private final SessionLogService sessionLogService;

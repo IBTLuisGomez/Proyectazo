@@ -26,12 +26,10 @@ public class SyncService {
     private final PensaderoItemRepository pensaderoItemRepository;
     private final ProjectService projectService;
 
+    // IDs de los datos demo de versiones antiguas. No se filtra por nombre: un proyecto real puede llamarse igual.
     private static final Set<String> DEMO_PROJECT_IDS = Set.of(
         "p-focusflow", "p-cytohelix", "p-cytocore",
         "proj_focusflow", "proj_cytohelix", "proj_cytocore"
-    );
-    private static final Set<String> DEMO_NAMES = Set.of(
-        "FocusFlow OS", "CytoHelix", "CytoCore"
     );
 
     public SyncService(ProjectRepository projectRepository,
@@ -65,7 +63,6 @@ public class SyncService {
             for (Project project : incoming.getProjects()) {
                 if (project == null) continue;
                 if (project.getId() != null && DEMO_PROJECT_IDS.contains(project.getId())) continue;
-                if (project.getName() != null && DEMO_NAMES.contains(project.getName().trim())) continue;
                 mergeProject(project);
             }
         }
