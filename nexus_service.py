@@ -64,6 +64,7 @@ class ThoughtClassification(BaseModel):
     suggested_action: str = Field(description="Acción inmediata sugerida para reducir disfunción ejecutiva")
     first_step: str = Field(description="Micro-tarea de menos de 15 minutos si es proyecto/tarea, o vacío si es descarte")
     cognitive_weight: str = Field(default="medio", description="Peso cognitivo: ligero, medio, pesado o fuego")
+    matched: bool = Field(default=True, description="False si el clasificador heurístico no reconoció nada y devolvió el valor por defecto")
 
 # 3. Esquema para Desglose Atómico de Metas (AI Deconstruction)
 class GoalDeconstruction(BaseModel):
@@ -201,7 +202,8 @@ def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
             target_module=ModuleTarget.PROJECTS,
             suggested_action="Masticar en micro-pasos de 15 min y vincular a proyecto",
             first_step="Escribir título y objetivo en 1 línea",
-            cognitive_weight="medio"
+            cognitive_weight="medio",
+            matched=False
         )
 
 

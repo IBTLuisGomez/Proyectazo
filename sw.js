@@ -1,9 +1,13 @@
-const CACHE_NAME = 'nexus-orb-v3.3';
+const CACHE_NAME = 'nexus-orb-v3.5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './favicon.svg',
+  './assets/tailwind.css',
+  './js/smoke-palette.js',
+  './js/orb-shader-engine.js',
+  './js/app.js',
   './assets/nexus_n.jpg',
   './assets/nexus_n_banner.jpg',
   './assets/nexus_core.jpg',
@@ -38,9 +42,12 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Red primero para el HTML, el código de la app y el CSS: deben ir siempre en la misma versión
   const isDocument = event.request.mode === 'navigate'
     || url.pathname.endsWith('.html')
-    || url.pathname.endsWith('/');
+    || url.pathname.endsWith('/')
+    || url.pathname.includes('/js/')
+    || url.pathname.endsWith('/tailwind.css');
   if (isDocument) {
     event.respondWith(
       fetch(event.request).then(networkResponse => {

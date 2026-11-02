@@ -78,9 +78,33 @@ Puertos disponibles:
 - **Microservicio Nexus AI**: [http://localhost:8002/docs](http://localhost:8002/docs)
 - **Base de Datos PostgreSQL**: Puerto 5432
 
+### Seguridad y primer acceso
+- Copia `.env.example` a `.env`. `POSTGRES_PASSWORD` es obligatoria.
+- El usuario inicial se crea con `NEXUS_ADMIN_USER` y `NEXUS_ADMIN_PASSWORD` (mínimo 8 caracteres). Si no defines la contraseña, se genera una temporal y aparece en `docker logs nexus-backend`.
+- Toda la API (`/api/**`) y el microservicio Nexus (`/nexus/**`, mediante `auth_request` de nginx) requieren `Authorization: Bearer <token>`, obtenido en `POST /api/auth/login`.
+- El borrado total por `/api/sync` exige la cabecera `X-Confirm-Wipe: BORRAR-TODO`.
+- El PIN del Baúl se elige la primera vez que se abre y se guarda solo como hash.
+
+### Estilos (Tailwind compilado)
+Tailwind ya no se carga desde CDN: se compila a `assets/tailwind.css` con la configuración de `tailwind.config.js`.
+```bash
+npm install
+npm run build:css     # o npm run watch:css mientras editas index.html
+```
+La imagen de nginx lo recompila sola en `docker compose build`.
+
+### Tests
+```bash
+cd backend && ./mvnw test          # seguridad, CORS, wipe y límite WIP
+python -m pytest -q tests          # microservicio Nexus sin Gemini
+```
+GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) ejecuta ambos, compila el CSS, valida la sintaxis de `js/*.js` y construye las imágenes Docker.
+
 ### Actualización en Caliente del Frontend
 ```powershell
+npm run build:css
 docker cp index.html nexus-frontend:/usr/share/nginx/html/index.html
+docker cp assets/tailwind.css nexus-frontend:/usr/share/nginx/html/assets/tailwind.css
 docker exec nexus-frontend nginx -s reload
 ```
 
@@ -88,6 +112,6 @@ docker exec nexus-frontend nginx -s reload
 
 ## 📚 Documentación Adicional
 
-- 🖥️ **[Guía de Usuario para Aplicación Web](GUIA_USUARIO_WEB.md)**
-- 📱 **[Guía de Usuario para Aplicación Móvil](GUIA_USUARIO_MOVIL.md)**
-- 📖 **[Descripción Completa y Detallada del Sistema](DESCRIPCION_DETALLADA.md)**
+- 🖥️ **[Guía de Usuario para Aplicación Web](docs/GUIA_USUARIO_WEB.md)**
+- 📱 **[Guía de Usuario para Aplicación Móvil](docs/GUIA_USUARIO_MOVIL.md)**
+- 📖 **[Descripción Completa y Detallada del Sistema](docs/DESCRIPCION_DETALLADA.md)**
