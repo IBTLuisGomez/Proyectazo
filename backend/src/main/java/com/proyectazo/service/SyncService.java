@@ -113,6 +113,7 @@ public class SyncService {
         if (source.getContext() != null) target.setContext(source.getContext());
         if (source.getNextAction() != null) target.setNextAction(source.getNextAction());
         if (source.getNextActionType() != null) target.setNextActionType(source.getNextActionType());
+        if (source.getKeywords() != null) target.setKeywords(source.getKeywords());
         if (source.getLastActivity() != null) target.setLastActivity(source.getLastActivity());
     }
 

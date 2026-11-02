@@ -158,6 +158,26 @@ class SecurityAndWipIntegrationTest {
     }
 
     @Test
+    void projectKeywordsSurviveUpdateAndSync() throws Exception {
+        mvc.perform(post("/api/projects").header("Authorization", bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"p-kw\",\"name\":\"Clínica\"}"))
+                .andExpect(status().isCreated());
+        mvc.perform(put("/api/projects/p-kw").header("Authorization", bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"keywords\":\"paciente, fisio\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.keywords").value("paciente, fisio"));
+
+        mvc.perform(post("/api/sync").header("Authorization", bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"projects\":[{\"id\":\"p-kw\",\"name\":\"Clínica\",\"keywords\":\"paciente, fisio, cita\",\"updatedAt\":\"2099-01-01T00:00:00\"}],\"inbox\":[],\"pensadero\":[]}"))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/projects/p-kw").header("Authorization", bearer()))
+                .andExpect(jsonPath("$.keywords").value("paciente, fisio, cita"));
+    }
+
+    @Test
     void wipLimitAllowsAtMostThreeTasksInFocus() throws Exception {
         String projectBody = mvc.perform(post("/api/projects").header("Authorization", bearer())
                         .contentType(MediaType.APPLICATION_JSON)

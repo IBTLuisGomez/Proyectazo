@@ -132,6 +132,7 @@ class ProyectazoApp {
     if (!this.state.settings) {
       this.state.settings = { sound: true, vibration: true, theme: 'theme-dark-soft', userName: 'Usuario' };
     }
+    this.migrateLegacyRoutingKeywords();
     if (!this.state.inbox) {
       this.state.inbox = [];
     }
@@ -4115,8 +4116,53 @@ class ProyectazoApp {
 
     // Sin color elegido: pedir a Nexus que lo clasifique (tras crearlo en el servidor, para que el PUT lo encuentre)
     if (cat === 'humo_general') {
-      created.then(() => this.autoClassifyThought(newItem.id, cleanText));
+      created.then(() => this.nexusClassifyNewThought(newItem.id, cleanText));
     }
+  }
+
+
+  // --- ENRUTADO A PROYECTOS POR PALABRAS CLAVE ---
+  getProjectKeywords(project) {
+    const extra = String(project.keywords || '').split(',');
+    return [project.name, ...extra]
+      .map(k => (k || '').toLowerCase().trim())
+      .filter(k => k.length >= 3);
+  }
+
+  // Devuelve el proyecto cuyo nombre o palabra clave aparece en el texto (gana la coincidencia más larga)
+  findProjectForText(text) {
+    const lower = (text || '').toLowerCase();
+    let best = null;
+    let bestLen = 0;
+    for (const p of (this.state.projects || [])) {
+      if (p.inBaul) continue;
+      for (const kw of this.getProjectKeywords(p)) {
+        if (kw.length > bestLen && lower.includes(kw)) {
+          best = p;
+          bestLen = kw.length;
+        }
+      }
+    }
+    return best;
+  }
+
+  // Antes estas reglas estaban fijas en el código. Se copian una vez a los proyectos
+  // con esos nombres para conservar el comportamiento, y desde entonces se editan en el formulario.
+  migrateLegacyRoutingKeywords() {
+    const legacy = {
+      cytohelix: 'landing, software, web corporativa, frontend, portafolio',
+      cytocore: 'célula, celula, mesenquimal, cultivo, dosis, laboratorio, paciente',
+      focusflow: 'kanban, ruido marrón, ruido marron, orbe, tdah, spring boot, focus'
+    };
+    let changed = false;
+    for (const p of (this.state.projects || [])) {
+      if (p.keywords !== undefined && p.keywords !== null) continue;
+      const name = (p.name || '').toLowerCase();
+      const key = Object.keys(legacy).find(k => name.includes(k));
+      p.keywords = key ? legacy[key] : '';
+      changed = true;
+    }
+    if (changed) this.saveState();
   }
 
   // --- AUTOCLASIFICACIÓN CON NEXUS IA (POR CÓDIGO & GEMINI) ---
@@ -4127,22 +4173,8 @@ class ProyectazoApp {
     const text = item.content.trim();
     const lower = text.toLowerCase();
 
-    // 1. Detección Inteligente de Proyectos
-    let targetProject = null;
-    if (lower.includes('cytohelix') || lower.includes('landing') || lower.includes('software') || lower.includes('web corporativa') || lower.includes('frontend') || lower.includes('portafolio')) {
-      targetProject = this.state.projects.find(p => p.id === 'p-cytohelix') || this.state.projects.find(p => p.name.toLowerCase().includes('cytohelix'));
-    } else if (lower.includes('cytocore') || lower.includes('célula') || lower.includes('celula') || lower.includes('mesenquimal') || lower.includes('cultivo') || lower.includes('dosis') || lower.includes('laboratorio') || lower.includes('paciente')) {
-      targetProject = this.state.projects.find(p => p.id === 'p-cytocore') || this.state.projects.find(p => p.name.toLowerCase().includes('cytocore'));
-    } else if (lower.includes('focusflow') || lower.includes('kanban') || lower.includes('ruido marrón') || lower.includes('ruido marron') || lower.includes('orbe') || lower.includes('tdah') || lower.includes('spring boot')) {
-      targetProject = this.state.projects.find(p => p.id === 'p-focusflow') || this.state.projects.find(p => p.name.toLowerCase().includes('focusflow'));
-    } else {
-      for (const p of (this.state.projects || [])) {
-        if (lower.includes(p.name.toLowerCase())) {
-          targetProject = p;
-          break;
-        }
-      }
-    }
+    // 1. Detección de proyecto por nombre o palabras clave (configurables en cada proyecto)
+    const targetProject = this.findProjectForText(text);
 
     if (targetProject) {
       let cleanTitle = text
@@ -4169,7 +4201,7 @@ class ProyectazoApp {
       this.triggerDopamineReward();
       this.triggerShockwave();
 
-      alert(`✨ ¡Autoclasificado con Nexus IA!\n\nSe detectó el proyecto: "${targetProject.name}".\nSe agregó directamente a su Buzón de tareas:\n"${cleanTitle}"`);
+      this.showToast(`✨ Enviado a ${targetProject.name}: "${cleanTitle.slice(0, 40)}"`, () => this.openKanbanProject(targetProject.id), 'Ver');
       return;
     }
 
@@ -4186,7 +4218,7 @@ class ProyectazoApp {
     this.triggerShockwave();
     this.triggerDopamineReward();
 
-    alert(`✨ ¡Pensamiento autoclasificado con Nexus IA!\n\nAsignado a: ${meta.icon} ${meta.name} (${meta.title})\nPeso cognitivo: ${contract.cognitive_weight}`);
+    this.showToast(`✨ Clasificado como ${meta.icon} ${meta.name} · peso ${contract.cognitive_weight}`);
   }
 
   // --- CLASIFICACIÓN / TRASLADO POR COMANDO DE VOZ ---
@@ -4230,21 +4262,7 @@ class ProyectazoApp {
 
     const lower = voiceText.toLowerCase();
 
-    let targetProject = null;
-    if (lower.includes('cytohelix') || lower.includes('landing') || lower.includes('software')) {
-      targetProject = this.state.projects.find(p => p.id === 'p-cytohelix') || this.state.projects.find(p => p.name.toLowerCase().includes('cytohelix'));
-    } else if (lower.includes('cytocore') || lower.includes('célula') || lower.includes('celula') || lower.includes('dosis') || lower.includes('cultivo')) {
-      targetProject = this.state.projects.find(p => p.id === 'p-cytocore') || this.state.projects.find(p => p.name.toLowerCase().includes('cytocore'));
-    } else if (lower.includes('focusflow') || lower.includes('focus') || lower.includes('kanban')) {
-      targetProject = this.state.projects.find(p => p.id === 'p-focusflow') || this.state.projects.find(p => p.name.toLowerCase().includes('focusflow'));
-    } else {
-      for (const p of (this.state.projects || [])) {
-        if (lower.includes(p.name.toLowerCase())) {
-          targetProject = p;
-          break;
-        }
-      }
-    }
+    const targetProject = this.findProjectForText(voiceText);
 
     if (targetProject) {
       const isNext = lower.includes('próximo') || lower.includes('proximo') || lower.includes('hoy') || lower.includes('foco');
@@ -4337,7 +4355,7 @@ class ProyectazoApp {
     this.showToast(enabled ? '🧠 Nexus clasificará lo que sueltes sin color.' : 'Auto-clasificación desactivada.');
   }
 
-  async autoClassifyThought(itemId, text) {
+  async nexusClassifyNewThought(itemId, text) {
     if (!this.isAutoClassifyEnabled()) return;
     let data;
     try {
@@ -8101,6 +8119,7 @@ class ProyectazoApp {
       document.getElementById('project-form-name').value = p.name || '';
       document.getElementById('project-form-objective').value = p.objective || '';
       document.getElementById('project-form-next-action').value = p.nextAction || '';
+      document.getElementById('project-form-keywords').value = p.keywords || '';
       document.getElementById('project-form-status').value = p.status || 'activo';
       document.getElementById('project-form-energy').value = p.energy || 'media';
       this.selectProjectColor(p.color || '#10b981');
@@ -8112,6 +8131,7 @@ class ProyectazoApp {
       document.getElementById('project-form-name').value = '';
       document.getElementById('project-form-objective').value = '';
       document.getElementById('project-form-next-action').value = '';
+      document.getElementById('project-form-keywords').value = '';
       document.getElementById('project-form-status').value = 'activo';
       document.getElementById('project-form-energy').value = 'media';
       this.selectProjectColor('#10b981');
@@ -8131,6 +8151,8 @@ class ProyectazoApp {
     const nextAction = document.getElementById('project-form-next-action').value.trim() || 'Definir primera micro-acción';
     const status = document.getElementById('project-form-status').value;
     const energy = document.getElementById('project-form-energy').value;
+    const keywords = document.getElementById('project-form-keywords').value
+      .split(',').map(k => k.trim()).filter(Boolean).join(', ');
 
     // Límite TDAH: Máximo 3 proyectos "en_ejecucion" simultáneamente
     if (status === 'en_ejecucion') {
@@ -8151,6 +8173,7 @@ class ProyectazoApp {
         p.nextAction = nextAction;
         p.status = status;
         p.energy = energy;
+        p.keywords = keywords;
 
         if (this.backendAvailable) {
           fetch(`${this.API_BASE}/projects/${id}`, {
@@ -8171,6 +8194,7 @@ class ProyectazoApp {
         nextActionType: 'hacer',
         status: status,
         energy: energy,
+        keywords: keywords,
         lastActivity: new Date().toISOString(),
         logs: [],
         tasks: [

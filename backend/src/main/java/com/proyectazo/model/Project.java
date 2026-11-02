@@ -41,6 +41,10 @@ public class Project {
     @Column(length = 32)
     private String nextActionType = "hacer"; // hacer, esperar, decidir, explorar
 
+    /** Palabras clave separadas por comas para enrutar pensamientos a este proyecto. */
+    @Column(columnDefinition = "TEXT")
+    private String keywords;
+
     private LocalDateTime lastActivity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -114,4 +118,7 @@ public class Project {
 
     public List<SessionLog> getLogs() { return logs; }
     public void setLogs(List<SessionLog> logs) { this.logs = logs; }
+
+    public String getKeywords() { return keywords; }
+    public void setKeywords(String keywords) { this.keywords = keywords; }
 }

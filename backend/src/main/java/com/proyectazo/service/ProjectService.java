@@ -83,6 +83,7 @@ public class ProjectService {
         if (projectData.getContext() != null) existing.setContext(projectData.getContext());
         if (projectData.getNextAction() != null) existing.setNextAction(projectData.getNextAction());
         if (projectData.getNextActionType() != null) existing.setNextActionType(projectData.getNextActionType());
+        if (projectData.getKeywords() != null) existing.setKeywords(projectData.getKeywords());
 
         existing.setUpdatedAt(LocalDateTime.now());
         return projectRepository.save(existing);
