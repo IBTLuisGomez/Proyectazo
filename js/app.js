@@ -649,6 +649,11 @@ class ProyectazoApp {
     window.addEventListener('resize', () => this.applyFormFactor());
     this.applyFormFactor();
 
+    // Escritorio: el atajo global de Electron abre el gadget de captura
+    if (window.electronAPI?.onQuickCapture) {
+      window.electronAPI.onQuickCapture(() => this.openOrbeQuickGadget());
+    }
+
     // Estado de conexión: reflejarlo al instante y sincronizar al volver la red
     window.addEventListener('online', () => {
       this.checkBackendConnection();
@@ -1304,7 +1309,8 @@ class ProyectazoApp {
       {
         title: '🫧 Vacía la mente',
         html: `<p>Mantén pulsado el orbe para <strong>hablar</strong>, o escribe abajo y pulsa <strong>Soltar</strong>.</p>
-               <p class="theme-text-muted">No tienes que ordenar nada ahora. Primero sacarlo de la cabeza; clasificar viene después.</p>`
+               <p class="theme-text-muted">No tienes que ordenar nada ahora. Primero sacarlo de la cabeza; clasificar viene después.</p>
+               ${window.electronAPI?.quickCaptureShortcut ? `<p class="text-xs">⌨️ Desde cualquier aplicación: <kbd class="px-1.5 py-0.5 rounded bg-slate-800 font-mono">${window.electronAPI.quickCaptureShortcut}</kbd> abre la captura rápida.</p>` : ''}`
       },
       {
         title: '🎨 Cada color dice qué es',

@@ -23,6 +23,8 @@ Este script:
 ---
 
 ## 📦 Método 3: Paquete Nativo con Electron
+
+> Solo la app Electron tiene **atajo global**: `Ctrl+Shift+Espacio` (`Cmd+Shift+Espacio` en macOS) trae la ventana al frente y abre la captura rápida desde cualquier aplicación. Si otra app ya usa esa combinación, se avisa en la consola y la app sigue funcionando sin el atajo.
 Si deseas compilar un instalador ejecutable (`.exe` para Windows):
 
 1. Abre una terminal dentro de la carpeta `desktop/`:

@@ -1,10 +1,30 @@
-const { app, BrowserWindow, Menu, screen } = require('electron');
+const { app, BrowserWindow, Menu, screen, globalShortcut } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 
 let mainWindow = null;
 let pythonProcess = null;
+
+// Atajo global: abre el gadget de captura desde cualquier aplicación
+const QUICK_CAPTURE_SHORTCUT = 'CommandOrControl+Shift+Space';
+
+function showQuickCapture() {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    createWindow();
+    mainWindow.webContents.once('did-finish-load', () => mainWindow.webContents.send('nexus:quick-capture'));
+    return;
+  }
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+  mainWindow.webContents.send('nexus:quick-capture');
+}
+
+function registerQuickCaptureShortcut() {
+  const ok = globalShortcut.register(QUICK_CAPTURE_SHORTCUT, showQuickCapture);
+  if (!ok) console.warn(`El atajo ${QUICK_CAPTURE_SHORTCUT} ya lo usa otra aplicación.`);
+}
 
 function boundsFile() {
   return path.join(app.getPath('userData'), 'window-bounds.json');
@@ -111,12 +131,17 @@ if (!gotLock) {
     app.setAppUserModelId('com.nexusorb.focusflow');
     startBackendService();
     createWindow();
+    registerQuickCaptureShortcut();
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
   });
 }
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
 
 app.on('window-all-closed', () => {
   if (pythonProcess && !pythonProcess.killed) {
