@@ -91,3 +91,23 @@ def test_unmatched_thought_is_flagged(nexus):
 
 def test_matched_thought_is_flagged(nexus):
     assert nexus.process_thought_with_gemini("Pagar la tarjeta que vence").matched is True
+
+
+def test_python_and_browser_classify_the_same(nexus):
+    # Mismas frases que tests/js/captura-parser.test.mjs: ambos leen js/clasificador-reglas.js
+    casos = json.loads((ROOT / "tests" / "clasificacion_casos.json").read_text(encoding="utf-8"))["casos"]
+    for frase, esperado in casos:
+        category, _ = nexus.classify_local(frase)
+        assert category == esperado, frase
+
+
+def test_unmatched_reference_phrase_is_not_invented(nexus):
+    result = nexus.process_thought_with_gemini("Estoy satisfecho con el avance")
+    assert result.matched is False
+
+
+def test_head_health_returns_200(server):
+    req = urllib.request.Request(f"{server}/health", method="HEAD")
+    with urllib.request.urlopen(req) as res:
+        assert res.status == 200
+

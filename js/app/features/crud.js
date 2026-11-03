@@ -101,22 +101,8 @@ defineAppMethods({
     if (!text) return;
 
     if (target === 'pensadero') {
-      if (!this.state.pensadero) this.state.pensadero = [];
-      this.state.pensadero.unshift({
-        id: this.uid(),
-        content: text,
-        category: 'chispa',
-        isPinned: false,
-        createdAt: new Date().toISOString()
-      });
-
-      if (this.backendAvailable) {
-        fetch(`${this.API_BASE}/pensadero`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: text, category: 'chispa' })
-        }).catch(() => {});
-      }
+      // Antes guardaba category: 'chispa', que no existe en la paleta
+      this.captureThought(text, { source: 'captura-rapida' });
     } else {
       const p = this.state.projects.find(x => x.id === target);
       if (p) {

@@ -59,6 +59,8 @@ defineAppMethods({
     if (vibEl) vibEl.checked = !!this.state.settings?.vibration;
     const autoEl = document.getElementById('setting-auto-classify');
     if (autoEl) autoEl.checked = this.isAutoClassifyEnabled();
+    const cloudEl = document.getElementById('setting-cloud-ai');
+    if (cloudEl) cloudEl.checked = this.isCloudAIEnabled();
     this.applyFormFactor();
     this.refreshPinSettings();
     this.updateNotificationUI();

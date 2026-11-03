@@ -75,3 +75,16 @@ def test_free_text_in_onclick_is_escaped():
         if "encodeURIComponent(" in m.group(1):
             offenders.append(f"js/app.js:{APP_JS.count(chr(10), 0, m.start()) + 1} → encodeURIComponent en onclick")
     assert not offenders, "Texto sin escapar en onclick: " + "; ".join(offenders)
+
+
+def test_every_capture_goes_through_the_funnel():
+    # Solo captureThought (js/app/features/captura.js) puede guardar pensamientos con quickDumpToOrbe:
+    # así todas las vías comparten separación de ideas, deduplicado y clasificación
+    offenders = []
+    for path in [ROOT / "js" / "app.js", *sorted((ROOT / "js" / "app").rglob("*.js"))]:
+        if path.name == "captura.js":
+            continue
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if "this.quickDumpToOrbe(" in line:
+                offenders.append(f"{path.relative_to(ROOT)}:{n}")
+    assert not offenders, "Capturas que no pasan por captureThought: " + ", ".join(offenders)

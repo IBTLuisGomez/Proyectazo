@@ -747,47 +747,19 @@ defineAppMethods({
     if (label) label.textContent = 'Presiona para hablar o escribe tu comando';
   },
 
+  // Contrato de clasificación para la consola Nexus, con el clasificador local compartido
   classifyThoughtWithGeminiContract(text) {
-    const lower = text.toLowerCase();
-    let cat = 'humo_dorado';
-    let weight = 'medio';
-
-    if (lower.includes('soltar') || lower.includes('olvidar') || lower.includes('intrusivo') || lower.includes('preocupación') || lower.includes('culpa') || lower.includes('ansiedad') || lower.includes('blanco')) {
-      cat = 'humo_blanco';
-      weight = 'ligero';
-    } else if (lower.includes('urgente') || lower.includes('crítico') || lower.includes('critico') || lower.includes('sat') || lower.includes('impuesto') || lower.includes('pagar') || lower.includes('vence') || lower.includes('fuego') || lower.includes('rojo')) {
-      cat = 'humo_rojo';
-      weight = 'fuego';
-    } else if (lower.includes('deep work') || lower.includes('concentra') || lower.includes('código') || lower.includes('codigo') || lower.includes('arquitectura') || lower.includes('estudiar') || lower.includes('programar') || lower.includes('azul')) {
-      cat = 'humo_azul';
-      weight = 'pesado';
-    } else if (lower.includes('hábito') || lower.includes('habito') || lower.includes('bienestar') || lower.includes('salud') || lower.includes('ejercicio') || lower.includes('racha') || lower.includes('verde')) {
-      cat = 'humo_verde';
-      weight = 'ligero';
-    } else if (lower.includes('llamar') || lower.includes('amigo') || lower.includes('mamá') || lower.includes('mama') || lower.includes('papá') || lower.includes('papa') || lower.includes('contacto') || lower.includes('familia') || lower.includes('púrpura') || lower.includes('purpura') || lower.includes('morado')) {
-      cat = 'humo_purpura';
-      weight = 'medio';
-    } else if (lower.includes('comprar') || lower.includes('dinero') || lower.includes('costo') || lower.includes('precio') || lower.includes('tarjeta') || lower.includes('gasto') || lower.includes('naranja')) {
-      cat = 'humo_naranja';
-      weight = 'medio';
-    } else if (lower.includes('algún día') || lower.includes('algun dia') || lower.includes('someday') || lower.includes('futuro') || lower.includes('quizás') || lower.includes('quizas') || lower.includes('congelar') || lower.includes('ceniza')) {
-      cat = 'humo_ceniza';
-      weight = 'ligero';
-    } else if (lower.includes('tarea') || lower.includes('pendiente') || lower.includes('quehacer') || lower.includes('to-do') || lower.includes('todo') || lower.includes('hacer') || lower.includes('mandar') || lower.includes('enviar') || lower.includes('trámite') || lower.includes('tramite') || lower.includes('revisar') || lower.includes('índigo') || lower.includes('indigo')) {
-      cat = 'humo_tarea';
-      weight = 'medio';
-    } else {
-      cat = 'humo_dorado';
-      weight = 'medio';
-    }
-
-    const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_dorado;
+    const local = CapturaParser.classifyLocal(text, { memory: this.state.settings?.classifierMemory });
+    const cat = local.matched ? local.category : 'humo_general';
+    const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_general;
     return {
       thought: text,
       category: cat,
+      matched: local.matched,
+      reasons: local.reasons,
       color_hex: meta.hex,
       color_vec3: meta.vec3,
-      cognitive_weight: weight,
+      cognitive_weight: local.matched ? local.cognitiveWeight : 'libre',
       module: meta.module,
       action: meta.title,
       shader_params: meta.shader
@@ -808,30 +780,11 @@ defineAppMethods({
       targetProject = this.state.projects.find(p => p.id === targetProjectId);
     }
 
-    // Aliases para relacionar proyectos
-    const projectAliases = [
-      { id: 'p-naturissima', keywords: ['farmacia', 'botánica', 'botanica', 'naturissima', 'ámbar', 'ambar', 'frascos', 'tienda', 'catálogo'] },
-      { id: 'p-cytohelix', keywords: ['clínica', 'clinica', 'cytohelix', 'cita', 'agenda', 'pacientes', 'médico', 'medico', 'consultorio'] },
-      { id: 'p-fisio', keywords: ['fisio', 'fisioaleph', 'terapia', 'expediente', 'consentimiento', 'rehabilitación'] },
-      { id: 'p-blog', keywords: ['blog', 'artículo', 'articulo', 'post', 'publicación'] },
-      { id: 'p-iot', keywords: ['iot', 'bombilla', 'sensor', 'luz', 'automatización'] }
-    ];
-
-    for (const pa of projectAliases) {
-      if (pa.keywords.some(k => lower.includes(k))) {
-        targetProjectId = pa.id;
-        targetProject = this.state.projects.find(p => p.id === pa.id);
-        break;
-      }
-    }
-
     if (!targetProject) {
-      for (const p of this.state.projects) {
-        if (lower.includes(p.name.toLowerCase())) {
-          targetProjectId = p.id;
-          targetProject = p;
-          break;
-        }
+      const match = this.findProjectMatch(text);
+      if (match) {
+        targetProject = match.project;
+        targetProjectId = match.project.id;
       }
     }
 
@@ -864,7 +817,7 @@ defineAppMethods({
         dotEl.style.background = targetProject.color || '#10b981';
         dotEl.style.boxShadow = `0 0 8px ${targetProject.color || '#10b981'}`;
       }
-      if (summaryEl) summaryEl.innerHTML = `Crear nueva tarea en el Buzón de <strong>${targetProject.emoji || '🎯'} ${targetProject.name}</strong>:<br>"${cleanTaskTitle}"`;
+      if (summaryEl) summaryEl.innerHTML = `Crear nueva tarea en el Buzón de <strong>${this.escapeHtml(targetProject.emoji || '🎯')} ${this.escapeHtml(targetProject.name)}</strong>:<br>"${this.escapeHtml(cleanTaskTitle)}"`;
       if (previewEl) {
         previewEl.textContent = JSON.stringify({
           action: "add_task_to_backlog",
@@ -893,7 +846,7 @@ defineAppMethods({
       if (summaryEl) {
         summaryEl.innerHTML = `
           <strong>Destino:</strong> ${meta.title}<br>
-          <strong>Pensamiento:</strong> "${text}"
+          <strong>Pensamiento:</strong> "${this.escapeHtml(text)}"
         `;
       }
       if (previewEl) {
@@ -932,46 +885,13 @@ defineAppMethods({
       }
     } else if (act.type === 'pensadero') {
       const c = act.contract;
-      if (!this.state.pensadero) this.state.pensadero = [];
-
-      const newThought = {
-        id: this.uid(),
-        content: c.thought,
-        category: c.category,
-        cognitiveWeight: c.cognitive_weight,
-        module: c.module,
-        amount: (c.category === 'humo_naranja') ? 50 : null,
-        contactName: (c.category === 'humo_purpura') ? 'Contacto' : null,
-        hibernatedUntil: (c.category === 'humo_ceniza') ? Date.now() + 14 * 86400000 : null,
-        isPinned: false,
-        isResolved: false,
-        createdAt: new Date().toISOString()
-      };
-
-      this.state.pensadero.unshift(newThought);
-      this.saveState();
-      this.triggerDopamineReward();
-
+      this.captureThought(c.thought, { source: 'nexus', category: c.matched ? c.category : null, skipSplit: true });
       if (this.shaderEngine) {
         this.shaderEngine.setSmokeState(c.category, c.shader_params);
         this.shaderEngine.pulseShockwave();
       }
-
-      if (c.category === 'humo_rojo') {
-        if (navigator.vibrate) try { navigator.vibrate([200, 100, 200]); } catch(e){}
-      }
-
-      if (this.backendAvailable) {
-        fetch(`${this.API_BASE}/pensadero`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: c.thought, category: c.category })
-        }).catch(() => {});
-      }
-
       this.closeNexusVoice();
       this.navigate('soltar');
-      this.showToast(`✓ Pensamiento guardado en Soltar`);
     }
 
     this.pendingNexusAction = null;

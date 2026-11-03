@@ -221,10 +221,8 @@ defineAppMethods({
     if (!inp || !inp.value.trim()) return;
     const text = inp.value.trim();
     inp.value = '';
-    const selectedColor = (this.pensaderoSmokeFilter && this.pensaderoSmokeFilter !== 'all') ? this.pensaderoSmokeFilter : 'humo_general';
-    this.quickDumpToOrbe(text, selectedColor);
-    const meta = SMOKE_PALETTE[selectedColor] || SMOKE_PALETTE.humo_general;
-    this.showToast(`✓ Depositado en Orbe (${meta.icon} ${meta.name}): "${text.slice(0, 30)}..."`);
+    const selectedColor = (this.pensaderoSmokeFilter && this.pensaderoSmokeFilter !== 'all') ? this.pensaderoSmokeFilter : null;
+    this.captureThought(text, { source: 'soltar', category: selectedColor });
     if (this.shaderEngine) this.shaderEngine.pulseShockwave();
     this.triggerDopamineReward();
     setTimeout(() => {
@@ -437,30 +435,8 @@ defineAppMethods({
     }
 
     // Verificar si es comando directo a un proyecto existente (ej: "mandar a cytohelix...", "agregar a cytocore...")
-    const projects = this.state.projects || [];
-    for (const p of projects) {
-      const pNameLower = p.name.toLowerCase();
-      if (lower.includes(pNameLower) || lower.includes(pNameLower.replace(' ', ''))) {
-        // Asignar directo a este proyecto
-        const cleanTitle = clean.replace(new RegExp('(mandar|agregar|mover|pasar)\s+(a|al\s+proyecto)\s+' + pNameLower, 'i'), '').trim() || clean;
-        if (!p.tasks) p.tasks = [];
-        p.tasks.push({
-          id: this.uid(),
-          title: cleanTitle,
-          column: 'buzon',
-          effort: 'S',
-          createdAt: new Date().toISOString()
-        });
-        this.saveState();
-        this.showToast(`🚀 Tarea enviada por voz a ${p.name}`, () => this.openKanbanProject(p.id));
-        return;
-      }
-    }
-
-    // Si no es comando de proyecto, depositar como pensamiento con autoclasificación
-    const currentCat = (this.pensaderoSmokeFilter && this.pensaderoSmokeFilter !== 'all') ? this.pensaderoSmokeFilter : 'humo_general';
-    this.quickDumpToOrbe(clean, currentCat);
-    this.showToast(`✨ Pensamiento depositado en el Orbe: "${clean.slice(0, 30)}..."`);
+    const currentCat = (this.pensaderoSmokeFilter && this.pensaderoSmokeFilter !== 'all') ? this.pensaderoSmokeFilter : null;
+    this.captureThought(clean, { source: 'voz', category: currentCat, voiceRoute: true });
   },
 
   // Ciclar colores mediante deslizamiento (Swipe)
@@ -565,105 +541,14 @@ defineAppMethods({
   },
 
   submitPensaderoJARVIS() {
-    if (this._isSubmittingThought) return;
     const input = document.getElementById('pensadero-jarvis-input');
     if (!input) return;
     const text = input.value.trim();
     if (!text) return;
-
-    this._isSubmittingThought = true;
-    setTimeout(() => { this._isSubmittingThought = false; }, 400);
-
-    const cat = document.getElementById('pensadero-cat-val')?.value || 'humo_dorado';
     input.value = ''; // Limpiar de inmediato para prevenir re-envíos por doble evento Enter/Touch
-
-    // Protección contra duplicados en ventana corta (3 seg)
-    const isDuplicate = (this.state.pensadero || []).some(p => 
-      (p.content || '').trim().toLowerCase() === text.toLowerCase() && 
-      p.category === cat && 
-      (Date.now() - new Date(p.createdAt).getTime() < 3000)
-    );
-    if (isDuplicate) return;
-
-    const meta = SMOKE_PALETTE[cat] || SMOKE_PALETTE.humo_dorado;
-    const newItem = {
-      id: this.uid(),
-      content: text,
-      category: cat,
-      cognitiveWeight: meta.cognitiveWeight || 'medio',
-      module: meta.module || 'El Pensadero',
-      amount: (cat === 'humo_naranja') ? 50 : null,
-      contactName: (cat === 'humo_purpura') ? 'Contacto' : null,
-      hibernatedUntil: (cat === 'humo_ceniza') ? Date.now() + 14 * 86400000 : null,
-      isPinned: false,
-      isResolved: false,
-      createdAt: new Date().toISOString()
-    };
-
-    if (!this.state.pensadero) this.state.pensadero = [];
-    this.state.pensadero.unshift(newItem);
-    this.cleanDuplicateThoughts();
-    this.saveState();
-
-    // Asegurar que el filtro no oculte el pensamiento recién creado
-    if (this.pensaderoSmokeFilter && this.pensaderoSmokeFilter !== 'all' && this.pensaderoSmokeFilter !== cat) {
-      this.pensaderoSmokeFilter = 'all';
-    }
-
-    // Renderizado ultra-rápido abajo sin recarga total
-    if (this.currentView === 'pensadero') {
-      this.renderPensaderoItemsOnly();
-      const list = document.getElementById('pensadero-list');
-      if (list && list.firstElementChild) {
-        const firstCard = list.firstElementChild;
-        firstCard.classList.add('ring-2', 'ring-cyan-400', 'shadow-lg');
-        setTimeout(() => {
-          firstCard.classList.remove('ring-2', 'ring-cyan-400', 'shadow-lg');
-        }, 1200);
-        firstCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    } else {
-      this.render();
-    }
-
-    // Notificaciones en PC y Celular (Pensamientos Rojos / Sin clasificar)
-    if (cat === 'humo_rojo') {
-      this.sendSystemNotification('🚨 Urgencia Crítica / Fuego Activo', {
-        body: `Atención inmediata: "${text.slice(0, 50)}"`,
-        tag: 'humo-rojo-' + newItem.id,
-        requireInteraction: true
-      });
-    } else if (cat === 'humo_general' || !cat) {
-      this.sendSystemNotification('✨ Pensamiento sin clasificar depositado', {
-        body: `Nuevo pensamiento en el Pensadero: "${text.slice(0, 50)}"`,
-        tag: 'humo-general-' + newItem.id
-      });
-    }
-
-    if (this.shaderEngine) {
-      this.shaderEngine.setSmokeState(cat);
-      this.shaderEngine.pulseShockwave();
-    }
-
-    if (cat === 'humo_rojo' && navigator.vibrate) {
-      try { navigator.vibrate([200, 100, 200]); } catch(e){}
-    }
-
-    if (this.backendAvailable) {
-      fetch(`${this.API_BASE}/pensadero`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: newItem.id, content: text, category: cat })
-      }).then(async r => {
-        if (r.ok) {
-          const saved = await r.json();
-          if (saved && saved.id && saved.id !== newItem.id) {
-            newItem.id = saved.id;
-            this.saveState();
-          }
-        }
-      }).catch(() => {});
-    }
+    const chosen = document.getElementById('pensadero-cat-val')?.value || null;
+    this.captureThought(text, { source: 'jarvis', category: chosen });
+    if (this.shaderEngine) this.shaderEngine.pulseShockwave();
   },
 
   // --- GRABACIÓN RÁPIDA EN EL GADGET AISLADO ---
@@ -726,11 +611,10 @@ defineAppMethods({
                  (document.getElementById('gadget-dump-text')?.value.trim()) || '';
     if (text) {
       const smoke = this.selectedGadgetSmoke || 'humo_general';
-      this.quickDumpToOrbe(text, smoke);
+      this.captureThought(text, { source: 'gadget-voz', category: smoke });
       this.closeModal('nexus-orbe-quick-gadget-modal');
       const txt = document.getElementById('gadget-dump-text');
       if (txt) txt.value = '';
-      this.showToast(`✓ Pensamiento depositado desde Gadget: "${text.slice(0, 30)}..."`);
     }
   },
 
@@ -769,18 +653,17 @@ defineAppMethods({
       return;
     }
     const smoke = this.selectedGadgetSmoke || 'humo_blanco';
-    this.quickDumpToOrbe(text, smoke);
+    this.captureThought(text, { source: 'gadget', category: smoke });
     this.closeModal('nexus-orbe-quick-gadget-modal');
     input.value = '';
   },
 
-  quickDumpToOrbe(text, customCategory = null) {
-    if (!text || !text.trim()) return;
-    if (this._isSubmittingThought) return;
-
+  // Almacenamiento de bajo nivel de un pensamiento ya interpretado. Usar captureThought().
+  quickDumpToOrbe(text, customCategory = null, extra = {}) {
+    if (!text || !text.trim()) return null;
+    // Sin bloqueo temporal: impedía guardar varias ideas seguidas. Los dobles envíos
+    // los filtra captureThought (mismo texto en 10 min) y el control de 3 s de abajo.
     const cleanText = text.trim();
-    this._isSubmittingThought = true;
-    setTimeout(() => { this._isSubmittingThought = false; }, 400);
 
     // Limpiar inputs embebidos inmediatamente
     const directInput = document.getElementById('pensadero-direct-dump-input');
@@ -788,7 +671,8 @@ defineAppMethods({
     const jarvisInput = document.getElementById('pensadero-jarvis-input');
     if (jarvisInput && jarvisInput.value.trim() === cleanText) jarvisInput.value = '';
 
-    let cat = customCategory || this.selectedGadgetSmoke || 'humo_general';
+    // Sin heredar el color del gadget: antes, tras usarlo, todo caía en "Soltar"
+    let cat = customCategory || 'humo_general';
 
     // Prevención de duplicados en ventana corta (3 seg)
     const isDuplicate = (this.state.pensadero || []).some(p => 
@@ -805,8 +689,11 @@ defineAppMethods({
       category: cat,
       cognitiveWeight: meta.cognitiveWeight || 'libre',
       module: meta.module || 'El Pensadero',
-      amount: (cat === 'humo_naranja') ? 50 : null,
-      contactName: (cat === 'humo_purpura') ? 'Contacto' : null,
+      // Importe y persona salen del texto; antes se inventaban (50 y "Contacto")
+      amount: extra.amount ?? null,
+      contactName: extra.contactName ?? null,
+      dueAt: extra.dueAt || null,
+      source: extra.source || null,
       hibernatedUntil: (cat === 'humo_ceniza') ? Date.now() + 14 * 86400000 : null,
       isPinned: false,
       isResolved: false,
@@ -865,7 +752,11 @@ defineAppMethods({
       ? fetch(`${this.API_BASE}/pensadero`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: newItem.id, content: cleanText, category: cat })
+          body: JSON.stringify({
+          id: newItem.id, content: cleanText, category: cat,
+          amount: newItem.amount != null ? String(newItem.amount) : null,
+          contactName: newItem.contactName
+        })
         }).then(async r => {
           if (r.ok) {
             const saved = await r.json();
@@ -877,10 +768,7 @@ defineAppMethods({
         }).catch(() => {})
       : Promise.resolve();
 
-    // Sin color elegido: pedir a Nexus que lo clasifique (tras crearlo en el servidor, para que el PUT lo encuentre)
-    if (cat === 'humo_general') {
-      created.then(() => this.nexusClassifyNewThought(newItem.id, cleanText));
-    }
+    return { item: newItem, created };
   },
 
 
@@ -894,15 +782,21 @@ defineAppMethods({
 
   // Devuelve el proyecto cuyo nombre o palabra clave aparece en el texto (gana la coincidencia más larga)
   findProjectForText(text) {
+    const match = this.findProjectMatch(text);
+    return match ? match.project : null;
+  },
+
+  // { project, keyword, byName } · byNameOnly: solo cuenta el nombre del proyecto, no sus palabras clave
+  findProjectMatch(text, { byNameOnly = false } = {}) {
     const lower = (text || '').toLowerCase();
     let best = null;
-    let bestLen = 0;
     for (const p of (this.state.projects || [])) {
       if (p.inBaul) continue;
-      for (const kw of this.getProjectKeywords(p)) {
-        if (kw.length > bestLen && lower.includes(kw)) {
-          best = p;
-          bestLen = kw.length;
+      const name = (p.name || '').toLowerCase().trim();
+      const candidates = byNameOnly ? [name] : this.getProjectKeywords(p);
+      for (const kw of candidates) {
+        if (kw.length >= 3 && (!best || kw.length > best.keyword.length) && lower.includes(kw)) {
+          best = { project: p, keyword: kw, byName: kw === name };
         }
       }
     }
@@ -969,19 +863,16 @@ defineAppMethods({
     }
 
     // 2. Si no es un proyecto, clasificar en categoría/color de humo correspondiente
-    const contract = this.classifyThoughtWithGeminiContract(text);
-    item.category = contract.category;
-    item.cognitiveWeight = contract.cognitive_weight;
-    item.module = contract.module;
-    this.saveState();
-    this.render();
-
-    const meta = SMOKE_PALETTE[contract.category] || SMOKE_PALETTE.humo_dorado;
-    this.setOrbeColor(contract.category);
-    this.triggerShockwave();
+    const local = CapturaParser.classifyLocal(text, { memory: this.state.settings?.classifierMemory });
+    if (!local.matched) {
+      this.showToast('🤔 No encontré pistas claras. Elige el color en la tarjeta y lo recordaré.');
+      return;
+    }
+    item.classifiedBy = { by: 'local', reasons: local.reasons, confidence: local.confidence };
+    this.changeThoughtCategory(item.id, local.category, { source: 'auto' });
     this.triggerDopamineReward();
-
-    this.showToast(`✨ Clasificado como ${meta.icon} ${meta.name} · peso ${contract.cognitive_weight}`);
+    const meta = SMOKE_PALETTE[local.category];
+    this.showToast(`✨ ${meta.icon} ${meta.name} · por «${local.reasons.join('», «')}»`);
   },
 
   // --- CLASIFICACIÓN / TRASLADO POR COMANDO DE VOZ ---
@@ -1062,15 +953,21 @@ defineAppMethods({
     if (cat) {
       this.changeThoughtCategory(item.id, cat);
       const meta = SMOKE_PALETTE[cat];
-      alert(`🎙️ Por comando de voz ("${voiceText}"):\n✓ Pensamiento clasificado como ${meta.name} (${meta.title}).`);
+      this.showToast(`🎙️ Por voz: ${meta.icon} ${meta.name}`);
     } else {
       this.autoClassifyThought(item.id);
     }
   },
 
-  changeThoughtCategory(target, newCategory) {
+  // opts.source 'auto' = lo decidió la app; cualquier otro cambio es una corrección del usuario y se aprende
+  changeThoughtCategory(target, newCategory, opts = {}) {
     const item = this.getPensaderoItem(target);
     if (!item) return;
+    if (opts.source !== 'auto' && newCategory !== 'humo_general' && item.content) {
+      if (!this.state.settings) this.state.settings = {};
+      this.state.settings.classifierMemory = CapturaParser.learn(this.state.settings.classifierMemory || {}, item.content, newCategory);
+      item.classifiedBy = { by: 'usuario' };
+    }
 
     const meta = SMOKE_PALETTE[newCategory] || SMOKE_PALETTE.humo_general;
     item.category = newCategory;
@@ -1124,10 +1021,11 @@ defineAppMethods({
     const item = (this.state.pensadero || []).find(p => p.id === itemId);
     if (!item || item.category !== 'humo_general') return;
 
-    this.changeThoughtCategory(itemId, cat);
+    item.classifiedBy = { by: 'gemini' };
+    this.changeThoughtCategory(itemId, cat, { source: 'auto' });
     const meta = SMOKE_PALETTE[cat];
     this.showToast(`🧠 Nexus lo clasificó como ${meta.icon} ${meta.name}`, () => {
-      this.changeThoughtCategory(itemId, 'humo_general');
+      this.changeThoughtCategory(itemId, 'humo_general', { source: 'auto' });
     }, 'Deshacer');
   },
 
@@ -1142,28 +1040,13 @@ defineAppMethods({
       text = text.trim();
     }
 
-    const cat = document.getElementById('pensadero-cat-val')?.value || 'humo_general';
-    const newItem = {
-      id: this.uid(),
-      content: text,
-      category: cat,
-      cognitiveWeight: 'medio',
-      module: 'Proyectos Oro',
-      isPinned: false,
-      isResolved: false,
-      createdAt: new Date().toISOString()
-    };
-    if (!this.state.pensadero) this.state.pensadero = [];
-    this.state.pensadero.unshift(newItem);
-    this.cleanDuplicateThoughts();
+    const cat = document.getElementById('pensadero-cat-val')?.value || null;
+    const [item] = this.captureThought(text, { source: 'directo', category: cat, skipSplit: true, silent: true });
     if (jarvisInput) jarvisInput.value = '';
     if (directInput) directInput.value = '';
-    this.saveState();
     this.updateBadges();
     this.renderPensaderoDirectItems();
-
-    // Lanzar dispatcher para este item recién creado por su ID
-    this.quickDispatchThoughtToProject(newItem.id);
+    if (item) this.quickDispatchThoughtToProject(item.id);
   },
 
   openDispatchThoughtModal(target) {

@@ -12,6 +12,8 @@ RUN useradd -m -u 1000 appuser && \
 
 # Copy service script
 COPY --chown=appuser:appuser nexus_service.py .
+# Reglas del clasificador compartidas con el navegador
+COPY --chown=appuser:appuser js/clasificador-reglas.js ./js/
 
 USER appuser
 

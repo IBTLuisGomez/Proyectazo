@@ -142,16 +142,18 @@ class ProyectazoApp {
     this.saveState();
   }
 
+  // Solo quita copias del mismo texto y color creadas con menos de 10 min de diferencia (dobles envíos
+  // o sync). Antes borraba para siempre cualquier pensamiento repetido aunque fuera de otro día.
   cleanDuplicateThoughts() {
     if (!this.state.pensadero || !Array.isArray(this.state.pensadero)) return;
-    const seen = new Set();
+    const kept = new Map();
     this.state.pensadero = this.state.pensadero.filter(item => {
       if (!item || !item.content) return false;
-      const contentKey = `${(item.content || '').trim().toLowerCase()}__${item.category || ''}`;
-      if (seen.has(contentKey)) {
-        return false;
-      }
-      seen.add(contentKey);
+      const key = `${(item.content || '').trim().toLowerCase()}__${item.category || ''}`;
+      const t = new Date(item.createdAt || 0).getTime();
+      const previous = kept.get(key);
+      if (previous && previous.id !== item.id && Math.abs(previous.t - t) < 10 * 60 * 1000) return false;
+      if (!previous) kept.set(key, { id: item.id, t });
       return true;
     });
   }

@@ -1,0 +1,23 @@
+{
+  "_comentario": "Frases y categoría esperada. Las usan tests/js/captura-parser.test.mjs y tests/test_nexus_service.py para garantizar que el navegador y el microservicio clasifican igual.",
+  "casos": [
+    ["Pagar la tarjeta que vence el viernes", "humo_rojo"],
+    ["Urgente: mandar el contrato hoy mismo", "humo_rojo"],
+    ["Declarar impuestos del SAT", "humo_rojo"],
+    ["Estoy satisfecho con el avance", "humo_general"],
+    ["Tengo que llamar a mamá por su cumpleaños", "humo_purpura"],
+    ["Café con Ana el jueves", "humo_purpura"],
+    ["Comprar audífonos nuevos, cuestan 800 pesos", "humo_naranja"],
+    ["Revisar el presupuesto del mes", "humo_naranja"],
+    ["Salir a caminar 20 minutos y tomar agua", "humo_verde"],
+    ["Refactorizar el módulo de pagos con calma", "humo_azul"],
+    ["Necesito concentrarme para estudiar el examen", "humo_azul"],
+    ["Enviar la factura al cliente", "humo_naranja"],
+    ["Imprimir y firmar el formulario", "humo_tarea"],
+    ["Se me ocurre una app para recetas", "humo_dorado"],
+    ["Algún día aprender a tocar piano", "humo_ceniza"],
+    ["Me preocupa no llegar, tengo ansiedad", "humo_blanco"],
+    ["Hacer todos los días algo", "humo_general"],
+    ["Mañana veo la película", "humo_general"]
+  ]
+}

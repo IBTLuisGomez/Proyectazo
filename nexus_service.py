@@ -6,6 +6,8 @@ Handles thought classification, atomic goal deconstruction, gap filling, and dor
 
 import os
 import json
+import re
+import unicodedata
 import smtplib
 import ssl
 import threading
@@ -82,6 +84,76 @@ class ReactivationBriefing(BaseModel):
     exact_next_step: str = Field(description="Cuál es el siguiente paso hiperespecífico inmediato sin pensar")
     encouraging_insight: str = Field(description="Mensaje empático sin culpa para romper parálisis de reactivación")
 
+# --- CLASIFICADOR LOCAL COMPARTIDO CON EL NAVEGADOR ---
+_RULES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "clasificador-reglas.js")
+
+
+def _load_rules() -> dict:
+    with open(_RULES_PATH, "r", encoding="utf-8") as f:
+        text = f.read()
+    start = text.index("/*REGLAS-JSON*/") + len("/*REGLAS-JSON*/")
+    end = text.index("/*FIN-REGLAS-JSON*/")
+    return json.loads(text[start:end])
+
+
+CLASSIFIER_RULES = _load_rules()
+
+
+def _normalize(text: str) -> str:
+    decomposed = unicodedata.normalize("NFD", (text or "").lower())
+    stripped = "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn")
+    return re.sub(r"[^a-z0-9$]+", " ", stripped).strip()
+
+
+def classify_local(text: str):
+    """Misma lógica que classifyLocal() en js/captura-parser.js (sin la memoria personal)."""
+    padded = " " + _normalize(text) + " "
+    best = None
+    for order, cat in enumerate(CLASSIFIER_RULES["categories"]):
+        reasons = []
+        for kw in cat["keywords"]:
+            stem = _normalize(kw.rstrip("*"))
+            if not stem:
+                continue
+            hit = (" " + stem) in padded if kw.endswith("*") else (" " + stem + " ") in padded
+            if hit:
+                reasons.append(kw.rstrip("*"))
+        if reasons and (best is None or len(reasons) > len(best[1])):
+            best = (cat["category"], reasons)
+    return best if best else ("humo_general", [])
+
+
+# Textos de cada categoría para la respuesta del heurístico
+_CATEGORY_PROFILES = {
+    "humo_rojo": dict(thought_type="urgente", smoke_color=SmokeColor.ROJO, target_module=ModuleTarget.TASKS,
+                      suggested_action="Sincronizar con Google Tasks y fijar alerta persistente",
+                      first_step="Abrir portal o preparar documento de trámite en 5 minutos", cognitive_weight="fuego"),
+    "humo_blanco": dict(thought_type="intrusivo", smoke_color=SmokeColor.BLANCO, target_module=ModuleTarget.PENSADERO,
+                        suggested_action="Soltar sin culpa para vaciar la memoria de trabajo RAM",
+                        first_step="", cognitive_weight="ligero"),
+    "humo_azul": dict(thought_type="deep_work", smoke_color=SmokeColor.AZUL, target_module=ModuleTarget.DEEPWORK,
+                      suggested_action="Agendar bloque de Deep Work de 2h con buffers de 15 min",
+                      first_step="Abrir editor de código y silenciar notificaciones", cognitive_weight="pesado"),
+    "humo_verde": dict(thought_type="habito", smoke_color=SmokeColor.VERDE, target_module=ModuleTarget.HABITS,
+                       suggested_action="Incrementar racha y detonar recompensa de dopamina",
+                       first_step="Hacer 2 minutos de la actividad ahora mismo", cognitive_weight="ligero"),
+    "humo_purpura": dict(thought_type="contacto", smoke_color=SmokeColor.PURPURA, target_module=ModuleTarget.CRM,
+                         suggested_action="Consultar Avatar de Memoria social antes de llamar",
+                         first_step="Enviar mensaje de audio corto de 15 segundos", cognitive_weight="medio"),
+    "humo_naranja": dict(thought_type="finanzas", smoke_color=SmokeColor.NARANJA, target_module=ModuleTarget.FINANCES,
+                         suggested_action="Evaluar fricción sobre dinero libre mensual o congelar 72h",
+                         first_step="Calcular porcentaje de impacto sobre el presupuesto libre", cognitive_weight="medio"),
+    "humo_ceniza": dict(thought_type="hibernacion", smoke_color=SmokeColor.CENIZA, target_module=ModuleTarget.PENSADERO,
+                        suggested_action="Hibernar 14 a 30 días para evitar sobrecarga en pantalla",
+                        first_step="", cognitive_weight="ligero"),
+    "humo_tarea": dict(thought_type="tarea", smoke_color=SmokeColor.INDIGO, target_module=ModuleTarget.TASKS,
+                       suggested_action="Registrar en lista de tareas pendientes y programar aviso",
+                       first_step="Despejar 10 minutos o fijar un recordatorio", cognitive_weight="medio"),
+    "humo_dorado": dict(thought_type="idea_proyecto", smoke_color=SmokeColor.DORADO, target_module=ModuleTarget.PROJECTS,
+                        suggested_action="Masticar en micro-pasos de 15 min y vincular a proyecto",
+                        first_step="Escribir título y objetivo en 1 línea", cognitive_weight="medio"),
+}
+
 # --- FUNCIONES DE PROCESAMIENTO GEMINI ---
 
 def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
@@ -112,89 +184,10 @@ def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
                 pass
         print(f"[Nexus] Nota: Gemini API en alta demanda/fallback activo. Aplicando clasificador heurístico neuronal.")
 
-    # Fallback neuronal heurístico exacto
-    lower = user_text.lower()
-    if any(k in lower for k in ['urgente', 'sat', 'impuesto', 'pagar', 'vence', 'crítico', 'critico', 'fuego', 'rojo']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="urgente",
-            smoke_color=SmokeColor.ROJO,
-            target_module=ModuleTarget.TASKS,
-            suggested_action="Sincronizar con Google Tasks y fijar alerta persistente",
-            first_step="Abrir portal o preparar documento de trámite en 5 minutos",
-            cognitive_weight="fuego"
-        )
-    elif any(k in lower for k in ['soltar', 'olvidar', 'intrusivo', 'preocupación', 'culpa', 'ansiedad', 'blanco']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="intrusivo",
-            smoke_color=SmokeColor.BLANCO,
-            target_module=ModuleTarget.PENSADERO,
-            suggested_action="Soltar sin culpa para vaciar la memoria de trabajo RAM",
-            first_step="",
-            cognitive_weight="ligero"
-        )
-    elif any(k in lower for k in ['deep work', 'código', 'codigo', 'concentra', 'arquitectura', 'programar', 'estudiar', 'azul']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="deep_work",
-            smoke_color=SmokeColor.AZUL,
-            target_module=ModuleTarget.DEEPWORK,
-            suggested_action="Agendar bloque de Deep Work de 2h con buffers de 15 min",
-            first_step="Abrir editor de código y silenciar notificaciones",
-            cognitive_weight="pesado"
-        )
-    elif any(k in lower for k in ['hábito', 'habito', 'salud', 'ejercicio', 'caminar', 'agua', 'meditar', 'verde']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="habito",
-            smoke_color=SmokeColor.VERDE,
-            target_module=ModuleTarget.HABITS,
-            suggested_action="Incrementar racha y detonar recompensa de dopamina",
-            first_step="Hacer 2 minutos de la actividad ahora mismo",
-            cognitive_weight="ligero"
-        )
-    elif any(k in lower for k in ['llamar', 'contacto', 'amigo', 'mamá', 'mama', 'papá', 'papa', 'mensaje', 'púrpura', 'purpura']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="contacto",
-            smoke_color=SmokeColor.PURPURA,
-            target_module=ModuleTarget.CRM,
-            suggested_action="Consultar Avatar de Memoria social antes de llamar",
-            first_step="Enviar mensaje de audio corto de 15 segundos",
-            cognitive_weight="medio"
-        )
-    elif any(k in lower for k in ['comprar', 'dinero', 'precio', 'costo', 'tarjeta', 'naranja', 'gasto']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="finanzas",
-            smoke_color=SmokeColor.NARANJA,
-            target_module=ModuleTarget.FINANCES,
-            suggested_action="Evaluar fricción sobre dinero libre mensual o congelar 72h",
-            first_step="Calcular porcentaje de impacto sobre el presupuesto libre",
-            cognitive_weight="medio"
-        )
-    elif any(k in lower for k in ['algún día', 'algun dia', 'someday', 'futuro', 'quizás', 'ceniza']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="hibernacion",
-            smoke_color=SmokeColor.CENIZA,
-            target_module=ModuleTarget.PENSADERO,
-            suggested_action="Hibernar 14 a 30 días para evitar sobrecarga en pantalla",
-            first_step="",
-            cognitive_weight="ligero"
-        )
-    elif any(k in lower for k in ['tarea', 'pendiente', 'quehacer', 'to-do', 'todo', 'hacer', 'mandar', 'enviar', 'trámite', 'tramite', 'revisar', 'índigo', 'indigo']):
-        return ThoughtClassification(
-            raw_thought=user_text,
-            thought_type="tarea",
-            smoke_color=SmokeColor.INDIGO,
-            target_module=ModuleTarget.TASKS,
-            suggested_action="Registrar en lista de tareas pendientes y programar aviso por correo",
-            first_step="Despejar 10 minutos o fijar recordatorio en Gmail",
-            cognitive_weight="medio"
-        )
-    else:
+    # Fallback local: las mismas reglas que el navegador (js/clasificador-reglas.js)
+    category, reasons = classify_local(user_text)
+    profile = _CATEGORY_PROFILES.get(category)
+    if profile is None:
         return ThoughtClassification(
             raw_thought=user_text,
             thought_type="idea_proyecto",
@@ -205,6 +198,7 @@ def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
             cognitive_weight="medio",
             matched=False
         )
+    return ThoughtClassification(raw_thought=user_text, matched=True, **profile)
 
 
 def deconstruct_goal_with_gemini(goal_text: str) -> GoalDeconstruction:
@@ -654,6 +648,20 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
         self.send_response(204)
         self._send_cors_headers()
         self.end_headers()
+
+    def do_HEAD(self):
+        clean_path = self.path.split('?')[0].rstrip('/')
+        if clean_path in ('/api/nexus/health', '/nexus/health', '/health', '',
+                           '/api/nexus/mail/status', '/nexus/mail/status', '/mail/status',
+                           '/api/nexus/mail/scheduled', '/nexus/mail/scheduled', '/mail/scheduled'):
+            self.send_response(200)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+        else:
+            self.send_response(404)
+            self._send_cors_headers()
+            self.end_headers()
 
     def do_GET(self):
         clean_path = self.path.split('?')[0].rstrip('/')
