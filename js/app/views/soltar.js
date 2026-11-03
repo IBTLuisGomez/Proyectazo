@@ -1330,166 +1330,86 @@ defineAppMethods({
     this.showToast(message);
   },
 
+  // Tarjeta de pensamiento: una acción principal según el color, "Proyecto", borrar y el resto en "⋯".
+  // Antes mostraba 8–10 botones y la fila "Mover a" con todos los proyectos: demasiadas decisiones a la vez.
   renderPensaderoCard(item, idx) {
-    const catMeta = SMOKE_PALETTE[item.category] || SMOKE_PALETTE.humo_dorado;
-    const weightBadges = {
-      ligero: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-      medio: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-      pesado: 'bg-purple-500/10 text-purple-300 border-purple-500/30',
-      fuego: 'bg-rose-500/20 text-rose-300 border-rose-500/50 font-bold animate-pulse'
+    const catMeta = SMOKE_PALETTE[item.category] || SMOKE_PALETTE.humo_general;
+    const id = item.id;
+    const btn = 'px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 shrink-0 transition active:scale-95';
+    const menuBtn = 'w-full text-left px-3 py-2 rounded-lg text-xs font-medium hover:bg-slate-500/15 flex items-center gap-2';
+
+    // Acción principal: la que corresponde a ese color
+    const primaryByCategory = {
+      humo_rojo: !item.isResolved ? { on: `app.resolveRedSmoke('${id}')`, icon: '✓', label: 'Apagar', title: 'Apagar fuego' } : null,
+      humo_blanco: { on: `app.releaseWhiteSmoke('${id}')`, icon: '💨', label: 'Soltar', title: 'Soltar y olvidar sin culpa' },
+      humo_dorado: { on: `app.chewGoldSmoke('${id}')`, icon: '🍴', label: '15 min', title: 'Masticar en 3 micro-pasos de 15 min' },
+      humo_tarea: { on: `app.chewGoldSmoke('${id}')`, icon: '🍴', label: '15 min', title: 'Masticar en 3 micro-pasos de 15 min' },
+      humo_azul: { on: `app.scheduleDeepWorkBlock('${id}')`, icon: '💻', label: 'Bloque', title: 'Agendar bloque de Deep Work' },
+      humo_verde: { on: `app.registerHabitStreak('${id}')`, icon: '🌱', label: '+1', title: 'Alimentar la racha' },
+      humo_purpura: { on: `app.openPersonalCRM('${id}')`, icon: '💜', label: 'Persona', title: 'Ver avatar de memoria antes de llamar' },
+      humo_naranja: { on: `app.registerFinancialFriction('${id}')`, icon: '💳', label: 'Gasto', title: 'Evaluar impacto y enfriar la compra' },
+      humo_ceniza: item.hibernatedUntil
+        ? { on: `app.wakeThought('${id}')`, icon: '☀️', label: 'Despertar', title: 'Despertar pensamiento' }
+        : { on: `app.hibernateThought('${id}', 14)`, icon: '❄️', label: '14 días', title: 'Congelar 14 días' }
     };
-    const weightClass = weightBadges[item.cognitiveWeight || catMeta.cognitiveWeight] || weightBadges.medio;
+    const primary = primaryByCategory[item.category]
+      || { on: `app.autoClassifyThought('${id}')`, icon: '🎨', label: 'Clasificar', title: 'Sugerir color y proyecto' };
+
+    // Proyecto: directo al sugerido si lo hay; si no, el selector
+    const suggested = item.suggestedProjectId && (this.state.projects || []).find(p => p.id === item.suggestedProjectId);
+    const projectBtn = suggested
+      ? `<button onclick="app.executeDispatchThought('${id}', '${suggested.id}', 'buzon')" class="${btn} bg-cyan-600 hover:bg-cyan-500 text-white" title="Mandar al Buzón de ${this.escapeHtml(suggested.name)}">🚀 <span class="max-w-[110px] truncate">A ${this.escapeHtml(suggested.name)}</span></button>`
+      : `<button onclick="app.quickDispatchThoughtToProject('${id}')" class="${btn} bg-cyan-600 hover:bg-cyan-500 text-white" title="Mandar a un proyecto o convertir en proyecto">🚀 Proyecto</button>`;
+
+    // Extras del color que no son la acción principal
+    const extras = [];
+    if (item.category === 'humo_rojo') extras.push(`<button onclick="app.syncRedSmokeToGoogle('${id}', '${this.uriArg(item.content)}')" class="${menuBtn}">📅 Sincronizar con Google</button>`);
+    if (item.category === 'humo_tarea') extras.push(`<button onclick="app.openScheduleEmailModal('${id}', '${this.uriArg(item.content)}')" class="${menuBtn}">⏰ Programar recordatorio</button>`);
+    const projects = (this.state.projects || []).filter(p => p.status === 'en_ejecucion' || p.status === 'activo');
 
     return `
-      <div class="p-4 rounded-2xl theme-card border ${item.category === 'humo_rojo' && !item.isResolved ? 'border-rose-500/60 bg-rose-950/10 shadow-rose-950/30' : 'theme-border'} flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm hover:brightness-105 transition">
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full border ${catMeta.badgeClass}">
-              ${catMeta.icon} ${catMeta.name} · ${catMeta.title}
-            </span>
-            <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full border ${weightClass}">
-              Peso: ${item.cognitiveWeight || catMeta.cognitiveWeight}
-            </span>
-            ${item.isPinned ? `<span class="text-xs text-amber-400 font-bold">📌 Fijado</span>` : ''}
-            ${item.isResolved ? `<span class="text-xs text-emerald-400 font-bold">✓ Resuelto</span>` : ''}
-            <span class="text-[10px] font-mono theme-text-muted">${new Date(item.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-          <p class="text-sm font-semibold leading-relaxed">${this.escapeHtml(item.content)}</p>
-          ${this.captureChips(item)}
-          ${item.amount ? `<p class="text-xs text-orange-400 font-mono mt-1">💳 Importe: $${this.escapeHtml(item.amount)}</p>` : ''}
-          ${item.streakCount ? `<p class="text-xs text-emerald-400 font-mono mt-1">🔥 Racha actual: ${item.streakCount} días consecutivos</p>` : ''}
-          ${item.contactName ? `<p class="text-xs text-purple-300 font-mono mt-1">👤 Contacto: ${this.escapeHtml(item.contactName)}</p>` : ''}
-          ${item.hibernatedUntil ? `<p class="text-xs text-slate-400 font-mono mt-1">❄️ Hibernado hasta: ${new Date(item.hibernatedUntil).toLocaleDateString('es-ES')}</p>` : ''}
-
-          ${item.drawingData ? `
-            <div class="mt-2.5 rounded-2xl overflow-hidden border theme-border max-w-sm bg-slate-950/40 p-2 cursor-pointer hover:border-emerald-500/50 transition group" onclick="app.loadDrawingIntoFreeform('${item.id}')" title="Clic para continuar editando en Lienzo Freeform">
-              <img src="${item.drawingData}" alt="Boceto Freeform" class="w-full h-36 object-contain rounded-xl bg-slate-900/40" />
-              <span class="block text-[10px] theme-text-muted mt-1.5 text-center font-mono group-hover:text-emerald-400">🎨 Clic para abrir y continuar en Lienzo Freeform →</span>
-            </div>
-          ` : ''}
-
-          <!-- Barra de Clasificación y Asignación Rápida a Proyectos -->
-          <div class="mt-3 pt-2.5 border-t theme-border flex flex-wrap items-center justify-between gap-2">
-            <!-- Canalizar a Proyecto con 1 Clic -->
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Mover a:</span>
-              ${(this.state.projects || []).filter(p => p.status === 'en_ejecucion' || p.status === 'activo').map(p => `
-                <button onclick="app.executeDispatchThought('${item.id}', '${p.id}', 'buzon')" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-cyan-400 hover:text-cyan-300 text-xs font-semibold text-slate-200 transition flex items-center gap-1 shadow-sm active:scale-95 shrink-0" title="Enviar como tarea al Buzón de ${this.escapeHtml(p.name)}">
-                  <span>${p.emoji || '🎯'}</span> <span class="max-w-[80px] sm:max-w-none truncate">${this.escapeHtml(p.name)}</span>
-                </button>
-              `).join('')}
-            </div>
-
-            <!-- Autoclasificar con Nexus IA, Voz y Selector de Color -->
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <!-- Botón Autoclasificar con Nexus IA -->
-              <button onclick="app.autoClassifyThought('${item.id}')" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-purple-600/30 to-indigo-600/30 text-purple-300 border border-purple-500/40 hover:bg-purple-600/50 text-xs font-bold transition flex items-center gap-1 shadow-sm active:scale-95 shrink-0" title="Analizar texto y autoclasificar a proyecto o color con Nexus IA">
-                <span>✨</span> <span class="hidden sm:inline">Autoclasificar </span>IA
-              </button>
-              <!-- Botón Mover por Voz -->
-              <button onclick="app.dispatchThoughtByVoice('${item.id}')" class="px-2 py-1 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-600/40 text-xs font-bold transition flex items-center gap-1 shadow-sm active:scale-95 shrink-0" title="Decir por voz a qué proyecto o color mover">
-                <span>🎙️</span> <span class="hidden sm:inline">Voz</span>
-              </button>
-              <!-- Selector de Color de Humo -->
-              <select onchange="app.changeThoughtCategory('${item.id}', this.value)" class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-xl px-2 py-1 focus:outline-none focus:ring-1 focus:ring-cyan-500 font-mono cursor-pointer shrink-0" title="Cambiar color del pensamiento">
-                ${Object.keys(SMOKE_PALETTE).map(k => `
-                  <option value="${k}" ${item.category === k ? 'selected' : ''}>${SMOKE_PALETTE[k].icon} ${SMOKE_PALETTE[k].name}</option>
-                `).join('')}
-              </select>
-            </div>
-          </div>
+      <div class="p-4 rounded-2xl theme-card border ${item.category === 'humo_rojo' && !item.isResolved ? 'border-rose-500/60 bg-rose-950/10' : 'theme-border'} shadow-sm transition">
+        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${catMeta.badgeClass}">${catMeta.icon} ${catMeta.name}</span>
+          ${item.isPinned ? `<span class="text-xs text-amber-400 font-bold">📌 Fijado</span>` : ''}
+          ${item.isResolved ? `<span class="text-xs text-emerald-400 font-bold">✓ Resuelto</span>` : ''}
+          <span class="text-xs theme-text-muted">${new Date(item.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
         </div>
+        <p class="text-base font-semibold leading-relaxed">${this.escapeHtml(item.content)}</p>
+        ${this.captureChips(item)}
+        ${item.amount ? `<p class="text-xs text-orange-400 mt-1">💳 Importe: $${this.escapeHtml(item.amount)}</p>` : ''}
+        ${item.streakCount ? `<p class="text-xs text-emerald-400 mt-1">🔥 Racha: ${item.streakCount} días</p>` : ''}
+        ${item.contactName ? `<p class="text-xs text-purple-300 mt-1">👤 ${this.escapeHtml(item.contactName)}</p>` : ''}
+        ${item.hibernatedUntil ? `<p class="text-xs text-slate-400 mt-1">❄️ Hibernado hasta ${new Date(item.hibernatedUntil).toLocaleDateString('es-ES')}</p>` : ''}
+        ${item.drawingData ? `
+          <div class="mt-2.5 rounded-2xl overflow-hidden border theme-border max-w-sm bg-slate-950/40 p-2 cursor-pointer hover:border-emerald-500/50 transition" onclick="app.loadDrawingIntoFreeform('${id}')" title="Abrir en el Lienzo">
+            <img src="${item.drawingData}" alt="Boceto del lienzo" class="w-full h-36 object-contain rounded-xl bg-slate-900/40" />
+          </div>` : ''}
 
-        <!-- Botones de Acción Neuroquímica & Despacho a Proyectos -->
-        <div class="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
+        <div class="mt-3 flex items-center gap-1.5 flex-wrap">
+          <button onclick="${primary.on}" class="${btn} theme-card-subtle border theme-border" title="${primary.title}">${primary.icon} ${primary.label}</button>
+          ${projectBtn}
+          <button onclick="app.deletePensaderoItemWithUndo('${id}')" class="${btn} theme-card-subtle border theme-border theme-text-muted hover:text-rose-400" title="Archivar (se puede deshacer)" aria-label="Archivar">🗑️</button>
 
-          <!-- Botón Primario: Mandar a Proyecto -->
-          <button onclick="app.quickDispatchThoughtToProject('${item.id}')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition flex items-center gap-1 shrink-0" title="Mandar directamente a proyectos o convertir">
-            <span>🚀</span> <span class="hidden sm:inline">Mandar a </span>Proyecto
-          </button>
-
-          <!-- Mover al Baúl Secreto -->
-          <button onclick="app.sendThoughtToBaul('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0 transition active:scale-95" title="Mover al Baúl privado protegido por código">
-            <span>🔒</span> <span class="hidden sm:inline">Al </span>Baúl
-          </button>
-
-          ${(item.category === 'humo_rojo' || item.category === 'duda') ? `
-            <button onclick="app.syncRedSmokeToGoogle('${item.id}', '${this.uriArg(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Sincronizar con Google Tasks y Calendar">
-              <span>📅</span> Google
-            </button>
-            ${!item.isResolved ? `
-              <button onclick="app.resolveRedSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Apagar fuego">
-                <span>✓</span> Apagar
-              </button>
-            ` : ''}
-          ` : ''}
-
-          ${(item.category === 'humo_blanco' || item.category === 'descarga') ? `
-            <button onclick="app.releaseWhiteSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-200 border border-white/20 hover:bg-white/20 text-xs font-semibold flex items-center gap-1 shrink-0" title="Soltar y olvidar sin culpa para liberar memoria de trabajo">
-              <span>💨</span> Soltar
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_tarea') ? `
-            <button onclick="app.openScheduleEmailModal('${item.id}', '${this.uriArg(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Programar recordatorio por Google Mail (Gmail)">
-              <span>📧</span> Correo
-            </button>
-            <button onclick="app.chewGoldSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Masticar en 3 micro-pasos de 15 min">
-              <span>🍴</span> 15m
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_dorado' || item.category === 'chispa') ? `
-            <button onclick="app.chewGoldSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Masticar en 3 micro-pasos de 15 min">
-              <span>🍴</span> 15m
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_azul') ? `
-            <button onclick="app.scheduleDeepWorkBlock('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Agendar bloque de Deep Work de 2h con buffers">
-              <span>💻</span> Deep Work
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_verde') ? `
-            <button onclick="app.registerHabitStreak('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Alimentar racha y recargar dopamina">
-              <span>🌱</span> +1 Racha
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_purpura') ? `
-            <button onclick="app.openPersonalCRM('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Ver avatar de memoria antes de llamar">
-              <span>💜</span> Avatar
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_naranja') ? `
-            <button onclick="app.registerFinancialFriction('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Evaluar impacto financiero y enfriar compra">
-              <span>💳</span> Gasto
-            </button>
-          ` : ''}
-
-          ${(item.category === 'humo_ceniza') ? `
-            ${item.hibernatedUntil ? `
-              <button onclick="app.wakeThought('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold shrink-0" title="Despertar pensamiento">
-                ☀️ Despertar
-              </button>
-            ` : `
-              <button onclick="app.hibernateThought('${item.id}', 14)" class="px-2.5 py-1.5 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 text-xs font-semibold shrink-0" title="Congelar por 14 días">
-                ❄️ 14d
-              </button>
-            `}
-          ` : ''}
-
-          <button onclick="app.openEditThoughtModal('${item.id}')" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-cyan-400 text-xs shrink-0" title="Editar Pensamiento (CRUD)">
-            ✏️
-          </button>
-          <button onclick="app.togglePinPensadero('${item.id}')" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-amber-400 text-xs shrink-0" title="Fijar">
-            📌
-          </button>
-          <button onclick="app.deletePensaderoItemWithUndo('${item.id}')" class="p-1.5 rounded-xl theme-card-subtle border theme-border theme-text-muted hover:text-rose-400 text-xs shrink-0" title="Limpiar sin culpa">
-            🗑️
-          </button>
+          <details class="relative ml-auto thought-more">
+            <summary class="${btn} theme-card-subtle border theme-border cursor-pointer list-none" title="Más opciones" aria-label="Más opciones">⋯</summary>
+            <div class="absolute right-0 z-30 mt-1 w-60 p-1.5 rounded-xl theme-card border theme-border shadow-2xl space-y-0.5">
+              <label class="block px-3 pt-1.5 text-[11px] theme-text-muted">Color</label>
+              <select onchange="app.changeThoughtCategory('${id}', this.value)" class="w-full theme-card-subtle border theme-border text-xs rounded-lg px-2 py-1.5 mb-1 cursor-pointer" aria-label="Cambiar color del pensamiento">
+                ${Object.keys(SMOKE_PALETTE).map(k => `<option value="${k}" ${item.category === k ? 'selected' : ''}>${SMOKE_PALETTE[k].icon} ${SMOKE_PALETTE[k].name}</option>`).join('')}
+              </select>
+              <button onclick="app.autoClassifyThought('${id}')" class="${menuBtn}">✨ Sugerir color y proyecto</button>
+              <button onclick="app.dispatchThoughtByVoice('${id}')" class="${menuBtn}">🎙️ Decidir por voz</button>
+              ${extras.join('')}
+              <button onclick="app.openEditThoughtModal('${id}')" class="${menuBtn}">✏️ Editar</button>
+              <button onclick="app.togglePinPensadero('${id}')" class="${menuBtn}">📌 ${item.isPinned ? 'Desfijar' : 'Fijar arriba'}</button>
+              <button onclick="app.sendThoughtToBaul('${id}')" class="${menuBtn}">🔒 Mover al Baúl</button>
+              ${projects.length ? `
+                <p class="px-3 pt-2 text-[11px] theme-text-muted">Mandar a</p>
+                ${projects.map(p => `<button onclick="app.executeDispatchThought('${id}', '${p.id}', 'buzon')" class="${menuBtn}"><span>${p.emoji || '🎯'}</span><span class="truncate">${this.escapeHtml(p.name)}</span></button>`).join('')}
+              ` : ''}
+            </div>
+          </details>
         </div>
       </div>
     `;

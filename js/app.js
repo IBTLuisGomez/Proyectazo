@@ -795,7 +795,17 @@ class ProyectazoApp {
       if (e.key === 'Escape') {
         this.closeZenMode();
         this.closeAllModals();
+        document.querySelectorAll('details.thought-more[open]').forEach(d => d.removeAttribute('open'));
       }
+    });
+
+    // Menú "⋯" de las tarjetas: se cierra al elegir una opción o al tocar fuera, y solo uno abierto a la vez
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('details.thought-more[open]').forEach(d => {
+        const inside = d.contains(e.target);
+        const choseOption = inside && e.target.closest('button') && !e.target.closest('summary');
+        if (!inside || choseOption) d.removeAttribute('open');
+      });
     });
 
     window.addEventListener('resize', () => this.applyFormFactor());
