@@ -91,7 +91,7 @@ La app carga la URL del servidor (configurable dentro de la app). Apúntala a tu
 ## 3. Revisar y subir el trabajo
 
 ```powershell
-git log --oneline main..dev     # 13 commits, uno por bloque
+git log --oneline main..dev     # un commit por bloque de trabajo
 git push -u origin dev
 ```
 Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los tests, el build del CSS y el de las imágenes Docker.
