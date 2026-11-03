@@ -157,6 +157,22 @@ class ProyectazoApp {
   }
 
   // --- SEGURIDAD: SANITIZACIÓN DEFENSIVA CONTRA XSS ---
+  // Texto dentro de un argumento '...' de un manejador inline: escapar para JS y para el atributo HTML
+  jsStr(value) {
+    return String(value ?? '')
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\r\n|\r|\n/g, '\\n')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;');
+  }
+
+  // encodeURIComponent no escapa el apóstrofo, que cerraría la cadena '...' de un manejador inline
+  uriArg(value) {
+    return encodeURIComponent(String(value ?? '')).replace(/'/g, '%27');
+  }
+
   escapeHtml(text) {
     if (text === null || text === undefined) return '';
     const map = {
@@ -2242,7 +2258,7 @@ class ProyectazoApp {
         <span class="font-bold text-white text-xs sm:text-sm line-clamp-1">${topRed.content}</span>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="app.syncRedSmokeToGoogle('${topRed.id}', '${encodeURIComponent(topRed.content)}')" class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow transition flex items-center gap-1" title="Sincronizar con Google Calendar">
+        <button onclick="app.syncRedSmokeToGoogle('${topRed.id}', '${this.uriArg(topRed.content)}')" class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow transition flex items-center gap-1" title="Sincronizar con Google Calendar">
           <span>📅</span> Google Sync
         </button>
         <button onclick="app.resolveRedSmoke('${topRed.id}')" class="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition flex items-center gap-1" title="Marcar como atendido">
@@ -2544,14 +2560,14 @@ class ProyectazoApp {
 
         <!-- 4. ACCIONES DE CIERRE Y ANTI-PARÁLISIS -->
         <section class="flex flex-col space-y-2 pt-1">
-          <button onclick="app.completeSprintAndRegisterVictory('${activeProject.id}', '${activeTask.id}', '${encodeURIComponent(activeTask.title)}')"
+          <button onclick="app.completeSprintAndRegisterVictory('${activeProject.id}', '${activeTask.id}', '${this.uriArg(activeTask.title)}')"
             class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-display font-bold text-sm shadow-md active:scale-95 transition">
             <span>✓</span>
             <span>Listo, registrar el avance</span>
           </button>
 
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="app.breakdownTaskWithAI('${encodeURIComponent(activeTask.title)}', '${activeProject.id}')"
+            <button onclick="app.breakdownTaskWithAI('${this.uriArg(activeTask.title)}', '${activeProject.id}')"
               class="py-2.5 px-3 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
               <span>⚡</span>
               <span>Desglosar en 15 min</span>
@@ -2877,7 +2893,7 @@ class ProyectazoApp {
                 <span>🎯</span> Próxima Micro-Acción (Masticada)
               </span>
               <div class="flex items-center gap-1.5">
-                <button onclick="app.promptMasticarTask('${heroProject.nextAction}')" class="text-[10px] theme-text-muted hover:text-white px-2 py-0.5 rounded border theme-border hover:brightness-110" title="Desglosar en 3 micro-pasos de 5 min">
+                <button onclick="app.promptMasticarTask('${this.jsStr(heroProject.nextAction)}')" class="text-[10px] theme-text-muted hover:text-white px-2 py-0.5 rounded border theme-border hover:brightness-110" title="Desglosar en 3 micro-pasos de 5 min">
                   🍴 Masticar
                 </button>
                 <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full theme-card border theme-border">
@@ -2897,7 +2913,7 @@ class ProyectazoApp {
 
           <!-- Botones de Acción Inmediata -->
           <div class="flex flex-wrap items-center gap-2.5">
-            <button onclick="app.openZenMode(app.state.projects.find(p=>p.id==='${heroProject.id}'), '${heroProject.nextAction}')" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+            <button onclick="app.openZenMode(app.state.projects.find(p=>p.id==='${heroProject.id}'), '${this.jsStr(heroProject.nextAction)}')" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition">
               <span>🎯</span> Modo Zen Hiperfoco
             </button>
             <button onclick="app.openCheckout('${heroProject.id}')" class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border font-semibold text-xs hover:brightness-110 active:scale-95 transition">
@@ -3213,7 +3229,7 @@ class ProyectazoApp {
           <button onclick="app.openCheckout('${project.id}')" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-display font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition text-center" title="Registrar avance">
             ▶ Avancé
           </button>
-          <button onclick="app.launchZenForTask('${project.id}', '', '${encodeURIComponent(project.nextAction || project.name)}')" class="py-2 px-2.5 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25 font-semibold text-xs transition" title="Llevar a Modo Zen">
+          <button onclick="app.launchZenForTask('${project.id}', '', '${this.uriArg(project.nextAction || project.name)}')" class="py-2 px-2.5 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25 font-semibold text-xs transition" title="Llevar a Modo Zen">
             🧘 Zen
           </button>
           <button onclick="app.openOneThingMode('${project.id}')" class="py-2 px-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 font-semibold text-xs transition" title="Modo Solo 1 Cosa (Filtro de Ruido)">
@@ -4782,7 +4798,7 @@ class ProyectazoApp {
           </button>
 
           ${(item.category === 'humo_rojo' || item.category === 'duda') ? `
-            <button onclick="app.syncRedSmokeToGoogle('${item.id}', '${encodeURIComponent(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Sincronizar con Google Tasks y Calendar">
+            <button onclick="app.syncRedSmokeToGoogle('${item.id}', '${this.uriArg(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Sincronizar con Google Tasks y Calendar">
               <span>📅</span> Google
             </button>
             ${!item.isResolved ? `
@@ -4799,7 +4815,7 @@ class ProyectazoApp {
           ` : ''}
 
           ${(item.category === 'humo_tarea') ? `
-            <button onclick="app.openScheduleEmailModal('${item.id}', '${encodeURIComponent(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Programar recordatorio por Google Mail (Gmail)">
+            <button onclick="app.openScheduleEmailModal('${item.id}', '${this.uriArg(item.content)}')" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Programar recordatorio por Google Mail (Gmail)">
               <span>📧</span> Correo
             </button>
             <button onclick="app.chewGoldSmoke('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1 shrink-0" title="Masticar en 3 micro-pasos de 15 min">
@@ -5366,11 +5382,11 @@ class ProyectazoApp {
             </button>
           `}
 
-          <button onclick="app.completeTaskAsVictory('${t.projectId}', '${t.id}', '${encodeURIComponent(t.title)}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 text-xs font-bold transition flex items-center gap-1" title="Marcar como Victoria">
+          <button onclick="app.completeTaskAsVictory('${t.projectId}', '${t.id}', '${this.uriArg(t.title)}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 text-xs font-bold transition flex items-center gap-1" title="Marcar como Victoria">
             <span>✓</span> Victoria
           </button>
 
-          <button onclick="app.breakdownTaskWithAI('${encodeURIComponent(t.title)}', '${t.projectId}')" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs transition" title="Desglose Atómico Gemini (micro-pasos de 15m)">
+          <button onclick="app.breakdownTaskWithAI('${this.uriArg(t.title)}', '${t.projectId}')" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs transition" title="Desglose Atómico Gemini (micro-pasos de 15m)">
             🪄
           </button>
 
@@ -5568,7 +5584,7 @@ class ProyectazoApp {
           </button>
 
           <!-- Modo Zen Hiperfoco -->
-          <button onclick="app.openZenMode(app.state.projects.find(p=>p.id==='${project.id}'), '${project.nextAction}')" class="p-2 rounded-xl theme-card-subtle text-emerald-400 hover:brightness-110 text-xs border theme-border transition" title="Modo Zen Hiperfoco">
+          <button onclick="app.openZenMode(app.state.projects.find(p=>p.id==='${project.id}'), '${this.jsStr(project.nextAction)}')" class="p-2 rounded-xl theme-card-subtle text-emerald-400 hover:brightness-110 text-xs border theme-border transition" title="Modo Zen Hiperfoco">
             🎯
           </button>
 
@@ -5717,12 +5733,12 @@ class ProyectazoApp {
                 <span class="text-[10px] whitespace-nowrap">Sin culpa</span>
               </button>
               <!-- Llevar a Modo Zen -->
-              <button onclick="app.launchZenForTask('${project.id}', '${task.id}', '${encodeURIComponent(task.title)}')" class="p-3 rounded-2xl bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95 border border-cyan-500/40 plasma-glow" title="Entrar en Modo Zen Hiperfoco">
+              <button onclick="app.launchZenForTask('${project.id}', '${task.id}', '${this.uriArg(task.title)}')" class="p-3 rounded-2xl bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 text-xs font-bold flex flex-col items-center gap-1 transition active:scale-95 border border-cyan-500/40 plasma-glow" title="Entrar en Modo Zen Hiperfoco">
                 <span class="text-lg">🧘</span>
                 <span class="text-[10px] whitespace-nowrap">Modo Zen</span>
               </button>
               <!-- ¡Victoria lograda! -->
-              <button onclick="app.completeTinderVictory('${project.id}', '${task.id}', '${encodeURIComponent(task.title)}')" class="p-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-display font-extrabold flex flex-col items-center gap-1 transition active:scale-95 shadow-lg shadow-emerald-500/25 pulse-glow-tertiary" title="Marcar como Victoria y recibir dopamina">
+              <button onclick="app.completeTinderVictory('${project.id}', '${task.id}', '${this.uriArg(task.title)}')" class="p-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-display font-extrabold flex flex-col items-center gap-1 transition active:scale-95 shadow-lg shadow-emerald-500/25 pulse-glow-tertiary" title="Marcar como Victoria y recibir dopamina">
                 <span class="text-lg">🎉</span>
                 <span class="text-[10px] whitespace-nowrap">¡Victoria!</span>
               </button>
@@ -5874,19 +5890,19 @@ class ProyectazoApp {
             <span class="text-[9px] font-mono px-1.5 py-0.5 rounded theme-card-subtle theme-text-muted">
               ${task.effort || 'M'}
             </span>
-            <button onclick="app.promptMasticarTask('${task.title}')" class="text-[9px] theme-text-muted hover:text-white px-1 py-0.5 rounded hover:bg-slate-700/50" title="Masticar en micro-pasos de 5 min">
+            <button onclick="app.promptMasticarTask('${this.jsStr(task.title)}')" class="text-[9px] theme-text-muted hover:text-white px-1 py-0.5 rounded hover:bg-slate-700/50" title="Masticar en micro-pasos de 5 min">
               🍴
             </button>
             <button onclick="app.openOneThingMode('${projectId}', '${task.id}')" class="text-[9px] theme-text-muted hover:text-purple-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Ver en Modo Solo 1 Cosa (Filtro de Ruido)">
               👁️
             </button>
-            <button onclick="app.openGapFillingModal('${task.id}', '${task.title.replace(/'/g, "\\'")}', 30, '${projectId}')" class="text-[9px] theme-text-muted hover:text-blue-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Gap Filling: Agendar en Google Calendar con buffers de 15 min y anti-optimismo">
+            <button onclick="app.openGapFillingModal('${task.id}', '${this.jsStr(task.title)}', 30, '${projectId}')" class="text-[9px] theme-text-muted hover:text-blue-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Gap Filling: Agendar en Google Calendar con buffers de 15 min y anti-optimismo">
               📅
             </button>
-            <button onclick="app.openDeconstructModal('${projectId}', '${task.title.replace(/'/g, "\\'")}')" class="text-[9px] theme-text-muted hover:text-amber-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Desglose Atómico Gemini (micro-pasos de 15m)">
+            <button onclick="app.openDeconstructModal('${projectId}', '${this.jsStr(task.title)}')" class="text-[9px] theme-text-muted hover:text-amber-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Desglose Atómico Gemini (micro-pasos de 15m)">
               🪄
             </button>
-            <button onclick="app.openScheduleEmailModal('${task.id}', '${task.title.replace(/'/g, "\\'")}', '${projectId}')" class="text-[9px] theme-text-muted hover:text-indigo-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Programar recordatorio por Google Mail (Gmail)">
+            <button onclick="app.openScheduleEmailModal('${task.id}', '${this.jsStr(task.title)}', '${projectId}')" class="text-[9px] theme-text-muted hover:text-indigo-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Programar recordatorio por Google Mail (Gmail)">
               📧
             </button>
             <button onclick="app.openDeepWork('${projectId}', '${task.id}')" class="text-[9px] theme-text-muted hover:text-sky-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Abrir notas y fragmentos de código (Deep Work)">
@@ -6212,7 +6228,7 @@ class ProyectazoApp {
           <p class="text-sm font-bold text-white leading-snug mb-3">
             ${data.kickstart_action}
           </p>
-          <button onclick="app.startKickstartInOneThing('${pId}', '${data.kickstart_action.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition flex items-center justify-center gap-2">
+          <button onclick="app.startKickstartInOneThing('${pId}', '${this.jsStr(data.kickstart_action)}')" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition flex items-center justify-center gap-2">
             <span>🎯</span> Arrancar YA en Modo Solo 1 Cosa
           </button>
         </div>
@@ -6871,7 +6887,7 @@ class ProyectazoApp {
           <button onclick="app.closeModal('modal-reactivation-briefing')" class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-semibold hover:brightness-110">
             Cerrar
           </button>
-          <button onclick="app.confirmReactivateProject('${p.id}', '${data.exact_next_step.replace(/'/g, "\\'")}')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-purple-400 hover:to-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-purple-500/25 active:scale-95 transition flex items-center gap-2">
+          <button onclick="app.confirmReactivateProject('${p.id}', '${this.jsStr(data.exact_next_step)}')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-purple-400 hover:to-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-purple-500/25 active:scale-95 transition flex items-center gap-2">
             <span>🚀</span> Despertar y Lanzar Solo 1 Cosa
           </button>
         </div>

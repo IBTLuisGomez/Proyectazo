@@ -59,3 +59,18 @@ def test_generated_ids_do_not_use_modal_prefix():
     for m in re.finditer(r"\.id\s*=\s*`modal-", APP_JS):
         line = APP_JS.count("\n", 0, m.start()) + 1
         raise AssertionError(f"js/app.js:{line} genera un id con prefijo modal-")
+
+
+def test_free_text_in_onclick_is_escaped():
+    # Texto libre (títulos, acciones, pasos de la IA) metido tal cual en onclick="app.x('...')"
+    # rompe el botón si lleva comillas o saltos de línea: debe pasar por this.jsStr() o encodeURIComponent
+    text_fields = re.compile(r"\.(nextAction|title|content|name|kickstart_action|exact_next_step|objective)\b")
+    offenders = []
+    for m in re.finditer(r'on[a-z]+="([^"]*)"', APP_JS):
+        for arg in re.findall(r"'\$\{([^}]*)\}'", m.group(1)):
+            if text_fields.search(arg) and "jsStr(" not in arg and "uriArg(" not in arg:
+                offenders.append(f"js/app.js:{APP_JS.count(chr(10), 0, m.start()) + 1} → {arg}")
+        # encodeURIComponent no escapa el apóstrofo: usar this.uriArg()
+        if "encodeURIComponent(" in m.group(1):
+            offenders.append(f"js/app.js:{APP_JS.count(chr(10), 0, m.start()) + 1} → encodeURIComponent en onclick")
+    assert not offenders, "Texto sin escapar en onclick: " + "; ".join(offenders)
