@@ -5,8 +5,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', '"Bricolage Grotesque"', 'sans-serif'],
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        // Las mismas que el <style> de index.html: antes font-display usaba Space Grotesk y h1–h3 Bricolage
+        display: ['"Bricolage Grotesque"', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {

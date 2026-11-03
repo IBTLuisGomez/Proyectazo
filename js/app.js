@@ -872,6 +872,9 @@ class ProyectazoApp {
     // Initialize Splash Intro on mobile if not seen yet
     setTimeout(() => this.initSplash(), 100);
 
+    // Contraste del tema claro (no hace nada en los oscuros)
+    setTimeout(() => this.initContrastGuard(), 400);
+
     // Texto compartido desde otra app o acceso directo de captura
     setTimeout(() => this.handleLaunchIntent(), 300);
 
@@ -2406,8 +2409,8 @@ class ProyectazoApp {
     bar.className = 'sticky top-16 z-40 bg-gradient-to-r from-rose-950 via-rose-900 to-slate-950 border-b border-rose-500/50 px-4 py-2.5 shadow-xl shadow-rose-950/40 text-xs flex flex-wrap items-center justify-between gap-3 text-rose-100 animate-pulse';
     bar.innerHTML = `
       <div class="flex items-center gap-2.5">
-        <span class="px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-black text-[10px] uppercase tracking-wider shadow">🚨 FUEGO ACTIVO (${redItems.length})</span>
-        <span class="font-bold text-white text-xs sm:text-sm line-clamp-1">${topRed.content}</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-rose-700 text-white font-black text-[10px] uppercase tracking-wider shadow">🚨 FUEGO ACTIVO (${redItems.length})</span>
+        <span class="font-bold text-white text-xs sm:text-sm line-clamp-1">${this.escapeHtml(topRed.content)}</span>
       </div>
       <div class="flex items-center gap-2">
         <button onclick="app.syncRedSmokeToGoogle('${topRed.id}', '${this.uriArg(topRed.content)}')" class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow transition flex items-center gap-1" title="Sincronizar con Google Calendar">

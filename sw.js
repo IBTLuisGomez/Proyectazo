@@ -1,10 +1,11 @@
-const CACHE_NAME = 'nexus-orb-v3.8';
+const CACHE_NAME = 'nexus-orb-v3.9';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './favicon.svg',
   './assets/tailwind.css',
+  './assets/contraste.css',
   './js/idb-store.js',
   './js/smoke-palette.js',
   './js/clasificador-reglas.js',
@@ -26,6 +27,7 @@ const ASSETS_TO_CACHE = [
   './js/app/views/lienzo.js',
   './js/app/features/movil.js',
   './js/app/features/captura.js',
+  './js/app/ui/contraste.js',
   './assets/nexus_n.jpg',
   './assets/nexus_n_banner.jpg',
   './assets/nexus_core.jpg',

@@ -12,7 +12,8 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <!-- 3 familias: Inter (texto), Bricolage Grotesque (títulos) y JetBrains Mono (etiquetas) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* Google Stitch Mobile Tokens & Micro-interactions */
     .plasma-glow {
@@ -72,7 +73,7 @@
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     
     /* Escalado de micro-fuentes para máxima legibilidad UX/UI en todos los dispositivos */
-    .text-\[9px\] { font-size: 11px !important; line-height: 14px !important; }
+    .text-\[8px\], .text-\[9px\] { font-size: 12px !important; line-height: 16px !important; }
     .text-\[10px\] { font-size: 12px !important; line-height: 16px !important; }
     .text-\[11px\] { font-size: 12.5px !important; line-height: 17px !important; }
     .text-xs { font-size: 0.84rem !important; line-height: 1.25rem !important; }
@@ -550,6 +551,8 @@
   <!-- Tailwind compilado (npm run build:css). Va DESPUÉS del <style> propio, como hacía el CDN:
        así .hidden y demás utilidades ganan a clases como .nexus-modal-wrapper { display:flex } -->
   <link rel="stylesheet" href="assets/tailwind.css">
+  <!-- Correcciones de contraste WCAG AA (generado: python scripts/gen-contraste.py) -->
+  <link rel="stylesheet" href="assets/contraste.css">
 </head>
 <body class="min-h-screen flex flex-col">
 
@@ -2575,5 +2578,6 @@
   <script src="js/app/views/lienzo.js"></script>
   <script src="js/app/features/movil.js"></script>
   <script src="js/app/features/captura.js"></script>
+  <script src="js/app/ui/contraste.js"></script>
 </body>
 </html>
