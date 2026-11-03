@@ -1,5 +1,7 @@
 server:
   port: ${PORT:8081}
+  # Detrás de nginx: usar X-Forwarded-Proto/Host para reconocer las peticiones de la propia web (CORS)
+  forward-headers-strategy: framework
 
 spring:
   application:

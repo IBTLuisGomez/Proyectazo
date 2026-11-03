@@ -1,0 +1,121 @@
+# Guía de pendientes (lo que te toca a ti)
+
+Estado: todo el trabajo está en la rama `dev` (sin subir a GitHub). `main` no se ha tocado.
+Los pasos están en orden: los de **Antes de arrancar** son obligatorios; el resto, cuando puedas.
+
+---
+
+## 1. Antes de arrancar (obligatorio)
+
+### 1.1 Cerrar el proceso de prueba
+Quedó un backend de prueba escuchando en el puerto 8091 y bloquea `backend/target/*.jar`.
+
+```powershell
+Get-CimInstance Win32_Process -Filter "Name='java.exe'" |
+  Where-Object { $_.CommandLine -like '*proyectazo-api-1.0.0.jar*' } |
+  ForEach-Object { Stop-Process -Id $_.ProcessId }
+```
+
+### 1.2 Completar `.env`
+Copia lo que falte desde [`.env.example`](../.env.example). Sin `POSTGRES_PASSWORD`, `docker compose` no arranca.
+
+| Variable | Qué poner |
+|---|---|
+| `POSTGRES_PASSWORD` | **Si ya tenías el volumen de Postgres**, la contraseña con que se creó: `nexus_secret_2026` (el valor que traía antes el compose). Si quieres otra, borra el volumen (`docker compose down -v`, **borra los datos del servidor**) |
+| `NEXUS_ADMIN_USER` | Tu usuario de login (p. ej. `fernando`) |
+| `NEXUS_ADMIN_PASSWORD` | Mínimo 8 caracteres. Si la dejas vacía, se genera una temporal y aparece en `docker logs nexus-backend` |
+| `CORS_ALLOWED_ORIGINS` | Solo si abres la app desde **otra** dirección que el propio servidor (ver 2.3). Por defecto vale |
+| `NEXUS_PUSH_SUBJECT` | `mailto:tu_correo@...` (lo exigen los servicios de push) |
+| `NEXUS_VAPID_PUBLIC_KEY` / `NEXUS_VAPID_PRIVATE_KEY` | Opcional. Si las dejas vacías se generan solas y se guardan en la BD |
+
+Para generar una contraseña segura:
+```powershell
+[Convert]::ToBase64String((1..24 | ForEach-Object { Get-Random -Maximum 256 }))
+```
+
+> El usuario inicial **solo se crea si no existe ninguno**. Cambiar `NEXUS_ADMIN_PASSWORD` después no cambia la contraseña: hazlo desde Ajustes → Avanzado → Seguridad.
+
+### 1.3 Arrancar y comprobar
+```powershell
+docker compose up -d --build
+docker compose ps          # los 4 servicios en "healthy"
+docker logs nexus-backend  # si no fijaste contraseña, aquí está la temporal
+```
+Abre `http://localhost:8080` (o el `PORT` de tu `.env`).
+
+---
+
+## 2. Probar en un navegador real (15 minutos)
+
+Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegador sin pantalla), pero conviene una vuelta tuya:
+
+- [ ] Login con tu usuario. Contraseña incorrecta debe dar error.
+- [ ] Aparece la **guía de bienvenida** la primera vez (se repite en Ajustes → Guía rápida).
+- [ ] Soltar un pensamiento sin color → Nexus lo clasifica y ofrece **Deshacer**.
+- [ ] En un pensamiento: **🚀 Mandar a Proyecto** abre la ventana y lo envía.
+- [ ] Borrar una tarea → **Deshacer** la recupera.
+- [ ] Editar un proyecto y poner **Palabras clave**; dictar/escribir una y comprobar que va a ese proyecto.
+- [ ] Abrir el **Baúl**: la primera vez pide crear el PIN.
+- [ ] Modo Zen: al acabar el sprint llega la notificación y "Cerrar sesión" abre el Checkout.
+- [ ] Desde otro dispositivo (móvil): login y ver que los datos se sincronizan.
+
+### 2.1 Datos que ya tenías
+- Lo guardado en cada navegador se sube al servidor **la primera vez que inicias sesión** en ese dispositivo. Abre la app en cada uno al menos una vez.
+- El antiguo PIN del Baúl se conserva (se convierte a hash). La antigua contraseña local se borra: ahora vale la del servidor.
+
+### 2.2 Avisos con la app cerrada (Web Push) y voz
+Requieren **HTTPS** (o `localhost`). En la red local por IP (`http://192.168.x.x`) el móvil **no** permitirá push ni micrófono.
+Opciones: un dominio con certificado (Caddy o certbot delante de nginx) o un túnel tipo Cloudflare Tunnel / Tailscale Funnel.
+Con HTTPS: Ajustes → Notificaciones → **Activar avisos con la app cerrada** en cada dispositivo → **Probar**.
+
+### 2.3 Si pones un proxy HTTPS delante (Cloudflare, Caddy…)
+Si el HTTPS termina **antes** de nginx, nginx ve `http` y el navegador `https`. Añade tu dirección pública a `.env`:
+```
+CORS_ALLOWED_ORIGINS=https://tu-dominio.com,null
+```
+(`null` es la app de escritorio Electron.) Síntoma si falta: al guardar, error 403 en la consola del navegador.
+
+### 2.4 App de escritorio (atajo Ctrl+Shift+Espacio)
+```powershell
+cd desktop
+npm install
+npm start
+```
+Pulsa `Ctrl+Shift+Espacio` desde cualquier programa: debe abrir la captura rápida.
+
+### 2.5 App Android
+La app carga la URL del servidor (configurable dentro de la app). Apúntala a tu dirección HTTPS para tener push y voz.
+
+---
+
+## 3. Revisar y subir el trabajo
+
+```powershell
+git log --oneline main..dev     # 13 commits, uno por bloque
+git push -u origin dev
+```
+Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los tests, el build del CSS y el de las imágenes Docker.
+
+---
+
+## 4. Decisiones pendientes (dime y lo hago)
+
+| Tema | Qué implica |
+|---|---|
+| **Tamaño mínimo de texto** | Pasar de 9–11 px a 12–13 px. Mejora la lectura (TDAH, móvil) pero cambia el aspecto de toda la app |
+| **Datos por usuario** | Hoy todas las cuentas ven los mismos proyectos. Solo importa si vas a dar acceso a otras personas |
+| **Google Calendar / Gmail con OAuth** | Sustituye la contraseña de aplicación de Gmail. Necesito que crees en [Google Cloud Console](https://console.cloud.google.com/) un proyecto, la pantalla de consentimiento OAuth y unas credenciales "Aplicación web" con tu dominio como URI de redirección, y me pases el *Client ID* |
+
+---
+
+## 5. Limpieza opcional
+
+- `nexus_deploy_v1.tar.gz` (52 MB, en la raíz): ya no está en git; bórralo si no lo necesitas.
+- `data/` y `backend/data/` (bases H2 antiguas): siguen en disco pero fuera de git. El backend en Docker usa Postgres.
+- `archive/` guarda la versión v1.1 e `Index.Gemini.html` por si quieres consultarlas; se pueden borrar.
+
+## 6. A tener en cuenta (seguridad)
+
+- La **contraseña de aplicación de Gmail** se guarda en texto plano en el disco del servicio Nexus (`data/google_mail_config.json` dentro del contenedor). Está protegida por el login, pero OAuth (punto 4) es lo correcto.
+- La **clave privada VAPID** se guarda en la base de datos si no la fijas en `.env`. Haz copias de seguridad de la BD.
+- Si alguna vez compartiste el `.env`, rota la `GEMINI_API_KEY` en Google AI Studio.

@@ -73,7 +73,7 @@ Proyectazo/
 docker-compose up -d --build
 ```
 Puertos disponibles:
-- **Frontend Web & PWA**: [http://localhost:8000](http://localhost:8000) o tu IP local `http://192.168.x.x:8000`
+- **Frontend Web & PWA**: [http://localhost:8080](http://localhost:8080) (o el `PORT` de tu `.env`); en la red local `http://192.168.x.x:8080`
 - **Backend Spring Boot**: [http://localhost:8081/api](http://localhost:8081/api)
 - **Microservicio Nexus AI**: [http://localhost:8002/docs](http://localhost:8002/docs)
 - **Base de Datos PostgreSQL**: Puerto 5432
@@ -116,6 +116,8 @@ docker exec nexus-frontend nginx -s reload
 ---
 
 ## 📚 Documentación Adicional
+
+- ✅ **[Guía de pendientes tras la actualización](docs/GUIA_PENDIENTES.md)**: configuración de `.env`, pruebas y decisiones
 
 - 🖥️ **[Guía de Usuario para Aplicación Web](docs/GUIA_USUARIO_WEB.md)**
 - 📱 **[Guía de Usuario para Aplicación Móvil](docs/GUIA_USUARIO_MOVIL.md)**

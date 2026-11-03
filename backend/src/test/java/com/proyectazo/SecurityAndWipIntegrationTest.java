@@ -129,6 +129,26 @@ class SecurityAndWipIntegrationTest {
     }
 
     @Test
+    void sameSiteRequestBehindNginxIsNotTreatedAsCrossOrigin() throws Exception {
+        // nginx reenvía Host/X-Forwarded-*; la web en mi-servidor:8000 no está en la lista blanca y aun así debe poder guardar
+        mvc.perform(post("/api/projects").header("Authorization", bearer())
+                        .header("Origin", "http://mi-servidor:8000")
+                        .header("X-Forwarded-Host", "mi-servidor:8000")
+                        .header("X-Forwarded-Proto", "http")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"p-proxy\",\"name\":\"Detrás de nginx\"}"))
+                .andExpect(status().isCreated());
+        // Otra web sigue rechazada
+        mvc.perform(post("/api/projects").header("Authorization", bearer())
+                        .header("Origin", "http://otra-web.example")
+                        .header("X-Forwarded-Host", "mi-servidor:8000")
+                        .header("X-Forwarded-Proto", "http")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"p-otra\",\"name\":\"Ajena\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void corsAllowsDesktopFileOrigin() throws Exception {
         // Electron carga index.html con file://, cuyo Origin es "null"
         mvc.perform(options("/api/projects")
