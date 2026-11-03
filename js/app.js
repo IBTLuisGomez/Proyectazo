@@ -6728,6 +6728,93 @@ class ProyectazoApp {
     this.closeModal('modal-schedule-email');
   }
 
+  // --- WEB PUSH: AVISOS CON LA APP CERRADA ---
+  urlBase64ToUint8Array(base64) {
+    const padded = (base64 + '='.repeat((4 - base64.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(padded);
+    return Uint8Array.from(raw, c => c.charCodeAt(0));
+  }
+
+  setPushStatus(text) {
+    const el = document.getElementById('push-status');
+    if (el) el.textContent = text;
+  }
+
+  async enableBackgroundPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      this.setPushStatus('Este navegador no admite avisos con la app cerrada.');
+      return;
+    }
+    if (!window.isSecureContext) {
+      this.setPushStatus('Necesita HTTPS (o localhost) para funcionar.');
+      return;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        this.setPushStatus('Permiso de notificaciones denegado. Actívalo en el navegador.');
+        return;
+      }
+      const keyRes = await fetch(`${this.API_BASE}/push/public-key`, { headers: { 'Accept': 'application/json' } });
+      if (!keyRes.ok) {
+        this.setPushStatus('El servidor no tiene Web Push disponible.');
+        return;
+      }
+      const { publicKey } = await keyRes.json();
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(publicKey)
+        });
+      }
+      const res = await fetch(`${this.API_BASE}/push/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subscription.toJSON())
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        this.setPushStatus(`No se pudo registrar: ${data.error || res.status}`);
+        return;
+      }
+      localStorage.setItem('nexus_push_enabled', 'true');
+      this.setPushStatus(`✓ Activado. Dispositivos con avisos: ${data.devices}.`);
+      this.showToast('📲 Avisos con la app cerrada activados en este dispositivo.');
+    } catch (err) {
+      this.setPushStatus(`No se pudo activar: ${err.message}`);
+    }
+  }
+
+  async testBackgroundPush() {
+    try {
+      const res = await fetch(`${this.API_BASE}/push/test`, { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        this.setPushStatus('El servidor no pudo enviar la prueba.');
+      } else if (!data.delivered) {
+        this.setPushStatus('Ningún dispositivo recibió la prueba. Pulsa "Activar" primero.');
+      } else {
+        this.setPushStatus(`Prueba enviada a ${data.delivered} dispositivo(s).`);
+      }
+    } catch (err) {
+      this.setPushStatus('Sin conexión con el servidor.');
+    }
+  }
+
+  async scheduleBackgroundPush(taskId, title, scheduledTime) {
+    const res = await fetch(`${this.API_BASE}/push/reminders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, taskId, sendAt: new Date(scheduledTime).getTime() })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}`);
+    }
+  }
+
   async confirmScheduleEmail() {
     const idEl = document.getElementById('schedule-email-task-id');
     const titleEl = document.getElementById('schedule-email-task-title');
@@ -6739,6 +6826,7 @@ class ProyectazoApp {
     const title = titleEl ? titleEl.textContent : 'Tarea Pendiente';
     const scheduledTime = dtEl ? dtEl.value : '';
     const recipient = recipEl ? recipEl.value.trim() : '';
+    const wantsPush = !!document.getElementById('schedule-push-toggle')?.checked;
 
     if (!scheduledTime) {
       if (fb) {
@@ -6746,6 +6834,33 @@ class ProyectazoApp {
         fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
       }
       return;
+    }
+
+    if (!wantsPush && !recipient) {
+      if (fb) {
+        fb.textContent = '❌ Elige al menos un canal: notificación o correo.';
+        fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+      }
+      return;
+    }
+
+    // Notificación push (independiente del correo: no necesita Gmail configurado)
+    if (wantsPush) {
+      try {
+        await this.scheduleBackgroundPush(taskId, title, scheduledTime);
+      } catch (err) {
+        if (fb) {
+          fb.textContent = `❌ No se pudo programar la notificación: ${err.message}`;
+          fb.className = 'p-2 rounded-xl text-[11px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 block';
+        }
+        return;
+      }
+      if (!recipient) {
+        this.closeModal('modal-schedule-email');
+        const hint = localStorage.getItem('nexus_push_enabled') ? '' : ' Actívalos en Ajustes → Notificaciones para recibirlo con la app cerrada.';
+        this.showToast(`📲 Aviso programado para ${new Date(scheduledTime).toLocaleString('es-ES')}.${hint}`);
+        return;
+      }
     }
 
     if (fb) {

@@ -34,6 +34,11 @@ app:
     # Usuario inicial (solo se crea si no existe ninguno). Sin contraseña se genera una temporal y se imprime en el log.
     admin-user: ${NEXUS_ADMIN_USER:admin}
     admin-password: ${NEXUS_ADMIN_PASSWORD:}
+  push:
+    # Claves VAPID opcionales. Si faltan, se generan una vez y se guardan en la base de datos.
+    vapid-public-key: ${NEXUS_VAPID_PUBLIC_KEY:}
+    vapid-private-key: ${NEXUS_VAPID_PRIVATE_KEY:}
+    subject: ${NEXUS_PUSH_SUBJECT:mailto:admin@localhost}
 
 management:
   endpoints:

@@ -85,6 +85,11 @@ Puertos disponibles:
 - El borrado total por `/api/sync` exige la cabecera `X-Confirm-Wipe: BORRAR-TODO`.
 - El PIN del Baúl se elige la primera vez que se abre y se guarda solo como hash.
 
+### Avisos con la app cerrada (Web Push)
+- En **Ajustes → Notificaciones → Activar avisos con la app cerrada** cada dispositivo se suscribe (requiere HTTPS o `localhost`).
+- Los recordatorios de **Programar recordatorio** se pueden enviar como notificación push, con o sin correo; el backend revisa cada 30 s los que vencen.
+- Las claves VAPID se generan solas y se guardan en la base de datos, o se fijan con `NEXUS_VAPID_PUBLIC_KEY` / `NEXUS_VAPID_PRIVATE_KEY`.
+
 ### Estilos (Tailwind compilado)
 Tailwind ya no se carga desde CDN: se compila a `assets/tailwind.css` con la configuración de `tailwind.config.js`.
 ```bash
