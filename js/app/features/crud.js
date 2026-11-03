@@ -260,9 +260,7 @@ defineAppMethods({
     this.saveState();
     this.render();
 
-    if (this.backendAvailable) {
-      fetch(`${this.API_BASE}/projects/${id}`, { method: 'DELETE' }).catch(() => {});
-    }
+    this.deleteOnServer('project', id); // encola si no hay red
     return true;
   },
 

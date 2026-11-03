@@ -1195,9 +1195,7 @@ defineAppMethods({
       this.state.pensadero.splice(idx, 1);
     }
 
-    if (this.backendAvailable && item && item.id) {
-      fetch(`${this.API_BASE}/pensadero/${item.id}`, { method: 'DELETE' }).catch(() => {});
-    }
+    this.deleteOnServer('pensadero', item.id); // encola si no hay red
 
     this.saveState();
     this.closeModal('modal-dispatch-thought');
@@ -1307,6 +1305,7 @@ defineAppMethods({
     if (!item) return;
     this.deletePensaderoItem(target);
     this.showToast('🧹 Pensamiento archivado', () => this.undoableRestore(() => {
+      this.cancelPendingDelete(item.id);
       this.state.pensadero.splice(Math.min(idx, this.state.pensadero.length), 0, item);
     }), 'Deshacer');
   },
@@ -1319,6 +1318,7 @@ defineAppMethods({
     const task = tasks[idx];
     this.deleteTask(projectId, taskId);
     this.showToast(`🗑️ Tarea eliminada: "${(task.title || '').slice(0, 30)}"`, () => this.undoableRestore(() => {
+      this.cancelPendingDelete(taskId);
       const p = this.state.projects.find(pr => pr.id === projectId);
       if (!p) return;
       if (!p.tasks) p.tasks = [];
@@ -1512,9 +1512,7 @@ defineAppMethods({
     this.saveState();
     this.render();
 
-    if (this.backendAvailable && item && item.id) {
-      fetch(`${this.API_BASE}/pensadero/${item.id}`, { method: 'DELETE' }).catch(() => {});
-    }
+    this.deleteOnServer('pensadero', item.id); // encola si no hay red
   },
 
   clearPensaderoPrompts() {

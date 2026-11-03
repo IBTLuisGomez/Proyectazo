@@ -66,7 +66,7 @@ defineAppMethods({
       this.showToast(`✂️ Separé ${ideas.length} ideas para que cada una vaya a su sitio`, () => {
         // Unir: deshacer la separación y guardar el texto como un solo pensamiento
         this.state.pensadero = (this.state.pensadero || []).filter(p => !ids.includes(p.id));
-        if (this.backendAvailable) ids.forEach(id => fetch(`${this.API_BASE}/pensadero/${id}`, { method: 'DELETE' }).catch(() => {}));
+        ids.forEach(id => this.deleteOnServer('pensadero', id));
         this.saveState();
         this.captureThought(raw, { ...opts, skipSplit: true });
       }, 'Unir');

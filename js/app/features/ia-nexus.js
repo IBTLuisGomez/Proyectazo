@@ -1251,8 +1251,6 @@ defineAppMethods({
     this.saveState();
     this.render();
 
-    if (this.backendAvailable) {
-      fetch(`${this.API_BASE}/tasks/${taskId}`, { method: 'DELETE' }).catch(() => {});
-    }
+    this.deleteOnServer('task', taskId); // encola si no hay red
   },
 });

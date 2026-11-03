@@ -88,3 +88,13 @@ def test_every_capture_goes_through_the_funnel():
             if "this.quickDumpToOrbe(" in line:
                 offenders.append(f"{path.relative_to(ROOT)}:{n}")
     assert not offenders, "Capturas que no pasan por captureThought: " + ", ".join(offenders)
+
+
+def test_deletes_go_through_the_offline_queue():
+    # Borrar en el servidor siempre con deleteOnServer(): si no hay red se encola y no "resucita" al sincronizar
+    offenders = []
+    for path in sorted((ROOT / "js" / "app").rglob("*.js")):
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if "method: 'DELETE'" in line:
+                offenders.append(f"{path.relative_to(ROOT)}:{n}")
+    assert not offenders, "DELETE directo (usar this.deleteOnServer): " + ", ".join(offenders)

@@ -74,6 +74,10 @@ class ProyectazoApp {
     this.freeMoneyMonthly = 450; // Buffer mensual de dinero libre para fricción financiera TDAH
 
     this.loadState();
+    this.hydrateFromIndexedDB();
+    // Al cerrar o esconder la pestaña, no esperar al temporizador de escritura
+    window.addEventListener('pagehide', () => this.flushIndexedDBWrite());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.flushIndexedDBWrite(); });
     this.captureEntitySignatures();
     this.ensureDeviceIdentity();
     this.initTheme();
@@ -104,13 +108,19 @@ class ProyectazoApp {
         this.state = JSON.parse(raw);
       } else {
         this.state = this.getSeedData();
-        this.saveState();
+        // Sin copia rápida: los datos pueden estar solo en IndexedDB (no cabían en localStorage).
+        // Hasta leerla no se guarda nada, para no pisarla con un estado vacío.
+        if (typeof NexusIDB !== 'undefined' && NexusIDB.available()) this._persistBlocked = true;
       }
     } catch (e) {
       console.error("Error al cargar estado, cargando seed:", e);
       this.state = this.getSeedData();
     }
+    this.normalizeState(DEMO_PROJECT_IDS);
+    this.saveState();
+  }
 
+  normalizeState(DEMO_PROJECT_IDS = new Set(['p-focusflow', 'p-cytohelix', 'p-cytocore', 'proj_focusflow', 'proj_cytohelix', 'proj_cytocore'])) {
     // Filtro riguroso: Eliminar cualquier proyecto o pensamiento de demostración heredado
     if (this.state.projects && Array.isArray(this.state.projects)) {
       this.state.projects = this.state.projects.filter(p => 
@@ -140,7 +150,124 @@ class ProyectazoApp {
     if (!this.state.freeformNotes) {
       this.state.freeformNotes = [];
     }
+    if (!Array.isArray(this.state.pendingDeletes)) {
+      this.state.pendingDeletes = [];
+    }
+  }
+
+  // --- ALMACENAMIENTO DURADERO (IndexedDB) ---
+  // localStorage es la copia rápida para arrancar al instante; IndexedDB guarda siempre y no tiene el
+  // límite de ~5 MB (los dibujos del lienzo lo llenan). Si localStorage se llena, se usa solo IndexedDB.
+  async hydrateFromIndexedDB() {
+    if (typeof NexusIDB === 'undefined' || !NexusIDB.available()) {
+      this._persistBlocked = false;
+      return;
+    }
+    let stored = null;
+    try {
+      const raw = await NexusIDB.get(this.STORAGE_KEY);
+      stored = raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      console.warn('No se pudo leer IndexedDB:', e);
+    }
+    const blocked = this._persistBlocked;
+    this._persistBlocked = false;
+    if (stored && (blocked || this.isoTime(stored.savedAt) > this.isoTime(this.state.savedAt))) {
+      // Lo capturado mientras se leía IndexedDB no se pierde
+      const capturedMeanwhile = blocked ? (this.state.pensadero || []) : [];
+      this.state = stored;
+      this.normalizeState();
+      for (const item of capturedMeanwhile) {
+        if (!this.state.pensadero.some(p => p.id === item.id)) this.state.pensadero.unshift(item);
+      }
+      this.captureEntitySignatures();
+      this.saveState();
+      this.render();
+    } else {
+      this.flushIndexedDBWrite(JSON.stringify(this.state));
+    }
+  }
+
+  writeLocalCache(json) {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, json);
+    } catch (e) {
+      // Lleno: se deja de usar la copia rápida; al arrancar se leerá IndexedDB
+      try { localStorage.removeItem(this.STORAGE_KEY); } catch (err) {}
+      const durable = typeof NexusIDB !== 'undefined' && NexusIDB.available();
+      if (!this._quotaWarned) {
+        this._quotaWarned = true;
+        this.showToast(durable
+          ? '💾 Tus datos ya no caben en el almacenamiento rápido; se guardan en IndexedDB.'
+          : '⚠️ No queda espacio para guardar en este navegador. Exporta un respaldo en Ajustes.');
+      }
+    }
+  }
+
+  scheduleIndexedDBWrite(json) {
+    if (typeof NexusIDB === 'undefined' || !NexusIDB.available()) return;
+    this._idbPendingJson = json;
+    if (this._idbTimer) return;
+    this._idbTimer = setTimeout(() => {
+      this._idbTimer = null;
+      this.flushIndexedDBWrite();
+    }, 300);
+  }
+
+  flushIndexedDBWrite(json = this._idbPendingJson) {
+    if (!json || typeof NexusIDB === 'undefined' || !NexusIDB.available()) return Promise.resolve();
+    this._idbPendingJson = null;
+    if (this._idbTimer) {
+      clearTimeout(this._idbTimer);
+      this._idbTimer = null;
+    }
+    return NexusIDB.set(this.STORAGE_KEY, json).catch(e => console.warn('No se pudo guardar en IndexedDB:', e));
+  }
+
+  // --- COLA DE BORRADOS ---
+  // Un borrado que no llega al servidor (sin red) se guarda y se repite al sincronizar; si no,
+  // el siguiente sync volvería a traer lo borrado.
+  deleteOnServer(kind, id) {
+    const paths = { pensadero: `/pensadero/${id}`, task: `/tasks/${id}`, project: `/projects/${id}` };
+    if (!id || !paths[kind]) return;
+    const enqueue = () => {
+      if (!Array.isArray(this.state.pendingDeletes)) this.state.pendingDeletes = [];
+      if (!this.isPendingDelete(kind, id)) this.state.pendingDeletes.push({ kind, id, at: new Date().toISOString() });
+      this.saveState();
+    };
+    if (!this.backendAvailable) return enqueue();
+    fetch(`${this.API_BASE}${paths[kind]}`, { method: 'DELETE' })
+      .then(r => { if (!r.ok && r.status !== 404) enqueue(); })
+      .catch(enqueue);
+  }
+
+  isPendingDelete(kind, id) {
+    return (this.state.pendingDeletes || []).some(d => d.kind === kind && d.id === id);
+  }
+
+  cancelPendingDelete(id) {
+    const before = (this.state.pendingDeletes || []).length;
+    this.state.pendingDeletes = (this.state.pendingDeletes || []).filter(d => d.id !== id);
+    if (this.state.pendingDeletes.length !== before) this.saveState();
+  }
+
+  async flushDeletionQueue() {
+    const paths = { pensadero: 'pensadero', task: 'tasks', project: 'projects' };
+    for (const d of [...(this.state.pendingDeletes || [])]) {
+      try {
+        const r = await fetch(`${this.API_BASE}/${paths[d.kind]}/${d.id}`, { method: 'DELETE' });
+        if (r.ok || r.status === 404) this.state.pendingDeletes = this.state.pendingDeletes.filter(x => x !== d);
+      } catch (e) {
+        break; // sin red: se reintenta en el próximo sync
+      }
+    }
     this.saveState();
+  }
+
+  // Sync incremental: solo lo creado o cambiado desde el último sync; completo cada 24 h
+  changedSince(list, since) {
+    if (!since) return list || [];
+    return (list || []).filter(x => x && (!x.updatedAt || this.isoTime(x.updatedAt) > since || this.isoTime(x.createdAt) > since));
   }
 
   // Solo quita copias del mismo texto y color creadas con menos de 10 min de diferencia (dobles envíos
@@ -479,8 +606,13 @@ class ProyectazoApp {
   saveState() {
     try {
       this.stampChangedEntities();
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
       this.captureEntitySignatures();
+      if (!this._persistBlocked) {
+        this.state.savedAt = new Date().toISOString();
+        const json = JSON.stringify(this.state);
+        this.writeLocalCache(json);
+        this.scheduleIndexedDBWrite(json);
+      }
       this.updateBadges();
     } catch (e) {
       console.error("Error al guardar estado:", e);
@@ -2115,7 +2247,7 @@ class ProyectazoApp {
 
     for (const remote of data.projects || []) {
       if (!remote || !remote.id) continue;
-      if (demoIds.has(remote.id)) continue;
+      if (demoIds.has(remote.id) || this.isPendingDelete('project', remote.id)) continue;
       let local = this.state.projects.find(p => p.id === remote.id);
       if (!local) {
         this.state.projects.push(remote);
@@ -2128,7 +2260,7 @@ class ProyectazoApp {
       }
       const byId = new Map((local.tasks || []).filter(t => t && t.id).map(t => [t.id, t]));
       for (const remoteTask of remote.tasks || []) {
-        if (!remoteTask || !remoteTask.id) continue;
+        if (!remoteTask || !remoteTask.id || this.isPendingDelete('task', remoteTask.id)) continue;
         const localTask = byId.get(remoteTask.id);
         if (!localTask) {
           if (!local.tasks) local.tasks = [];
@@ -2141,6 +2273,7 @@ class ProyectazoApp {
 
     for (const remote of data.pensadero || []) {
       if (!remote || !remote.id || remote.id.startsWith('pens_init_') || remote.id.startsWith('demo_')) continue;
+      if (this.isPendingDelete('pensadero', remote.id)) continue;
       const content = (remote.content || '').trim();
       if (!content) continue;
       const local = this.state.pensadero.find(item => item.id === remote.id);
@@ -2170,15 +2303,26 @@ class ProyectazoApp {
     const pillText = document.getElementById('sync-status-text');
     if (pillText) pillText.textContent = 'Sincronizando';
     try {
+      const syncStart = Date.now();
+      await this.flushDeletionQueue();
       const pull = await fetch(`${this.API_BASE}/sync`, { headers: { 'Accept': 'application/json' } });
-      if (pull.ok) this.mergeRemoteIntoLocal(await pull.json());
+      let remoteEmpty = false;
+      if (pull.ok) {
+        const remote = await pull.json();
+        remoteEmpty = !(remote.projects || []).length && !(remote.pensadero || []).length;
+        this.mergeRemoteIntoLocal(remote);
+      }
 
+      // Completo si nunca se hizo, cada 24 h o si el servidor viene vacío (BD nueva o restaurada)
+      const localHasData = (this.state.projects || []).length || (this.state.pensadero || []).length;
+      const full = !this.state.lastFullSyncAt || syncStart - this.state.lastFullSyncAt > 864e5 || (remoteEmpty && localHasData);
+      const since = full ? 0 : (this.state.lastSyncAt || 0);
       const payload = {
         deviceId: this.deviceId || localStorage.getItem('nexus_device_id'),
         deviceLabel: document.documentElement.dataset.form || 'unknown',
-        projects: this.state.projects || [],
-        inbox: this.state.inbox || [],
-        pensadero: this.state.pensadero || []
+        projects: this.changedSince(this.state.projects, since),
+        inbox: this.changedSince(this.state.inbox, since),
+        pensadero: this.changedSince(this.state.pensadero, since)
       };
       const res = await fetch(`${this.API_BASE}/sync`, {
         method: 'POST',
@@ -2188,6 +2332,8 @@ class ProyectazoApp {
       if (!res.ok) throw new Error('sync ' + res.status);
       const data = await res.json();
       this.mergeRemoteIntoLocal(data);
+      this.state.lastSyncAt = syncStart;
+      if (full) this.state.lastFullSyncAt = syncStart;
       this.saveState();
       this.render();
       if (pillText) pillText.textContent = 'En todos';
