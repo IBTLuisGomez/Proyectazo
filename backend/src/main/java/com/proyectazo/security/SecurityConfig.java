@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
@@ -42,6 +43,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1)
     public CommandLineRunner bootstrapAdminUser(AuthService authService,
                                                 @Value("${app.auth.admin-user:admin}") String adminUser,
                                                 @Value("${app.auth.admin-password:}") String adminPassword) {

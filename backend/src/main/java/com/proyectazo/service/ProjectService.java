@@ -5,6 +5,7 @@ import com.proyectazo.model.Project;
 import com.proyectazo.model.SessionLog;
 import com.proyectazo.repository.ProjectRepository;
 import com.proyectazo.repository.SessionLogRepository;
+import com.proyectazo.security.CurrentUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +27,19 @@ public class ProjectService {
 
     public List<Project> getAllProjects(String status) {
         if (status != null && !status.isBlank()) {
-            return projectRepository.findByStatusOrderByLastActivityDesc(status);
+            return projectRepository.findByOwnerIdAndStatusOrderByLastActivityDesc(CurrentUser.id(), status);
         }
-        return projectRepository.findAllByOrderByLastActivityDesc();
+        return projectRepository.findByOwnerIdOrderByLastActivityDesc(CurrentUser.id());
     }
 
     public Optional<Project> getProjectById(String id) {
-        return projectRepository.findById(id);
+        return projectRepository.findByIdAndOwnerId(id, CurrentUser.id());
+    }
+
+    /** Proyecto del usuario actual; uno ajeno se trata como inexistente. */
+    public Project requireOwned(String id) {
+        return projectRepository.findByIdAndOwnerId(id, CurrentUser.id())
+                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + id));
     }
 
     @Transactional
@@ -40,6 +47,12 @@ public class ProjectService {
         if (project.getId() == null || project.getId().isBlank()) {
             project.setId("p-" + UUID.randomUUID().toString().substring(0, 8));
         }
+        Long owner = CurrentUser.id();
+        projectRepository.findById(project.getId()).ifPresent(existing -> {
+            // Un id que ya usa otra cuenta no se puede sobrescribir: se crea con un id nuevo
+            if (!owner.equals(existing.getOwnerId())) project.setId("p-" + UUID.randomUUID().toString().substring(0, 8));
+        });
+        project.setOwnerId(owner);
         if (project.getCreatedAt() == null) {
             project.setCreatedAt(LocalDateTime.now());
         }
@@ -71,8 +84,7 @@ public class ProjectService {
 
     @Transactional
     public Project updateProject(String id, Project projectData) {
-        Project existing = projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + id));
+        Project existing = requireOwned(id);
 
         if (projectData.getName() != null) existing.setName(projectData.getName());
         if (projectData.getEmoji() != null) existing.setEmoji(projectData.getEmoji());
@@ -91,13 +103,12 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(String id) {
-        projectRepository.deleteById(id);
+        projectRepository.findByIdAndOwnerId(id, CurrentUser.id()).ifPresent(projectRepository::delete);
     }
 
     @Transactional
     public Project skipProjectWithoutGuilt(String id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + id));
+        Project project = requireOwned(id);
         project.setLastActivity(LocalDateTime.now());
         project.setUpdatedAt(LocalDateTime.now());
         return projectRepository.save(project);
@@ -105,8 +116,7 @@ public class ProjectService {
 
     @Transactional
     public SessionLog checkoutSession(String projectId, CheckoutRequest request) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + projectId));
+        Project project = requireOwned(projectId);
 
         SessionLog log = new SessionLog();
         log.setId("log-" + UUID.randomUUID().toString().substring(0, 8));

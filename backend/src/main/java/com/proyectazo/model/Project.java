@@ -1,5 +1,6 @@
 package com.proyectazo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +14,11 @@ public class Project {
     @Id
     @Column(length = 64)
     private String id;
+
+    /** Dueño (AppUser.id). Lo asigna el servidor; no se expone ni se acepta desde el cliente. */
+    @JsonIgnore
+    @Column(name = "owner_id")
+    private Long ownerId;
 
     @Column(nullable = false)
     private String name;
@@ -121,4 +127,7 @@ public class Project {
 
     public String getKeywords() { return keywords; }
     public void setKeywords(String keywords) { this.keywords = keywords; }
+
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }

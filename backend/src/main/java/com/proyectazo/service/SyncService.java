@@ -8,6 +8,7 @@ import com.proyectazo.model.Task;
 import com.proyectazo.repository.InboxItemRepository;
 import com.proyectazo.repository.PensaderoItemRepository;
 import com.proyectazo.repository.ProjectRepository;
+import com.proyectazo.security.CurrentUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +44,10 @@ public class SyncService {
     }
 
     public SyncDataDTO pullData() {
-        List<Project> projects = projectRepository.findAllByOrderByLastActivityDesc();
-        List<InboxItem> inbox = inboxItemRepository.findAllByOrderByCreatedAtDesc();
-        List<PensaderoItem> pensadero = pensaderoItemRepository.findAllByOrderByIsPinnedDescCreatedAtDesc();
+        Long owner = CurrentUser.id();
+        List<Project> projects = projectRepository.findByOwnerIdOrderByLastActivityDesc(owner);
+        List<InboxItem> inbox = inboxItemRepository.findByOwnerIdOrderByCreatedAtDesc(owner);
+        List<PensaderoItem> pensadero = pensaderoItemRepository.findByOwnerIdOrderByIsPinnedDescCreatedAtDesc(owner);
         return new SyncDataDTO(projects, inbox, pensadero);
     }
 
@@ -53,9 +55,11 @@ public class SyncService {
     public SyncDataDTO pushData(SyncDataDTO incoming) {
         if (incoming == null) return pullData();
         if (Boolean.TRUE.equals(incoming.getWipe())) {
-            projectRepository.deleteAll();
-            inboxItemRepository.deleteAll();
-            pensaderoItemRepository.deleteAll();
+            // Solo los datos de esta cuenta (antes deleteAll() borraba los de todos)
+            Long owner = CurrentUser.id();
+            projectRepository.deleteByOwnerId(owner);
+            inboxItemRepository.deleteByOwnerId(owner);
+            pensaderoItemRepository.deleteByOwnerId(owner);
             return pullData();
         }
 
@@ -70,6 +74,7 @@ public class SyncService {
             for (InboxItem item : incoming.getInbox()) {
                 if (item == null || item.getId() == null || item.getText() == null || item.getText().isBlank()) continue;
                 if (!inboxItemRepository.existsById(item.getId())) {
+                    item.setOwnerId(CurrentUser.id());
                     inboxItemRepository.save(item);
                 }
             }
@@ -92,6 +97,8 @@ public class SyncService {
             projectService.saveProject(incoming);
             return;
         }
+        // Un id de otra cuenta no se toca (saveProject le daría un id nuevo, duplicándolo en cada sync)
+        if (!CurrentUser.id().equals(existing.getOwnerId())) return;
 
         LocalDateTime incomingStamp = incoming.getUpdatedAt() != null ? incoming.getUpdatedAt() : incoming.getLastActivity();
         LocalDateTime existingStamp = existing.getUpdatedAt() != null ? existing.getUpdatedAt() : existing.getLastActivity();
@@ -155,15 +162,19 @@ public class SyncService {
     private void mergePensadero(PensaderoItem incoming) {
         if (incoming == null || incoming.getContent() == null || incoming.getContent().isBlank()) return;
         if (incoming.getId() != null && (incoming.getId().startsWith("pens_init_") || incoming.getId().startsWith("demo_"))) return;
+        Long owner = CurrentUser.id();
         if (incoming.getId() == null || incoming.getId().isBlank()) {
+            incoming.setOwnerId(owner);
             pensaderoItemRepository.save(incoming);
             return;
         }
         PensaderoItem existing = pensaderoItemRepository.findById(incoming.getId()).orElse(null);
         if (existing == null) {
+            incoming.setOwnerId(owner);
             pensaderoItemRepository.save(incoming);
             return;
         }
+        if (!owner.equals(existing.getOwnerId())) return; // de otra cuenta
         if (!isNewer(incoming.getUpdatedAt(), existing.getUpdatedAt()) && incoming.getUpdatedAt() != null) return;
         if (incoming.getUpdatedAt() == null && existing.getUpdatedAt() != null) return;
         existing.setContent(incoming.getContent());

@@ -6,6 +6,7 @@ import com.proyectazo.model.Task;
 import com.proyectazo.repository.InboxItemRepository;
 import com.proyectazo.repository.ProjectRepository;
 import com.proyectazo.repository.TaskRepository;
+import com.proyectazo.security.CurrentUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class InboxService {
     }
 
     public List<InboxItem> getAllItems() {
-        return inboxItemRepository.findAllByOrderByCreatedAtDesc();
+        return inboxItemRepository.findByOwnerIdOrderByCreatedAtDesc(CurrentUser.id());
     }
 
     @Transactional
@@ -36,20 +37,22 @@ public class InboxService {
         item.setId("inb-" + UUID.randomUUID().toString().substring(0, 8));
         item.setText(text);
         item.setCreatedAt(LocalDateTime.now());
+        item.setOwnerId(CurrentUser.id());
         return inboxItemRepository.save(item);
     }
 
     @Transactional
     public void deleteItem(String id) {
-        inboxItemRepository.deleteById(id);
+        inboxItemRepository.findByIdAndOwnerId(id, CurrentUser.id()).ifPresent(inboxItemRepository::delete);
     }
 
     @Transactional
     public Task convertToTask(String inboxId, String projectId) {
-        InboxItem item = inboxItemRepository.findById(inboxId)
+        Long owner = CurrentUser.id();
+        InboxItem item = inboxItemRepository.findByIdAndOwnerId(inboxId, owner)
                 .orElseThrow(() -> new IllegalArgumentException("Idea no encontrada: " + inboxId));
 
-        Project project = projectRepository.findById(projectId)
+        Project project = projectRepository.findByIdAndOwnerId(projectId, owner)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + projectId));
 
         Task task = new Task();

@@ -6,6 +6,7 @@ import com.proyectazo.model.Task;
 import com.proyectazo.repository.PensaderoItemRepository;
 import com.proyectazo.repository.ProjectRepository;
 import com.proyectazo.repository.TaskRepository;
+import com.proyectazo.security.CurrentUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,13 +34,23 @@ public class PensaderoService {
 
     public List<PensaderoItem> getAllItems(String category) {
         if (category != null && !category.isBlank()) {
-            return pensaderoItemRepository.findByCategoryOrderByCreatedAtDesc(category);
+            return pensaderoItemRepository.findByOwnerIdAndCategoryOrderByCreatedAtDesc(CurrentUser.id(), category);
         }
-        return pensaderoItemRepository.findAllByOrderByIsPinnedDescCreatedAtDesc();
+        return pensaderoItemRepository.findByOwnerIdOrderByIsPinnedDescCreatedAtDesc(CurrentUser.id());
+    }
+
+    private PensaderoItem requireOwned(String id) {
+        return pensaderoItemRepository.findByIdAndOwnerId(id, CurrentUser.id())
+                .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
     }
 
     @Transactional
     public PensaderoItem addItem(String content, String category) {
+        return addItem(content, category, null, null);
+    }
+
+    @Transactional
+    public PensaderoItem addItem(String content, String category, String amount, String contactName) {
         PensaderoItem item = new PensaderoItem();
         item.setId("pen-" + UUID.randomUUID().toString().substring(0, 8));
         item.setContent(content);
@@ -48,13 +59,15 @@ public class PensaderoService {
         item.setIsResolved(false);
         item.setCreatedAt(LocalDateTime.now());
         item.setUpdatedAt(LocalDateTime.now());
+        item.setOwnerId(CurrentUser.id());
+        if (amount != null && !amount.isBlank()) item.setAmount(amount);
+        if (contactName != null && !contactName.isBlank()) item.setContactName(contactName);
         return pensaderoItemRepository.save(item);
     }
 
     @Transactional
     public PensaderoItem updateItem(String id, PensaderoItem itemData) {
-        PensaderoItem existing = pensaderoItemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
+        PensaderoItem existing = requireOwned(id);
 
         if (itemData.getContent() != null) existing.setContent(itemData.getContent());
         if (itemData.getCategory() != null) existing.setCategory(itemData.getCategory());
@@ -69,8 +82,7 @@ public class PensaderoService {
 
     @Transactional
     public PensaderoItem togglePin(String id) {
-        PensaderoItem item = pensaderoItemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
+        PensaderoItem item = requireOwned(id);
         item.setIsPinned(!Boolean.TRUE.equals(item.getIsPinned()));
         item.setUpdatedAt(LocalDateTime.now());
         return pensaderoItemRepository.save(item);
@@ -78,16 +90,14 @@ public class PensaderoService {
 
     @Transactional
     public void deleteItem(String id) {
-        pensaderoItemRepository.deleteById(id);
+        pensaderoItemRepository.findByIdAndOwnerId(id, CurrentUser.id()).ifPresent(pensaderoItemRepository::delete);
     }
 
     @Transactional
     public Task convertToTask(String id, String projectId) {
-        PensaderoItem item = pensaderoItemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
+        PensaderoItem item = requireOwned(id);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + projectId));
+        Project project = projectService.requireOwned(projectId);
 
         Task task = new Task();
         task.setId("t-" + UUID.randomUUID().toString().substring(0, 8));
@@ -107,8 +117,7 @@ public class PensaderoService {
 
     @Transactional
     public Project convertToProject(String id, String projectName) {
-        PensaderoItem item = pensaderoItemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pensamiento no encontrado: " + id));
+        PensaderoItem item = requireOwned(id);
 
         Project project = new Project();
         project.setId("p-" + UUID.randomUUID().toString().substring(0, 8));

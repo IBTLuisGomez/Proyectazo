@@ -1,5 +1,6 @@
 package com.proyectazo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,6 +11,11 @@ public class InboxItem {
     @Id
     @Column(length = 64)
     private String id;
+
+    /** Dueño (AppUser.id). Lo asigna el servidor; no se expone ni se acepta desde el cliente. */
+    @JsonIgnore
+    @Column(name = "owner_id")
+    private Long ownerId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
@@ -37,4 +43,7 @@ public class InboxItem {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }

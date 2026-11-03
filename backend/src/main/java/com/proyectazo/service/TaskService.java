@@ -5,6 +5,7 @@ import com.proyectazo.model.Project;
 import com.proyectazo.model.Task;
 import com.proyectazo.repository.ProjectRepository;
 import com.proyectazo.repository.TaskRepository;
+import com.proyectazo.security.CurrentUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +25,26 @@ public class TaskService {
     }
 
     public List<Task> getTasksByProjectId(String projectId) {
+        requireOwnedProject(projectId);
         return taskRepository.findByProject_Id(projectId);
+    }
+
+    private Project requireOwnedProject(String projectId) {
+        return projectRepository.findByIdAndOwnerId(projectId, CurrentUser.id())
+                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + projectId));
+    }
+
+    /** Tarea de un proyecto del usuario actual; una ajena se trata como inexistente. */
+    private Task requireOwnedTask(String taskId) {
+        Long owner = CurrentUser.id();
+        return taskRepository.findById(taskId)
+                .filter(t -> t.getProject() != null && owner.equals(t.getProject().getOwnerId()))
+                .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada: " + taskId));
     }
 
     @Transactional
     public Task addTask(String projectId, Task task) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado: " + projectId));
+        Project project = requireOwnedProject(projectId);
 
         if (task.getId() == null || task.getId().isBlank()) {
             task.setId("t-" + UUID.randomUUID().toString().substring(0, 8));
@@ -52,8 +66,7 @@ public class TaskService {
 
     @Transactional
     public Task updateTask(String taskId, Task taskData) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada: " + taskId));
+        Task task = requireOwnedTask(taskId);
 
         if (taskData.getTitle() != null && !taskData.getTitle().isBlank()) {
             task.setTitle(taskData.getTitle().trim());
@@ -80,8 +93,7 @@ public class TaskService {
 
     @Transactional
     public Task moveTask(String taskId, TaskMoveRequest request) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada: " + taskId));
+        Task task = requireOwnedTask(taskId);
 
         String targetColumn = request.getColumn().toLowerCase();
 
@@ -100,6 +112,9 @@ public class TaskService {
 
     @Transactional
     public void deleteTask(String taskId) {
-        taskRepository.deleteById(taskId);
+        Long owner = CurrentUser.id();
+        taskRepository.findById(taskId)
+                .filter(t -> t.getProject() != null && owner.equals(t.getProject().getOwnerId()))
+                .ifPresent(taskRepository::delete);
     }
 }

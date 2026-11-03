@@ -33,6 +33,8 @@ Para generar una contraseña segura:
 [Convert]::ToBase64String((1..24 | ForEach-Object { Get-Random -Maximum 256 }))
 ```
 
+> Cada cuenta ve solo sus datos. Lo que ya existía antes de esta versión se asigna automáticamente al usuario inicial en el primer arranque.
+
 > El usuario inicial **solo se crea si no existe ninguno**. Cambiar `NEXUS_ADMIN_PASSWORD` después no cambia la contraseña: hazlo desde Ajustes → Avanzado → Seguridad.
 
 ### 1.3 Arrancar y comprobar
@@ -103,7 +105,6 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 | Tema | Qué implica |
 |---|---|
 | **Tamaño mínimo de texto** | Pasar de 9–11 px a 12–13 px. Mejora la lectura (TDAH, móvil) pero cambia el aspecto de toda la app |
-| **Datos por usuario** | Hoy todas las cuentas ven los mismos proyectos. Solo importa si vas a dar acceso a otras personas |
 | **Google Calendar / Gmail con OAuth** | Sustituye la contraseña de aplicación de Gmail. Necesito que crees en [Google Cloud Console](https://console.cloud.google.com/) un proyecto, la pantalla de consentimiento OAuth y unas credenciales "Aplicación web" con tu dominio como URI de redirección, y me pases el *Client ID* |
 
 ---

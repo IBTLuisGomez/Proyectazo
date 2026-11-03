@@ -2,6 +2,7 @@ package com.proyectazo.service;
 
 import com.proyectazo.model.SessionLog;
 import com.proyectazo.repository.SessionLogRepository;
+import com.proyectazo.security.CurrentUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +17,13 @@ public class SessionLogService {
     }
 
     public List<SessionLog> getLogs(String projectId, String query) {
+        Long owner = CurrentUser.id();
         if (query != null && !query.isBlank()) {
-            return sessionLogRepository.searchLogs(query.trim());
+            return sessionLogRepository.searchLogsByOwner(query.trim(), owner);
         }
         if (projectId != null && !projectId.isBlank()) {
-            return sessionLogRepository.findByProject_IdOrderByDateDesc(projectId);
+            return sessionLogRepository.findByProject_IdAndProject_OwnerIdOrderByDateDesc(projectId, owner);
         }
-        return sessionLogRepository.findAllByOrderByDateDesc();
+        return sessionLogRepository.findByProject_OwnerIdOrderByDateDesc(owner);
     }
 }

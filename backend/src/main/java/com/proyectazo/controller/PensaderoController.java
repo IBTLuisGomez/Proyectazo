@@ -34,7 +34,7 @@ public class PensaderoController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(pensaderoService.addItem(content.trim(), category));
+                .body(pensaderoService.addItem(content.trim(), category, payload.get("amount"), payload.get("contactName")));
     }
 
     @PutMapping("/{id}")

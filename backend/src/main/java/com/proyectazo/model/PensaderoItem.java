@@ -1,5 +1,6 @@
 package com.proyectazo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,6 +11,11 @@ public class PensaderoItem {
     @Id
     @Column(length = 64)
     private String id;
+
+    /** Dueño (AppUser.id). Lo asigna el servidor; no se expone ni se acepta desde el cliente. */
+    @JsonIgnore
+    @Column(name = "owner_id")
+    private Long ownerId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
@@ -89,4 +95,7 @@ public class PensaderoItem {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }
