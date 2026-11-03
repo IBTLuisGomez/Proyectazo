@@ -133,6 +133,7 @@ class ProyectazoApp {
       this.state.settings = { sound: true, vibration: true, theme: 'theme-dark-soft', userName: 'Usuario' };
     }
     this.migrateLegacyRoutingKeywords();
+    this.migrateLegacyCategories();
     if (!this.state.inbox) {
       this.state.inbox = [];
     }
@@ -738,6 +739,9 @@ class ProyectazoApp {
 
     // Initialize Splash Intro on mobile if not seen yet
     setTimeout(() => this.initSplash(), 100);
+
+    // Texto compartido desde otra app o acceso directo de captura
+    setTimeout(() => this.handleLaunchIntent(), 300);
 
     // Inicializar botón flotante Nexus IA arrastrable
     setTimeout(() => this.initDraggableNexusFab(), 120);

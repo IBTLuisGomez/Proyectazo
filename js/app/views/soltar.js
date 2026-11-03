@@ -143,6 +143,7 @@ defineAppMethods({
 
         <!-- FILTRO DE HUMOS & LISTA DE PENSAMIENTOS ABAJO -->
         <div class="flex flex-col space-y-3 pt-2" id="pensadero-deck">
+          ${this.renderQuickReviewPrompt()}
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-1.5 overflow-x-auto py-1 text-xs">
               <button onclick="app.filterPensaderoSmoke('all')" class="px-3 py-1 rounded-xl font-semibold transition ${activeFilter === 'all' ? 'bg-slate-700 text-white shadow' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}">
@@ -158,7 +159,7 @@ defineAppMethods({
                 🟡 Idea (${goldCount})
               </button>
               <button onclick="app.filterPensaderoSmoke('humo_azul')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_azul' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-blue-300'}">
-                🔵 Hacer (${blueCount})
+                🔵 Foco y ☑️ tareas (${blueCount})
               </button>
               <button onclick="app.filterPensaderoSmoke('humo_verde')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_verde' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-emerald-300'}">
                 🟢 Hábitos (${greenCount})
@@ -1354,7 +1355,8 @@ defineAppMethods({
             <span class="text-[10px] font-mono theme-text-muted">${new Date(item.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
           </div>
           <p class="text-sm font-semibold leading-relaxed">${this.escapeHtml(item.content)}</p>
-          ${item.amount ? `<p class="text-xs text-orange-400 font-mono mt-1">💳 Monto registrado: $${this.escapeHtml(item.amount)} USD</p>` : ''}
+          ${this.captureChips(item)}
+          ${item.amount ? `<p class="text-xs text-orange-400 font-mono mt-1">💳 Importe: $${this.escapeHtml(item.amount)}</p>` : ''}
           ${item.streakCount ? `<p class="text-xs text-emerald-400 font-mono mt-1">🔥 Racha actual: ${item.streakCount} días consecutivos</p>` : ''}
           ${item.contactName ? `<p class="text-xs text-purple-300 font-mono mt-1">👤 Contacto: ${this.escapeHtml(item.contactName)}</p>` : ''}
           ${item.hibernatedUntil ? `<p class="text-xs text-slate-400 font-mono mt-1">❄️ Hibernado hasta: ${new Date(item.hibernatedUntil).toLocaleDateString('es-ES')}</p>` : ''}

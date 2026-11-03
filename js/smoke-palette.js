@@ -64,8 +64,8 @@ const SMOKE_PALETTE = {
     shader: { turbulence: 0.4, pulse: 0.0, density: 1.2, dissipation: 0.0, satellites: 0.0, sink: 0.0, expansion: 0.0, flash: 0.2 }
   },
   humo_azul: {
-    name: 'Hacer',
-    title: 'Hacer y Deep Work',
+    name: 'Foco profundo',
+    title: 'Deep Work y concentración',
     desc: 'Sesiones de enfoque profundo, código, arquitectura, resolución lógica y escritura técnica.',
     hex: '#3B82F6',
     vec3: [0.23, 0.51, 0.96],
@@ -133,18 +133,19 @@ const SMOKE_PALETTE = {
     icon: '🔘',
     shader: { turbulence: 0.05, pulse: 0.0, density: 0.5, dissipation: 0.4, satellites: 0.0, sink: 1.0, expansion: 0.0, flash: 0.0 }
   },
+  // Antes era una copia de humo_azul (mismo nombre, color y categoría): no se distinguían
   humo_tarea: {
-    name: 'Hacer',
-    title: 'Hacer y Deep Work',
-    desc: 'Acciones pendientes y tareas a ejecutar.',
-    hex: '#3B82F6',
-    vec3: [0.23, 0.51, 0.96],
-    coreVec3: [0.1, 0.25, 0.65],
-    category: 'humo_azul',
-    module: 'calendario_deepwork',
-    cognitiveWeight: 'pesado',
-    badgeClass: 'bg-blue-500/15 text-blue-300 border-blue-500/40',
-    icon: '🔵',
-    shader: { turbulence: 0.1, pulse: 0.0, density: 1.1, dissipation: 0.0, satellites: 0.0, sink: 0.0, expansion: 0.0, flash: 0.0 }
+    name: 'Tarea',
+    title: 'Tarea pendiente',
+    desc: 'Acciones concretas por hacer: trámites, envíos, recados.',
+    hex: '#6366F1',
+    vec3: [0.39, 0.40, 0.95],
+    coreVec3: [0.2, 0.2, 0.6],
+    category: 'humo_tarea',
+    module: 'tareas',
+    cognitiveWeight: 'medio',
+    badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/40',
+    icon: '☑️',
+    shader: { turbulence: 0.2, pulse: 0.1, density: 1.0, dissipation: 0.05, satellites: 0.0, sink: 0.0, expansion: 0.0, flash: 0.1 }
   }
 };

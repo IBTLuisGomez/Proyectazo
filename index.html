@@ -1815,6 +1815,20 @@
     </div>
   </div>
 
+  <!-- MODAL: REPASO RÁPIDO DE LO SIN CLASIFICAR -->
+  <div id="modal-quick-review" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="theme-card border rounded-3xl max-w-md w-full max-h-[92dvh] overflow-y-auto p-6 shadow-2xl fade-enter space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-display font-bold">🧹 Repaso rápido</h3>
+        <div class="flex items-center gap-3">
+          <span id="quick-review-progress" class="text-[11px] font-mono theme-text-muted"></span>
+          <button type="button" onclick="app.finishQuickReview()" class="text-xs theme-text-muted hover:text-white">Terminar</button>
+        </div>
+      </div>
+      <div id="quick-review-body" class="space-y-3 text-sm"></div>
+    </div>
+  </div>
+
   <!-- MODAL: GUÍA DE BIENVENIDA (3 pasos) -->
   <div id="modal-onboarding" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="theme-card border rounded-3xl max-w-md w-full max-h-[92dvh] overflow-y-auto p-6 shadow-2xl fade-enter space-y-4">

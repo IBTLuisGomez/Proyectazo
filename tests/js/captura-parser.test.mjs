@@ -66,3 +66,16 @@ test('interpreta comandos, proyecto, importe, persona y fecha', () => {
   assert.equal(m.getHours(), 17);
   assert.equal(P.parseIdea('sin fecha', now).dueAt, null);
 });
+
+test('la paleta no repite nombres, colores ni claves', () => {
+  const src = readFileSync(new URL('../../js/smoke-palette.js', import.meta.url), 'utf8');
+  const palette = new Function(src + '; return SMOKE_PALETTE;')();
+  const entries = Object.entries(palette);
+  const names = entries.map(([, m]) => m.name);
+  const hexes = entries.map(([, m]) => m.hex);
+  assert.equal(new Set(names).size, names.length, 'nombres repetidos: ' + names);
+  assert.equal(new Set(hexes).size, hexes.length, 'colores repetidos: ' + hexes);
+  for (const [key, m] of entries) assert.equal(m.category, key, `${key}.category`);
+  // Cada categoría de las reglas existe en la paleta
+  for (const c of require('../../js/clasificador-reglas.js').categories) assert.ok(palette[c.category], c.category);
+});

@@ -449,6 +449,7 @@ defineAppMethods({
       </div>
 
       ${this.renderStalledProjectsCard()}
+      <div class="mb-5">${this.renderQuickReviewPrompt()}</div>
 
       <!-- HERO CARD: Sugerencia del Día (Elimina la decisión de inicio) -->
       ${heroProject ? `

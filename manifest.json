@@ -8,42 +8,94 @@
   "background_color": "#070a10",
   "theme_color": "#10b981",
   "orientation": "any",
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "shortcuts": [
+    {
+      "name": "💭 Soltar una idea",
+      "short_name": "Soltar",
+      "url": "./index.html?capturar=1",
+      "description": "Captura rápida: escribe o dicta y listo",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "🔴 Algo urgente",
+      "short_name": "Urgente",
+      "url": "./index.html?capturar=urgente",
+      "description": "Captura marcada como urgente",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
     {
       "name": "🎙️ Nexus IA Directo",
       "short_name": "Nexus IA",
       "url": "./index.html#nexus-ai",
       "description": "Acceso inmediato por voz y comandos a Nexus IA",
-      "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "⚡ Widget Dual (IA + Orbe)",
       "short_name": "Dual IA/Orbe",
       "url": "./index.html#dual-widget",
       "description": "Estación de acceso rápido dual: Nexus IA y Orbe 3D",
-      "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "🔮 Vaciado al Orbe (Gadget)",
       "short_name": "Vaciado Orbe",
       "url": "./index.html#gadget",
       "description": "Vaciado mental rápido al Orbe de Cristal Nexus",
-      "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "🏠 Hoy & Foco",
       "short_name": "Hoy",
       "url": "./index.html#hoy",
       "description": "Ver tareas del día y sugerencia de arranque",
-      "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "🎨 Lienzo Freeform",
       "short_name": "Freeform",
       "url": "./index.html#freeform",
       "description": "Dibujo libre, bocetos y notas adhesivas",
-      "icons": [{ "src": "./assets/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "icons": [
@@ -76,5 +128,14 @@
       "sizes": "any",
       "type": "image/svg+xml"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

@@ -146,6 +146,183 @@ defineAppMethods({
     if (this.isCloudAIEnabled()) await this.nexusClassifyNewThought(itemId, item.content);
   },
 
+  // Chips de la tarjeta: por qué tiene ese color, cuántas veces volvió y cuándo avisa
+  captureChips(item) {
+    const chips = [];
+    const by = item.classifiedBy && item.classifiedBy.by;
+    if (by === 'local' && item.classifiedBy.reasons && item.classifiedBy.reasons.length) {
+      chips.push(`🧠 por «${item.classifiedBy.reasons.map(r => this.escapeHtml(r)).join('», «')}»`);
+    } else if (by === 'usuario') {
+      chips.push('✋ elegido por ti');
+    } else if (by === 'gemini') {
+      chips.push('☁️ sugerido por IA');
+    }
+    if (item.count > 1) chips.push(`💭 pensado ${item.count} veces`);
+    if (item.dueAt) chips.push(`⏰ ${new Date(item.dueAt).toLocaleString('es-ES', { weekday: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`);
+    if (!chips.length) return '';
+    return `<div class="flex flex-wrap gap-1.5 mt-1.5">${chips.map(c => `<span class="text-[11px] px-2 py-0.5 rounded-full theme-card-subtle border theme-border theme-text-muted">${c}</span>`).join('')}</div>`;
+  },
+
+  // Categorías que ya no existen (p. ej. "chispa" de la antigua captura rápida) vuelven a Sin clasificar
+  migrateLegacyCategories() {
+    let changed = false;
+    for (const item of (this.state.pensadero || [])) {
+      if (item && item.category && !SMOKE_PALETTE[item.category]) {
+        item.category = 'humo_general';
+        changed = true;
+      }
+    }
+    if (changed) this.saveState();
+  },
+
+  // Entradas desde fuera: "Compartir" de otras apps (Share Target) y accesos directos del icono
+  handleLaunchIntent() {
+    const params = new URLSearchParams(window.location.search);
+    const shared = ['title', 'text', 'url'].map(k => (params.get(k) || '').trim()).filter(Boolean);
+    const mode = params.get('capturar');
+    if (!shared.length && !mode) return;
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+
+    if (shared.length) {
+      // Evitar "título — título" cuando la app de origen repite el texto
+      const unique = shared.filter((v, i) => shared.findIndex(o => o === v || o.includes(v)) === i);
+      this.captureThought(unique.join(' — '), { source: 'compartir', skipSplit: true });
+      this.navigate('soltar');
+      return;
+    }
+    this.openQuickCapture();
+    if (mode === 'urgente') {
+      const field = document.getElementById('quick-capture-text');
+      if (field) field.value = 'urgente: ';
+    }
+  },
+
+  // --- REPASO RÁPIDO: ordenar lo que quedó sin clasificar, de a uno ---
+  pendingReviewItems() {
+    return (this.state.pensadero || [])
+      .filter(p => p && !p.isResolved && (p.category === 'humo_general' || !p.category))
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  },
+
+  renderQuickReviewPrompt() {
+    const n = this.pendingReviewItems().length;
+    if (n < 3) return '';
+    const minutes = Math.max(1, Math.round(Math.min(n, 10) * 0.3));
+    return `
+      <button type="button" onclick="app.startQuickReview()" class="w-full p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 text-left transition flex items-center justify-between gap-3">
+        <span><strong>🧹 Repaso de ${minutes} min</strong> <span class="theme-text-muted">· ${n} pensamientos sin clasificar, de a uno</span></span>
+        <span class="text-cyan-300 font-bold shrink-0">Empezar →</span>
+      </button>`;
+  },
+
+  startQuickReview() {
+    this._review = { queue: this.pendingReviewItems().slice(0, 10).map(p => p.id), index: 0, done: 0 };
+    if (!this._review.queue.length) {
+      this.showToast('✨ No hay nada sin clasificar. Mente despejada.');
+      return;
+    }
+    if (!this._reviewKeys) {
+      this._reviewKeys = (e) => {
+        const modal = document.getElementById('modal-quick-review');
+        if (!modal || modal.classList.contains('hidden') || /input|textarea|select/i.test(e.target.tagName)) return;
+        const keys = this.reviewCategories();
+        const n = parseInt(e.key, 10);
+        if (n >= 1 && n <= keys.length) { e.preventDefault(); this.reviewChoose(keys[n - 1]); }
+        else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); this.reviewSkip(); }
+        else if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); this.reviewResolve(); }
+      };
+      document.addEventListener('keydown', this._reviewKeys);
+    }
+    this.renderReviewCard();
+    this.openModal('modal-quick-review');
+  },
+
+  reviewCategories() {
+    return Object.keys(SMOKE_PALETTE).filter(k => k !== 'humo_general');
+  },
+
+  renderReviewCard() {
+    const r = this._review;
+    const body = document.getElementById('quick-review-body');
+    if (!r || !body) return;
+    const item = (this.state.pensadero || []).find(p => p.id === r.queue[r.index]);
+    if (!item) return this.finishQuickReview();
+    const suggestion = CapturaParser.classifyLocal(item.content, { memory: this.state.settings?.classifierMemory });
+    const project = this.findProjectForText(item.content);
+    document.getElementById('quick-review-progress').textContent = `${r.index + 1} de ${r.queue.length}`;
+    body.innerHTML = `
+      <p class="text-lg font-semibold leading-snug">${this.escapeHtml(item.content)}</p>
+      <p class="text-[11px] theme-text-muted">Toca un color (o pulsa 1–${this.reviewCategories().length}). Lo que elijas lo aprenderé para la próxima.</p>
+      <div class="grid grid-cols-3 gap-2">
+        ${this.reviewCategories().map((k, i) => {
+          const m = SMOKE_PALETTE[k];
+          const hint = suggestion.matched && suggestion.category === k ? ' ring-2 ring-cyan-400' : '';
+          return `<button type="button" onclick="app.reviewChoose('${k}')" class="p-2 rounded-xl border ${m.badgeClass}${hint} text-xs font-semibold text-left transition active:scale-95">
+            <span class="theme-text-muted font-mono">${i + 1}</span> ${m.icon} ${m.name}</button>`;
+        }).join('')}
+      </div>
+      ${project ? `<button type="button" onclick="app.reviewSendToProject('${project.id}')" class="w-full py-2 rounded-xl border theme-border text-xs font-semibold">🚀 Es de ${this.escapeHtml(project.name)}: mandarlo a su Buzón</button>` : ''}
+      <div class="flex gap-2">
+        <button type="button" onclick="app.reviewResolve()" class="flex-1 py-2 rounded-xl border theme-border text-xs font-semibold">✓ Ya no importa</button>
+        <button type="button" onclick="app.reviewSkip()" class="flex-1 py-2 rounded-xl border theme-border text-xs font-semibold">Saltar →</button>
+      </div>`;
+  },
+
+  advanceReview(counted) {
+    if (counted) this._review.done++;
+    this._review.index++;
+    if (this._review.index >= this._review.queue.length) this.finishQuickReview();
+    else this.renderReviewCard();
+  },
+
+  reviewChoose(category) {
+    const id = this._review && this._review.queue[this._review.index];
+    if (!id) return;
+    this.changeThoughtCategory(id, category); // corrección del usuario: se aprende
+    this.advanceReview(true);
+  },
+
+  reviewSendToProject(projectId) {
+    const id = this._review && this._review.queue[this._review.index];
+    if (!id) return;
+    this.executeDispatchThought(id, projectId, 'buzon');
+    this.closeModal('modal-dispatch-thought');
+    this.openModal('modal-quick-review');
+    this.advanceReview(true);
+  },
+
+  reviewResolve() {
+    const id = this._review && this._review.queue[this._review.index];
+    const item = (this.state.pensadero || []).find(p => p.id === id);
+    if (!item) return;
+    item.isResolved = true;
+    item.updatedAt = new Date().toISOString();
+    this.saveState();
+    if (this.backendAvailable) {
+      fetch(`${this.API_BASE}/pensadero/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isResolved: true })
+      }).catch(() => {});
+    }
+    this.advanceReview(true);
+  },
+
+  reviewSkip() {
+    this.advanceReview(false);
+  },
+
+  finishQuickReview() {
+    const done = this._review ? this._review.done : 0;
+    this._review = null;
+    this.closeModal('modal-quick-review');
+    this.render();
+    if (done) {
+      this.triggerDopamineReward();
+      this.showToast(`🧹 Repaso hecho: ${done} pensamiento(s) en su sitio. Menos ruido en la cabeza.`);
+    }
+  },
+
   isCloudAIEnabled() {
     return this.state.settings?.cloudAI === true;
   },
