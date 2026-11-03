@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexus-orb-v3.5';
+const CACHE_NAME = 'nexus-orb-v3.6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,6 +8,20 @@ const ASSETS_TO_CACHE = [
   './js/smoke-palette.js',
   './js/orb-shader-engine.js',
   './js/app.js',
+  './js/app/views/ahora-hoy.js',
+  './js/app/views/soltar.js',
+  './js/app/views/mas.js',
+  './js/app/views/hacer.js',
+  './js/app/features/modos-foco.js',
+  './js/app/features/ia-nexus.js',
+  './js/app/features/correo-push.js',
+  './js/app/views/bitacora-radar.js',
+  './js/app/features/crud.js',
+  './js/app/views/tareas.js',
+  './js/app/features/temporizador.js',
+  './js/app/ui/modales-ajustes.js',
+  './js/app/views/lienzo.js',
+  './js/app/features/movil.js',
   './assets/nexus_n.jpg',
   './assets/nexus_n_banner.jpg',
   './assets/nexus_core.jpg',

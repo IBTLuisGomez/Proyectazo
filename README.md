@@ -103,7 +103,7 @@ La imagen de nginx lo recompila sola en `docker compose build`.
 cd backend && ./mvnw test          # seguridad, CORS, wipe y límite WIP
 python -m pytest -q tests          # microservicio Nexus sin Gemini
 ```
-GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) ejecuta ambos, compila el CSS, valida la sintaxis de `js/*.js` y construye las imágenes Docker.
+GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) ejecuta ambos, compila el CSS, valida la sintaxis de todo `js/` y construye las imágenes Docker.
 
 ### Actualización en Caliente del Frontend
 ```powershell

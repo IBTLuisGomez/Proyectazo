@@ -5,7 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 HTML = (ROOT / "index.html").read_text(encoding="utf-8")
-APP_JS = (ROOT / "js" / "app.js").read_text(encoding="utf-8")
+# La clase está repartida entre js/app.js y los módulos de js/app/
+APP_JS = "\n".join(p.read_text(encoding="utf-8") for p in [ROOT / "js" / "app.js", *sorted((ROOT / "js" / "app").rglob("*.js"))])
 
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 

@@ -44,7 +44,7 @@ jobs:
       - run: npm ci
       - run: npm run build:css
       - name: Comprobar sintaxis JS
-        run: for f in js/*.js; do node --check "$f"; done
+        run: find js -name '*.js' -print0 | xargs -0 -n1 node --check
 
   docker:
     name: Build de imágenes
