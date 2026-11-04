@@ -184,6 +184,8 @@ public class PushNotificationService {
             throw new IllegalArgumentException("La fecha del recordatorio es demasiado lejana.");
         }
         String safeTitle = title.length() > 255 ? title.substring(0, 255) : title;
+        // Un aviso pendiente por tarea: cambiar la fecha o "Mañana" lo mueve en vez de duplicarlo
+        if (!isBlank(taskId)) reminderRepository.deleteByUserIdAndTaskIdAndSentAtIsNull(user.getId(), taskId);
         return reminderRepository.save(new PushReminder(user.getId(), safeTitle, body, taskId, sendAt));
     }
 

@@ -153,6 +153,22 @@ class PushIntegrationTest {
     }
 
     @Test
+    void reschedulingATaskReplacesItsPendingReminder() throws Exception {
+        long soon = System.currentTimeMillis() + 3_600_000;
+        long later = soon + 86_400_000;
+        for (long at : new long[] { soon, later }) {
+            mvc.perform(post("/api/push/reminders").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"title\":\"Dentista\",\"taskId\":\"t-den\",\"sendAt\":" + at + "}"))
+                    .andExpect(status().isCreated());
+        }
+        String pending = mvc.perform(get("/api/push/reminders").header("Authorization", token))
+                .andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        com.fasterxml.jackson.databind.JsonNode list = mapper.readTree(pending);
+        assertEquals(1, list.size(), "un solo aviso pendiente por tarea");
+        assertEquals(later, list.get(0).get("sendAt").asLong() / 1000 * 1000, 1000);
+    }
+
+    @Test
     void reminderValidation() throws Exception {
         mvc.perform(post("/api/push/reminders").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"\",\"sendAt\":" + System.currentTimeMillis() + "}"))

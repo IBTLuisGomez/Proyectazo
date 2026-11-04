@@ -47,7 +47,7 @@ Abre `http://localhost:8080` (o el `PORT` de tu `.env`).
 
 ---
 
-## 2. Probar en un navegador real (15 minutos)
+## 2. Probar en un navegador real (20 minutos)
 
 Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegador sin pantalla), pero conviene una vuelta tuya:
 
@@ -60,6 +60,23 @@ Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegado
 - [ ] Abrir el **Baúl**: la primera vez pide crear el PIN.
 - [ ] Modo Zen: al acabar el sprint llega la notificación y "Cerrar sesión" abre el Checkout.
 - [ ] Desde otro dispositivo (móvil): login y ver que los datos se sincronizan.
+
+**Captura y clasificación**
+- [ ] Soltar `- Comprar pan` y `- Llamar a Ana` en dos líneas: se separan en 2 tarjetas (con botón **Unir**).
+- [ ] `urgente: pagar la luz mañana a las 9`: queda en 🔴 Urgente con aviso para mañana.
+- [ ] `para <tu proyecto>: revisar contrato`: crea la tarea directamente en ese proyecto.
+- [ ] Cambiar a mano el color de un pensamiento y soltar otro parecido: debe recordar tu elección.
+- [ ] Con 3+ sin clasificar aparece **🧹 Repaso**: ordenarlos con las teclas 1–9.
+- [ ] Ajustes → "Usar IA en la nube" está **apagado** por defecto (todo se clasifica en el dispositivo).
+
+**Tarjetas, fechas y tema**
+- [ ] Cada tarjeta muestra 3 acciones y **⋯**; el menú se cierra al tocar fuera.
+- [ ] Crear una tarea con **Para cuándo** hoy: aparece en Hoy → **📅 Para hoy**; probar **Mañana**.
+- [ ] Tema claro (Ajustes → Versión Clara): revisar que los textos se lean bien; dime cuáles no.
+- [ ] Android con la app instalada: **Compartir → Nexus Orb** desde el navegador guarda el enlace.
+
+**Sin red**
+- [ ] Modo avión, borrar un pensamiento, volver a conectar: no debe reaparecer.
 
 ### 2.1 Datos que ya tenías
 - Lo guardado en cada navegador se sube al servidor **la primera vez que inicias sesión** en ese dispositivo. Abre la app en cada uno al menos una vez.
@@ -104,7 +121,8 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 
 | Tema | Qué implica |
 |---|---|
-| **Tamaño mínimo de texto** | Pasar de 9–11 px a 12–13 px. Mejora la lectura (TDAH, móvil) pero cambia el aspecto de toda la app |
+| **Migraciones Flyway** | Necesito el esquema real de tu Postgres: `docker exec nexus-postgres pg_dump -s -U <POSTGRES_USER> <POSTGRES_DB>` (solo estructura, sin datos) |
+| **Voz en iOS/Firefox** | No tienen reconocimiento de voz en el navegador. Requiere transcribir en el servidor (Whisper), que pide ~1–2 GB de RAM más |
 | **Google Calendar / Gmail con OAuth** | Sustituye la contraseña de aplicación de Gmail. Necesito que crees en [Google Cloud Console](https://console.cloud.google.com/) un proyecto, la pantalla de consentimiento OAuth y unas credenciales "Aplicación web" con tu dominio como URI de redirección, y me pases el *Client ID* |
 
 ---
@@ -115,7 +133,13 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 - `data/` y `backend/data/` (bases H2 antiguas): siguen en disco pero fuera de git. El backend en Docker usa Postgres.
 - `archive/` guarda la versión v1.1 e `Index.Gemini.html` por si quieres consultarlas; se pueden borrar.
 
-## 6. A tener en cuenta (seguridad)
+## 6. A tener en cuenta
+
+- **Memoria del equipo**: durante el desarrollo había solo ~260 MB libres de 7,5 GB. Docker con Postgres, backend, Nexus y nginx necesita ~1–1,5 GB; cierra lo que no uses antes de `docker compose up`. Para los tests del backend en este equipo: `MAVEN_OPTS="-Xmx256m" ./mvnw test -DargLine="-Xmx320m"`.
+- **Clasificador**: las reglas están en `js/clasificador-reglas.js` (las usan el navegador y Nexus). Para añadir palabras, edítalas ahí y ejecuta los tests (`node --test tests/js/*.test.mjs` y `pytest tests`).
+- **Contraste**: `assets/contraste.css` se genera con `python scripts/gen-contraste.py`; no lo edites a mano.
+
+### Seguridad
 
 - La **contraseña de aplicación de Gmail** se guarda en texto plano en el disco del servicio Nexus (`data/google_mail_config.json` dentro del contenedor). Está protegida por el login, pero OAuth (punto 4) es lo correcto.
 - La **clave privada VAPID** se guarda en la base de datos si no la fijas en `.env`. Haz copias de seguridad de la BD.

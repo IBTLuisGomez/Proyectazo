@@ -499,6 +499,8 @@ defineAppMethods({
     task.isBureaucratic = isBureaucratic;
     task.notes = notes || null;
     task.codeSnippet = codeSnippet || null;
+    // Fecha nueva → mover el aviso push (el servidor reemplaza el pendiente de esta tarea)
+    if (dueAt && dueAt !== task.dueAt && this.backendAvailable) this.scheduleBackgroundPush(task.id, title, dueAt).catch(() => {});
     task.dueAt = dueAt;
     task.updatedAt = new Date().toISOString();
 

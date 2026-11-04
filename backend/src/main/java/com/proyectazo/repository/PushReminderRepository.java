@@ -12,4 +12,7 @@ public interface PushReminderRepository extends JpaRepository<PushReminder, Long
     List<PushReminder> findBySentAtIsNullAndSendAtLessThanEqual(LocalDateTime now);
 
     List<PushReminder> findByUserIdAndSentAtIsNullOrderBySendAtAsc(Long userId);
+
+    @org.springframework.transaction.annotation.Transactional
+    long deleteByUserIdAndTaskIdAndSentAtIsNull(Long userId, String taskId);
 }
