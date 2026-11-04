@@ -86,6 +86,7 @@ public class TaskService {
         if (taskData.getCodeSnippet() != null) task.setCodeSnippet(taskData.getCodeSnippet());
         if (taskData.getIsBureaucratic() != null) task.setIsBureaucratic(taskData.getIsBureaucratic());
         if (taskData.getIsMicroStep() != null) task.setIsMicroStep(taskData.getIsMicroStep());
+        if (taskData.getDueAt() != null) task.setDueAt(taskData.getDueAt());
 
         task.setUpdatedAt(LocalDateTime.now());
         return taskRepository.save(task);

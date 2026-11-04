@@ -157,6 +157,8 @@ public class SyncService {
         if (source.getCodeSnippet() != null) target.setCodeSnippet(source.getCodeSnippet());
         if (source.getIsBureaucratic() != null) target.setIsBureaucratic(source.getIsBureaucratic());
         if (source.getIsMicroStep() != null) target.setIsMicroStep(source.getIsMicroStep());
+        // La versión más nueva manda también para quitar la fecha
+        target.setDueAt(source.getDueAt());
     }
 
     private void mergePensadero(PensaderoItem incoming) {

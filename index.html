@@ -2448,6 +2448,11 @@
           </div>
 
           <div>
+            <label for="edit-task-due" class="block text-xs font-bold mb-1">📅 Para cuándo (opcional)</label>
+            <input type="datetime-local" id="edit-task-due" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+
+          <div>
             <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold">
               <input type="checkbox" id="edit-task-is-bureaucratic" class="rounded accent-amber-500 w-4 h-4" />
               <span>📑 Tarea Administrativa / Burocrática (Otorga doble dopamina al completarse)</span>
@@ -2530,6 +2535,11 @@
           </div>
 
           <div>
+            <label for="add-task-due" class="block text-xs font-bold mb-1">📅 Para cuándo (opcional)</label>
+            <input type="datetime-local" id="add-task-due" class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+
+          <div>
             <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold">
               <input type="checkbox" id="add-task-is-bureaucratic" class="rounded accent-amber-500 w-4 h-4" />
               <span>📑 Tarea Administrativa / Burocrática</span>
@@ -2579,5 +2589,6 @@
   <script src="js/app/features/movil.js"></script>
   <script src="js/app/features/captura.js"></script>
   <script src="js/app/ui/contraste.js"></script>
+  <script src="js/app/features/fechas.js"></script>
 </body>
 </html>

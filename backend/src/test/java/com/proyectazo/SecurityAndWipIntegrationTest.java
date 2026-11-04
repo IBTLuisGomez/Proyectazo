@@ -198,6 +198,34 @@ class SecurityAndWipIntegrationTest {
     }
 
     @Test
+    void taskDueDateSurvivesCreateUpdateAndSync() throws Exception {
+        mvc.perform(post("/api/projects").header("Authorization", bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"p-due\",\"name\":\"Fechas\"}"))
+                .andExpect(status().isCreated());
+        mvc.perform(post("/api/projects/p-due/tasks").header("Authorization", bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"t-due\",\"title\":\"Dentista\",\"column\":\"buzon\",\"dueAt\":\"2026-11-05T17:00:00.000Z\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.dueAt").exists());
+        mvc.perform(put("/api/tasks/t-due").header("Authorization", bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dueAt\":\"2026-11-06T09:00:00.000Z\"}"))
+                .andExpect(status().isOk());
+        String afterPut = mvc.perform(get("/api/projects/p-due/tasks").header("Authorization", bearer()))
+                .andReturn().getResponse().getContentAsString();
+        org.junit.jupiter.api.Assertions.assertTrue(afterPut.contains("2026-11-06"), afterPut);
+
+        // Sync con una versión más nueva sin fecha: la quita
+        mvc.perform(post("/api/sync").header("Authorization", bearer()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"projects\":[{\"id\":\"p-due\",\"name\":\"Fechas\",\"updatedAt\":\"2099-01-01T00:00:00\",\"tasks\":[{\"id\":\"t-due\",\"title\":\"Dentista\",\"column\":\"buzon\",\"updatedAt\":\"2099-01-01T00:00:00\"}]}],\"inbox\":[],\"pensadero\":[]}"))
+                .andExpect(status().isOk());
+        String afterSync = mvc.perform(get("/api/projects/p-due/tasks").header("Authorization", bearer()))
+                .andReturn().getResponse().getContentAsString();
+        org.junit.jupiter.api.Assertions.assertFalse(afterSync.contains("2026-11-06"), afterSync);
+    }
+
+    @Test
     void wipLimitAllowsAtMostThreeTasksInFocus() throws Exception {
         String projectBody = mvc.perform(post("/api/projects").header("Authorization", bearer())
                         .contentType(MediaType.APPLICATION_JSON)

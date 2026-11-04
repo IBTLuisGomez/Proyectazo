@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexus-orb-v3.9';
+const CACHE_NAME = 'nexus-orb-v3.10';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -28,6 +28,7 @@ const ASSETS_TO_CACHE = [
   './js/app/features/movil.js',
   './js/app/features/captura.js',
   './js/app/ui/contraste.js',
+  './js/app/features/fechas.js',
   './assets/nexus_n.jpg',
   './assets/nexus_n_banner.jpg',
   './assets/nexus_core.jpg',

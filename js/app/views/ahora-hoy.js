@@ -448,6 +448,7 @@ defineAppMethods({
         </div>
       </div>
 
+      ${this.renderDueTodayCard()}
       ${this.renderStalledProjectsCard()}
       <div class="mb-5">${this.renderQuickReviewPrompt()}</div>
 

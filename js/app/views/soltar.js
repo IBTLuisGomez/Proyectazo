@@ -1186,6 +1186,7 @@ defineAppMethods({
       effort: 'S',
       originThoughtId: item.id,
       originThoughtContent: item.content,
+      dueAt: item.dueAt ? new Date(item.dueAt).toISOString() : null,
       createdAt: new Date().toISOString()
     });
 

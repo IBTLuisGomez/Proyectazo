@@ -374,6 +374,7 @@ defineAppMethods({
     document.getElementById('add-task-effort').value = 'S';
     document.getElementById('add-task-is-bureaucratic').checked = false;
     document.getElementById('add-task-notes').value = '';
+    document.getElementById('add-task-due').value = '';
 
     this.openModal('modal-add-task');
     setTimeout(() => document.getElementById('add-task-title')?.focus(), 100);
@@ -387,6 +388,7 @@ defineAppMethods({
     const effort = document.getElementById('add-task-effort').value;
     const isBureaucratic = document.getElementById('add-task-is-bureaucratic').checked;
     const notes = document.getElementById('add-task-notes').value.trim();
+    const dueAt = this.dueFromInput(document.getElementById('add-task-due').value);
 
     if (!title) return;
 
@@ -408,11 +410,13 @@ defineAppMethods({
       effort: effort,
       isBureaucratic: isBureaucratic,
       notes: notes || null,
+      dueAt,
       createdAt: new Date().toISOString()
     };
 
     if (!project.tasks) project.tasks = [];
     project.tasks.push(newTask);
+    if (dueAt && this.backendAvailable) this.scheduleBackgroundPush(newTask.id, title, dueAt).catch(() => {});
     this.saveState();
     this.closeModal('modal-add-task');
     this.showToast('✓ Tarea agregada con éxito');
@@ -451,6 +455,7 @@ defineAppMethods({
     document.getElementById('edit-task-is-bureaucratic').checked = !!task.isBureaucratic;
     document.getElementById('edit-task-notes').value = task.notes || '';
     document.getElementById('edit-task-code').value = task.codeSnippet || '';
+    document.getElementById('edit-task-due').value = this.dueToInput(task.dueAt);
 
     this.openModal('modal-edit-task');
   },
@@ -466,6 +471,7 @@ defineAppMethods({
     const isBureaucratic = document.getElementById('edit-task-is-bureaucratic').checked;
     const notes = document.getElementById('edit-task-notes').value.trim();
     const codeSnippet = document.getElementById('edit-task-code').value.trim();
+    const dueAt = this.dueFromInput(document.getElementById('edit-task-due').value);
 
     if (!title) return;
 
@@ -493,6 +499,7 @@ defineAppMethods({
     task.isBureaucratic = isBureaucratic;
     task.notes = notes || null;
     task.codeSnippet = codeSnippet || null;
+    task.dueAt = dueAt;
     task.updatedAt = new Date().toISOString();
 
     // Si cambió de proyecto asignado:

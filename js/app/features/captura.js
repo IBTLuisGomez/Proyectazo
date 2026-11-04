@@ -94,7 +94,11 @@ defineAppMethods({
 
   addTaskFromCapture(project, parsed, { silent = false } = {}) {
     if (!project.tasks) project.tasks = [];
-    const task = { id: this.uid(), title: parsed.text, column: 'buzon', effort: 'S', createdAt: new Date().toISOString() };
+    const task = {
+      id: this.uid(), title: parsed.text, column: 'buzon', effort: 'S',
+      dueAt: parsed.dueAt ? new Date(parsed.dueAt).toISOString() : null,
+      createdAt: new Date().toISOString()
+    };
     project.tasks.unshift(task);
     project.lastActivity = new Date().toISOString();
     if (this.backendAvailable) {

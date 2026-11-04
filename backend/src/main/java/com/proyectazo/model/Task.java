@@ -44,6 +44,9 @@ public class Task {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    /** Para cuándo es (opcional). La vista Hoy muestra lo de hoy y lo que quedó de antes. */
+    private LocalDateTime dueAt;
+
     @PrePersist
     public void onPrePersist() {
         LocalDateTime now = LocalDateTime.now();
@@ -103,4 +106,7 @@ public class Task {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public LocalDateTime getDueAt() { return dueAt; }
+    public void setDueAt(LocalDateTime dueAt) { this.dueAt = dueAt; }
 }

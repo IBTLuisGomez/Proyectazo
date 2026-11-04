@@ -741,6 +741,7 @@ defineAppMethods({
           ` : ''}
 
           ${task.codeSnippet ? `<span class="text-[9px] font-mono text-sky-400">💻 Código</span>` : ''}
+          ${task.dueAt ? `<span class="text-[11px] px-1.5 py-0.5 rounded-full ${this.isDueTodayOrBefore(task.dueAt) ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30' : 'theme-card-subtle theme-text-muted'}">📅 ${this.formatDue(task.dueAt)}</span>` : ''}
         </div>
 
         <div class="flex items-center justify-between mt-2 pt-2 border-t theme-border">
