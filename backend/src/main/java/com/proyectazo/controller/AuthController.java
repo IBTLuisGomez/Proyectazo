@@ -2,6 +2,7 @@ package com.proyectazo.controller;
 
 import com.proyectazo.model.AppUser;
 import com.proyectazo.security.AuthService;
+import com.proyectazo.security.LoginRateLimiter;
 import com.proyectazo.security.TokenAuthFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -18,19 +19,31 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    private final LoginRateLimiter rateLimiter;
+
+    public AuthController(AuthService authService, LoginRateLimiter rateLimiter) {
         this.authService = authService;
+        this.rateLimiter = rateLimiter;
     }
 
     public record LoginRequest(String username, String password, Boolean remember) {}
     public record ChangeCredentialsRequest(String currentPassword, String newUsername, String newPassword) {}
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req, HttpServletRequest request) {
+        // getRemoteAddr ya respeta X-Forwarded-For de nginx (forward-headers-strategy: framework)
+        String ip = request.getRemoteAddr();
+        if (rateLimiter.isBlocked(ip)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).header("Retry-After", "60")
+                    .body(Map.of("error", "Demasiados intentos. Espera un minuto y vuelve a probar."));
+        }
         return authService.login(req.username(), req.password(), !Boolean.FALSE.equals(req.remember()))
-                .<ResponseEntity<?>>map(t -> ResponseEntity.ok(toBody(t)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Usuario o contraseña incorrectos.")));
+                .<ResponseEntity<?>>map(t -> { rateLimiter.reset(ip); return ResponseEntity.ok(toBody(t)); })
+                .orElseGet(() -> {
+                    rateLimiter.recordFailure(ip);
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of("error", "Usuario o contraseña incorrectos."));
+                });
     }
 
     /** También lo usa nginx (auth_request) para proteger el microservicio Nexus. */

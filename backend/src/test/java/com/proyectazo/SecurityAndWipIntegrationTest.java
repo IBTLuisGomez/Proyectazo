@@ -74,6 +74,20 @@ class SecurityAndWipIntegrationTest {
     }
 
     @Test
+    void repeatedWrongPasswordsAreThrottled() throws Exception {
+        String bad = "{\"username\":\"tester\",\"password\":\"incorrecta\"}";
+        for (int i = 0; i < 5; i++) {
+            mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(bad))
+                    .andExpect(status().isUnauthorized());
+        }
+        // El sexto intento se frena, aunque ahora la contraseña sea la buena
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"tester\",\"password\":\"" + PASSWORD + "\"}"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "60"));
+    }
+
+    @Test
     void logoutRevokesToken() throws Exception {
         mvc.perform(post("/api/auth/logout").header("Authorization", bearer())).andExpect(status().isNoContent());
         mvc.perform(get("/api/auth/me").header("Authorization", bearer())).andExpect(status().isUnauthorized());
