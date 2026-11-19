@@ -1530,6 +1530,8 @@ class ProyectazoApp {
     const userBadge = document.getElementById('header-username-badge');
     if (userBadge) userBadge.textContent = userName;
     this.maybeStartOnboarding();
+    // Resumen del día (una vez al día); se espera a que carguen los datos
+    setTimeout(() => { try { this.maybeShowBriefing(); } catch (e) {} }, 2500);
   }
 
   logout() {

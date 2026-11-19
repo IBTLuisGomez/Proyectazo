@@ -21,6 +21,7 @@ defineAppMethods({
     for (const idea of ideas) {
       const parsed = CapturaParser.parseIdea(idea);
       if (!parsed.text) continue;
+      if (opts.dueAt) parsed.dueAt = opts.dueAt; // fecha ya resuelta (p. ej. por Jarvis)
       const explicitCategory = (opts.category && opts.category !== 'humo_general') ? opts.category : parsed.category;
 
       // "para <proyecto>: …" o, por voz, nombrar el proyecto → tarea directa en su Buzón
@@ -95,7 +96,7 @@ defineAppMethods({
   addTaskFromCapture(project, parsed, { silent = false } = {}) {
     if (!project.tasks) project.tasks = [];
     const task = {
-      id: this.uid(), title: parsed.text, column: 'buzon', effort: 'S',
+      id: this.uid(), title: parsed.text, column: 'buzon', effort: parsed.effort || 'S',
       dueAt: parsed.dueAt ? new Date(parsed.dueAt).toISOString() : null,
       createdAt: new Date().toISOString()
     };

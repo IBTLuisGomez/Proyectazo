@@ -35,3 +35,12 @@ Los datos se siguen guardando con las claves antiguas (`humo_*`); la agrupación
 
 ## Funciones TDAH que se mantienen
 Límite de tareas en curso, modo Zen con temporizador y ruido marrón, Checkout/cierre de sesión, reactivar o hibernar proyectos sin culpa, deconstruir metas en micro-pasos, avisos push, Baúl con PIN.
+
+## Jarvis (asistente)
+Se abre con el botón 🤖/🎙️ flotante, desde Ajustes o desde el aviso del resumen diario. Se habla o se escribe en lenguaje normal.
+
+- **Qué puede hacer** (herramientas, se ejecutan en el navegador sobre tus datos): soltar un pensamiento, crear una tarea en un proyecto, programar un aviso, ver tareas, recordar un dato sobre ti, arrancar un foco, abrir una sección. No puede borrar nada.
+- **Memoria**: los datos que le pides recordar y la conversación se guardan en este dispositivo (no en el servidor). 🧹 empieza una conversación nueva; la memoria se conserva.
+- **Proveedor de IA**: `NEXUS_AI_PROVIDER` en `.env` (`claude` o `local`). Sin clave de IA funciona en modo local: lo que digas se guarda en Soltar con el intérprete de siempre (entiende "para <proyecto>: …" y fechas).
+- **Resumen del día**: una vez al día, a partir de las 6:00, al abrir la app: lo que vence hoy, lo urgente, la primera tarea propuesta y un proyecto quieto. Se calcula en el dispositivo, sin IA.
+- **Voz**: dictado con 🎙️; 🔈/🔊 activa la lectura de respuestas en voz alta.

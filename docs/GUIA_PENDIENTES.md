@@ -134,6 +134,15 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 - Quedan en disco (fuera de git) `data/` y `backend/data/` (bases H2 antiguas): bórralas si no las necesitas.
 - Los modelos de IA se eligen con `NEXUS_AI_MODELS` en `.env` (ver `.env.example`).
 
+## 5b. Activar Jarvis con IA (opcional)
+
+1. Crea una clave en https://console.anthropic.com y ponla en `.env`: `ANTHROPIC_API_KEY=...`
+2. `docker compose up -d --build nexus-ai`
+3. Comprueba: `http://localhost:8080/nexus/health` debe mostrar `"jarvis": {"provider": "claude", ...}`.
+4. Prueba: abre Jarvis y di "mañana a las 10 recuérdame llamar al banco".
+
+Modelo por defecto `claude-opus-5-5` con esfuerzo `low` (respuestas rápidas). Para gastar menos: `JARVIS_MODEL=claude-sonnet-5-5` o `claude-haiku-5-5`. Sin clave, Jarvis funciona en modo local.
+
 ## 6. A tener en cuenta
 
 - **Memoria del equipo**: durante el desarrollo había solo ~260 MB libres de 7,5 GB. Docker con Postgres, backend, Nexus y nginx necesita ~1–1,5 GB; cierra lo que no uses antes de `docker compose up`. Para los tests del backend en este equipo: `MAVEN_OPTS="-Xmx256m" ./mvnw test -DargLine="-Xmx320m"`.

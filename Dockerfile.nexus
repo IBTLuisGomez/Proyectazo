@@ -3,7 +3,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-RUN pip install --no-cache-dir pydantic python-dotenv google-genai
+RUN pip install --no-cache-dir pydantic python-dotenv google-genai anthropic
 
 # Create non-root user and data directory with correct permissions
 RUN useradd -m -u 1000 appuser && \
@@ -11,7 +11,7 @@ RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
 # Copy service script
-COPY --chown=appuser:appuser nexus_service.py .
+COPY --chown=appuser:appuser nexus_service.py jarvis.py ./
 # Reglas del clasificador compartidas con el navegador
 COPY --chown=appuser:appuser js/clasificador-reglas.js ./js/
 

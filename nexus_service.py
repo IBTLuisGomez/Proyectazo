@@ -21,6 +21,8 @@ from socketserver import ThreadingMixIn
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
+import jarvis
+
 # Cargar variables de entorno
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY", "")
@@ -684,7 +686,8 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
                 "status": "UP",
                 "service": "Nexus Cognitive Assistant",
                 "gemini_active": gemini_client is not None,
-                "model": ai_models()[0]
+                "model": ai_models()[0],
+                "jarvis": jarvis.status()
             }
             self.wfile.write(json.dumps(status).encode('utf-8'))
         elif clean_path in ('/api/nexus/mail/status', '/nexus/mail/status', '/mail/status'):
@@ -728,6 +731,14 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
             payload = {}
 
         clean_path = self.path.split('?')[0].rstrip('/')
+        if clean_path in ('/api/nexus/jarvis', '/nexus/jarvis', '/jarvis'):
+            code, body = jarvis.handle(payload)
+            self.send_response(code)
+            self._send_cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(body, ensure_ascii=False).encode('utf-8'))
+            return
         if clean_path in ('/api/nexus/thought', '/nexus/thought', '/thought', '/classify'):
             text = (payload.get('text') or payload.get('raw_thought') or '').strip()
             res = process_thought_with_gemini(text)

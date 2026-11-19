@@ -49,7 +49,7 @@ defineAppMethods({
           </div>
 
           <!-- 7. Nexus IA -->
-          <div onclick="app.openNexusVoice('streaming')" class="p-4 sm:p-5 rounded-3xl bg-slate-900 border border-purple-500/30 hover:border-purple-500/60 text-left transition cursor-pointer flex items-start gap-4 group">
+          <div onclick="app.openJarvis()" class="p-4 sm:p-5 rounded-3xl bg-slate-900 border border-purple-500/30 hover:border-purple-500/60 text-left transition cursor-pointer flex items-start gap-4 group">
             <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition">
               🤖
             </div>
@@ -58,7 +58,7 @@ defineAppMethods({
                 <h3 class="font-display font-bold text-base text-white">Nexus IA</h3>
                 
               </div>
-              <p class="text-xs text-slate-400 mt-1">Voz streaming, transcripción semántica, autoclasificación y desglose en micro-pasos de 15 min.</p>
+              <p class="text-xs text-slate-400 mt-1">Jarvis: habla o escribe y él apunta, avisa y te ayuda a empezar.</p>
             </div>
           </div>
 

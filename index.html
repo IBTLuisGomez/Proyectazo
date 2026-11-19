@@ -1097,7 +1097,7 @@
       <div class="w-px h-4 bg-slate-700/60"></div>
 
       <!-- Botón 2: Nexus IA Directo (Voz e Inteligencia Gemini) -->
-      <button type="button" onclick="app.openNexusVoice('streaming')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-emerald-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Hablar con Nexus IA (Gemini 1.5)">
+      <button type="button" onclick="app.openJarvis()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-emerald-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Hablar con Jarvis">
         <span class="text-sm animate-pulse">🎙️</span>
         <span>NEXUS IA</span>
       </button>
@@ -2280,7 +2280,7 @@
             </div>
 
             <div class="space-y-2">
-              <button onclick="app.closeModal('modal-dual-widget'); app.openNexusVoice('streaming')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+              <button onclick="app.closeModal('modal-dual-widget'); app.openJarvis()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
                 <span class="animate-pulse">🎙️</span> <span>Hablar con IA</span>
               </button>
               <button onclick="app.closeModal('modal-dual-widget'); app.openNexusVoice('pensadero')" class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
@@ -2582,5 +2582,6 @@
   <script src="js/app/features/captura.js"></script>
   <script src="js/app/ui/contraste.js"></script>
   <script src="js/app/features/fechas.js"></script>
+  <script src="js/app/features/jarvis.js"></script>
 </body>
 </html>

@@ -57,6 +57,10 @@ services:
       PORT: 8002
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       NEXUS_AI_MODELS: ${NEXUS_AI_MODELS:-}
+      NEXUS_AI_PROVIDER: ${NEXUS_AI_PROVIDER:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      JARVIS_MODEL: ${JARVIS_MODEL:-}
+      JARVIS_EFFORT: ${JARVIS_EFFORT:-}
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health')\" || exit 1"]
       interval: 10s
