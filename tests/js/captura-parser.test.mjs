@@ -67,12 +67,12 @@ test('interpreta comandos, proyecto, importe, persona y fecha', () => {
   assert.equal(P.parseIdea('sin fecha', now).dueAt, null);
 });
 
-test('la paleta no repite nombres, colores ni claves', () => {
+test('las categorías visibles no repiten nombres ni colores', () => {
   const src = readFileSync(new URL('../../js/smoke-palette.js', import.meta.url), 'utf8');
-  const palette = new Function(src + '; return SMOKE_PALETTE;')();
+  const { palette, visible } = new Function(src + '; return { palette: SMOKE_PALETTE, visible: SMOKE_VISIBLE_KEYS };')();
   const entries = Object.entries(palette);
-  const names = entries.map(([, m]) => m.name);
-  const hexes = entries.map(([, m]) => m.hex);
+  const names = visible.map(k => palette[k].name);
+  const hexes = visible.map(k => palette[k].hex);
   assert.equal(new Set(names).size, names.length, 'nombres repetidos: ' + names);
   assert.equal(new Set(hexes).size, hexes.length, 'colores repetidos: ' + hexes);
   for (const [key, m] of entries) assert.equal(m.category, key, `${key}.category`);

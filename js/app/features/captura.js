@@ -242,7 +242,7 @@ defineAppMethods({
   },
 
   reviewCategories() {
-    return Object.keys(SMOKE_PALETTE).filter(k => k !== 'humo_general');
+    return SMOKE_VISIBLE_KEYS.filter(k => k !== 'humo_general');
   },
 
   renderReviewCard() {
@@ -260,7 +260,7 @@ defineAppMethods({
       <div class="grid grid-cols-3 gap-2">
         ${this.reviewCategories().map((k, i) => {
           const m = SMOKE_PALETTE[k];
-          const hint = suggestion.matched && suggestion.category === k ? ' ring-2 ring-cyan-400' : '';
+          const hint = suggestion.matched && categoriaVisible(suggestion.category) === k ? ' ring-2 ring-cyan-400' : '';
           return `<button type="button" onclick="app.reviewChoose('${k}')" class="p-2 rounded-xl border ${m.badgeClass}${hint} text-xs font-semibold text-left transition active:scale-95">
             <span class="theme-text-muted font-mono">${i + 1}</span> ${m.icon} ${m.name}</button>`;
         }).join('')}
@@ -282,6 +282,12 @@ defineAppMethods({
   reviewChoose(category) {
     const id = this._review && this._review.queue[this._review.index];
     if (!id) return;
+    // Si la sugerencia local cae en el mismo grupo, conservar su subtipo (p. ej. personas dentro de Vida)
+    const item = (this.state.pensadero || []).find(p => p.id === id);
+    if (item) {
+      const sug = CapturaParser.classifyLocal(item.content, { memory: this.state.settings?.classifierMemory });
+      if (sug.matched && categoriaVisible(sug.category) === category) category = sug.category;
+    }
     this.changeThoughtCategory(id, category); // corrección del usuario: se aprende
     this.advanceReview(true);
   },

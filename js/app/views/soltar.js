@@ -10,15 +10,7 @@ defineAppMethods({
   // ==========================================
   renderViewSoltar(container) {
     const items = (this.state.pensadero || []).filter(x => !x.inBaul);
-    const generalCount = items.filter(x => x.category === 'humo_general' || !x.category).length;
-    const whiteCount = items.filter(x => x.category === 'humo_blanco').length;
-    const redCount = items.filter(x => x.category === 'humo_rojo' && !x.isResolved).length;
-    const goldCount = items.filter(x => x.category === 'humo_dorado').length;
-    const blueCount = items.filter(x => x.category === 'humo_azul' || x.category === 'humo_tarea').length;
-    const greenCount = items.filter(x => x.category === 'humo_verde').length;
-    const purpleCount = items.filter(x => x.category === 'humo_purpura').length;
-    const orangeCount = items.filter(x => x.category === 'humo_naranja').length;
-    const ashCount = items.filter(x => x.category === 'humo_ceniza').length;
+    const countOf = key => items.filter(x => categoriaVisible(x.category) === key && !(key === 'humo_rojo' && x.isResolved)).length;
 
     const activeFilter = this.pensaderoSmokeFilter || 'all';
     const nowMs = Date.now();
@@ -29,16 +21,7 @@ defineAppMethods({
         }
         return true;
       }
-      if (activeFilter === 'humo_general') return it.category === 'humo_general' || !it.category;
-      if (activeFilter === 'humo_blanco') return it.category === 'humo_blanco';
-      if (activeFilter === 'humo_rojo') return it.category === 'humo_rojo';
-      if (activeFilter === 'humo_dorado') return it.category === 'humo_dorado';
-      if (activeFilter === 'humo_azul') return it.category === 'humo_azul' || it.category === 'humo_tarea';
-      if (activeFilter === 'humo_verde') return it.category === 'humo_verde';
-      if (activeFilter === 'humo_purpura') return it.category === 'humo_purpura';
-      if (activeFilter === 'humo_naranja') return it.category === 'humo_naranja';
-      if (activeFilter === 'humo_ceniza') return it.category === 'humo_ceniza';
-      return true;
+      return categoriaVisible(it.category) === categoriaVisible(activeFilter);
     });
 
     const activeMeta = SMOKE_PALETTE[activeFilter] || SMOKE_PALETTE.humo_general;
@@ -108,8 +91,8 @@ defineAppMethods({
 
               <!-- Botones de Selección Directa de los 9 Colores del Orbe -->
               <div class="flex items-center justify-center gap-1.5 flex-wrap py-1">
-                ${Object.entries(SMOKE_PALETTE).map(([key, meta]) => {
-                  const isSel = (activeFilter === key) || (activeFilter === 'all' && key === 'humo_general');
+                ${SMOKE_VISIBLE_KEYS.map(key => [key, SMOKE_PALETTE[key]]).map(([key, meta]) => {
+                  const isSel = (categoriaVisible(activeFilter) === key) || (activeFilter === 'all' && key === 'humo_general');
                   return `
                     <button type="button" 
                             onclick="app.setOrbeColor('${key}')" 
@@ -149,30 +132,13 @@ defineAppMethods({
               <button onclick="app.filterPensaderoSmoke('all')" class="px-3 py-1 rounded-xl font-semibold transition ${activeFilter === 'all' ? 'bg-slate-700 text-white shadow' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}">
                 Todos (${items.length})
               </button>
-              <button onclick="app.filterPensaderoSmoke('humo_general')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_general' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-cyan-300'}">
-                ✨ Sin clasificar (${generalCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_rojo')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_rojo' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-rose-300'}">
-                🔴 Urgente (${redCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_dorado')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_dorado' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-yellow-300'}">
-                🟡 Idea (${goldCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_azul')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_azul' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-blue-300'}">
-                🔵 Foco y ☑️ tareas (${blueCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_verde')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_verde' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-emerald-300'}">
-                🟢 Hábitos (${greenCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_purpura')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_purpura' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-purple-300'}">
-                🟣 Personas (${purpleCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_naranja')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_naranja' ? 'bg-amber-700/20 text-amber-300 border border-amber-700/50' : 'bg-slate-900/60 text-slate-400 hover:text-amber-300'}">
-                🟠 Dinero (${orangeCount})
-              </button>
-              <button onclick="app.filterPensaderoSmoke('humo_ceniza')" class="px-2.5 py-1 rounded-xl font-semibold transition ${activeFilter === 'humo_ceniza' ? 'bg-slate-500/20 text-slate-300 border border-slate-500/50' : 'bg-slate-900/60 text-slate-400 hover:text-slate-300'}">
-                🔘 Después (${ashCount})
-              </button>
+              ${SMOKE_VISIBLE_KEYS.map(key => {
+                const m = SMOKE_PALETTE[key];
+                const on = categoriaVisible(activeFilter) === key && activeFilter !== 'all';
+                return `<button onclick="app.filterPensaderoSmoke('${key}')" class="px-2.5 py-1 rounded-xl font-semibold transition border ${on ? m.badgeClass : 'border-transparent bg-slate-900/60 text-slate-400 hover:text-white'}">
+                  ${m.icon} ${m.name} (${countOf(key)})
+                </button>`;
+              }).join('')}
             </div>
 
             <span class="text-[11px] font-mono text-slate-500 hidden sm:inline">
@@ -442,8 +408,8 @@ defineAppMethods({
 
   // Ciclar colores mediante deslizamiento (Swipe)
   cycleOrbColor(direction = 1) {
-    const paletteKeys = Object.keys(SMOKE_PALETTE);
-    const current = this.pensaderoSmokeFilter || 'humo_general';
+    const paletteKeys = SMOKE_VISIBLE_KEYS;
+    const current = categoriaVisible(this.pensaderoSmokeFilter || 'humo_general');
     let idx = paletteKeys.indexOf(current);
     if (idx === -1) idx = 0;
 
@@ -1371,7 +1337,7 @@ defineAppMethods({
     return `
       <div class="p-4 rounded-2xl theme-card border ${item.category === 'humo_rojo' && !item.isResolved ? 'border-rose-500/60 bg-rose-950/10' : 'theme-border'} shadow-sm transition">
         <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-          <span class="text-xs px-2 py-0.5 rounded-full border ${catMeta.badgeClass}">${catMeta.icon} ${catMeta.name}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full border ${catMeta.badgeClass}">${catMeta.icon} ${catMeta.name}</span>${etiquetaDe(item.category) ? `<span class="text-xs px-2 py-0.5 rounded-full border theme-border theme-text-muted">${etiquetaDe(item.category)}</span>` : ''}
           ${item.isPinned ? `<span class="text-xs text-amber-400 font-bold">📌 Fijado</span>` : ''}
           ${item.isResolved ? `<span class="text-xs text-emerald-400 font-bold">✓ Resuelto</span>` : ''}
           <span class="text-xs theme-text-muted">${new Date(item.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
@@ -1397,7 +1363,7 @@ defineAppMethods({
             <div class="absolute right-0 z-30 mt-1 w-60 p-1.5 rounded-xl theme-card border theme-border shadow-2xl space-y-0.5">
               <label class="block px-3 pt-1.5 text-[11px] theme-text-muted">Color</label>
               <select onchange="app.changeThoughtCategory('${id}', this.value)" class="w-full theme-card-subtle border theme-border text-xs rounded-lg px-2 py-1.5 mb-1 cursor-pointer" aria-label="Cambiar color del pensamiento">
-                ${Object.keys(SMOKE_PALETTE).map(k => `<option value="${k}" ${item.category === k ? 'selected' : ''}>${SMOKE_PALETTE[k].icon} ${SMOKE_PALETTE[k].name}</option>`).join('')}
+                ${SMOKE_VISIBLE_KEYS.map(k => { const own = categoriaVisible(item.category) === k; return `<option value="${own ? item.category : k}" ${own ? 'selected' : ''}>${SMOKE_PALETTE[k].icon} ${SMOKE_PALETTE[k].name}</option>`; }).join('')}
               </select>
               <button onclick="app.autoClassifyThought('${id}')" class="${menuBtn}">✨ Sugerir color y proyecto</button>
               <button onclick="app.dispatchThoughtByVoice('${id}')" class="${menuBtn}">🎙️ Decidir por voz</button>

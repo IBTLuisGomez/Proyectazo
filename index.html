@@ -968,27 +968,23 @@
             </span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span id="header-view-subtitle" class="text-[10px] font-mono font-semibold text-slate-400 truncate">🔮 Orbe</span>
+            <span id="header-view-subtitle" class="text-[10px] font-mono font-semibold text-slate-400 truncate">🔮 Soltar</span>
             <span id="header-device-chip" class="hidden sm:inline text-[10px] font-mono text-cyan-500/80 truncate"></span>
           </div>
         </div>
       </div>
 
-      <!-- Desktop Nav Tabs (4 Destinos TDAH - Orbe como principal e inicial) -->
+      <!-- Desktop Nav (3 secciones: Soltar / Ahora / Repasar) -->
       <nav class="hidden xl:flex items-center gap-1.5 p-1 rounded-xl border theme-card-subtle" id="desktop-nav">
         <button onclick="app.navigate('soltar')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all relative" data-view="soltar">
-          <span>🔮</span> Orbe
-          <span id="pensadero-count-badge" class="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-700 text-slate-200 font-bold font-mono">0</span>
+          <span>🔮</span> Soltar
+          <span id="pensadero-count-badge" class="hidden w-2 h-2 rounded-full bg-cyan-400" aria-label="Hay pensamientos por repasar"></span>
         </button>
         <button onclick="app.navigate('ahora')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="ahora">
           <span>🎯</span> Ahora
         </button>
-        <button onclick="app.navigate('hacer')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all relative" data-view="hacer">
-          <span>⚡</span> Hacer
-          <span id="tareas-count-badge" class="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-700 text-slate-200 font-bold font-mono">0</span>
-        </button>
-        <button onclick="app.navigate('mas')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="mas">
-          <span>⋯</span> Más
+        <button onclick="app.navigate('repasar')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="repasar">
+          <span>🗂️</span> Repasar
         </button>
       </nav>
 
@@ -1065,26 +1061,21 @@
     </div>
   </main>
 
-  <!-- Mobile Bottom Navigation Bar (4 Destinos TDAH) -->
+  <!-- Mobile Bottom Navigation Bar (3 secciones) -->
   <nav id="mobile-nav-shell" class="xl:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl border-t border-slate-800 bg-slate-950/95 pb-[env(safe-area-inset-bottom,0px)] transition-colors shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
-    <div class="grid grid-cols-4 h-16 items-center px-2" id="mobile-nav">
+    <div class="grid grid-cols-3 h-16 items-center px-2" id="mobile-nav">
       <button onclick="app.navigate('soltar')" class="bnav-btn relative flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="soltar">
         <span class="text-lg">🔮</span>
-        <span id="pensadero-count-mobile" class="hidden absolute top-0 right-[18%] min-w-[1.1rem] h-4 px-1 rounded-full bg-cyan-400 text-[10px] leading-4 font-bold text-slate-950">0</span>
-        <span class="text-[11px] font-sans font-semibold mt-0.5">Orbe</span>
+        <span id="pensadero-count-mobile" class="hidden absolute top-1 right-[34%] w-2 h-2 rounded-full bg-cyan-400" aria-label="Hay pensamientos por repasar"></span>
+        <span class="text-[11px] font-sans font-semibold mt-0.5">Soltar</span>
       </button>
       <button onclick="app.navigate('ahora')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="ahora">
         <span class="text-lg">🎯</span>
         <span class="text-[11px] font-sans font-semibold mt-0.5">Ahora</span>
       </button>
-      <button onclick="app.navigate('hacer')" class="bnav-btn relative flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="hacer">
-        <span class="text-lg">⚡</span>
-        <span id="tareas-count-mobile" class="hidden absolute top-0 right-[18%] min-w-[1.1rem] h-4 px-1 rounded-full bg-emerald-400 text-[10px] leading-4 font-bold text-slate-950">0</span>
-        <span class="text-[11px] font-sans font-semibold mt-0.5">Hacer</span>
-      </button>
-      <button onclick="app.navigate('mas')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="mas">
-        <span class="text-lg">⋯</span>
-        <span class="text-[11px] font-sans font-semibold mt-0.5">Más</span>
+      <button onclick="app.navigate('repasar')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="repasar">
+        <span class="text-lg">🗂️</span>
+        <span class="text-[11px] font-sans font-semibold mt-0.5">Repasar</span>
       </button>
     </div>
   </nav>
@@ -2576,6 +2567,7 @@
   <script src="js/app/views/ahora-hoy.js"></script>
   <script src="js/app/views/soltar.js"></script>
   <script src="js/app/views/mas.js"></script>
+  <script src="js/app/views/repasar.js"></script>
   <script src="js/app/views/hacer.js"></script>
   <script src="js/app/features/modos-foco.js"></script>
   <script src="js/app/features/ia-nexus.js"></script>
