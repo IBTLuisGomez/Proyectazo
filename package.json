@@ -8,6 +8,6 @@
     "watch:css": "tailwindcss -c tailwind.config.js -i styles/tailwind.input.css -o assets/tailwind.css --watch"
   },
   "devDependencies": {
-    "tailwindcss": "3.4.17"
+    "tailwindcss": "4.3.5"
   }
 }
