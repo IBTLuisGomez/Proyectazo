@@ -127,11 +127,12 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 
 ---
 
-## 5. Limpieza opcional
+## 5. Limpieza (hecha)
 
-- `nexus_deploy_v1.tar.gz` (52 MB, en la raíz): ya no está en git; bórralo si no lo necesitas.
-- `data/` y `backend/data/` (bases H2 antiguas): siguen en disco pero fuera de git. El backend en Docker usa Postgres.
-- `archive/` guarda la versión v1.1 e `Index.Gemini.html` por si quieres consultarlas; se pueden borrar.
+- Borrados `nexus_deploy_v1.tar.gz`, `__pycache__/`, `.pytest_cache/` y `android/build/`.
+- `archive/` y las especificaciones antiguas están en `docs/archivo/`. La especificación vigente es [PRODUCTO.md](PRODUCTO.md).
+- Quedan en disco (fuera de git) `data/` y `backend/data/` (bases H2 antiguas): bórralas si no las necesitas.
+- Los modelos de IA se eligen con `NEXUS_AI_MODELS` en `.env` (ver `.env.example`).
 
 ## 6. A tener en cuenta
 

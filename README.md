@@ -121,4 +121,5 @@ docker exec nexus-frontend nginx -s reload
 
 - 🖥️ **[Guía de Usuario para Aplicación Web](docs/GUIA_USUARIO_WEB.md)**
 - 📱 **[Guía de Usuario para Aplicación Móvil](docs/GUIA_USUARIO_MOVIL.md)**
-- 📖 **[Descripción Completa y Detallada del Sistema](docs/DESCRIPCION_DETALLADA.md)**
+- 📖 **[Especificación vigente del producto](docs/PRODUCTO.md)**
+- 🗺️ **[Propuesta de mejora y hoja de ruta](docs/PROPUESTA_MEJORA.md)**

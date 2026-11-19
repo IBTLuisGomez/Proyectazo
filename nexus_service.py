@@ -25,6 +25,16 @@ from dotenv import load_dotenv
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY", "")
 
+DEFAULT_AI_MODELS = "gemini-2.5-flash,gemini-flash-latest"
+
+
+def ai_models() -> list:
+    """Modelos a probar en orden (NEXUS_AI_MODELS en .env, separados por comas)."""
+    raw = os.getenv("NEXUS_AI_MODELS", "") or DEFAULT_AI_MODELS
+    models = [m.strip() for m in raw.split(",") if m.strip()]
+    return models or DEFAULT_AI_MODELS.split(",")
+
+
 # Inicializar cliente oficial de Gemini si está disponible la API key
 gemini_client = None
 try:
@@ -165,7 +175,7 @@ def process_thought_with_gemini(user_text: str) -> ThoughtClassification:
     )
 
     if gemini_client:
-        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]:
+        for model_name in ai_models():
             try:
                 from google.genai import types
                 response = gemini_client.models.generate_content(
@@ -210,7 +220,7 @@ def deconstruct_goal_with_gemini(goal_text: str) -> GoalDeconstruction:
     )
 
     if gemini_client:
-        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]:
+        for model_name in ai_models():
             try:
                 from google.genai import types
                 response = gemini_client.models.generate_content(
@@ -255,7 +265,7 @@ def generate_reactivation_briefing(project_name: str, context: str, logs: list) 
     prompt = f"Proyecto: {project_name}\nContexto: {context}\nÚltimos logs: {json.dumps(logs, ensure_ascii=False)}"
 
     if gemini_client:
-        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]:
+        for model_name in ai_models():
             try:
                 from google.genai import types
                 response = gemini_client.models.generate_content(
@@ -674,7 +684,7 @@ class NexusRequestHandler(BaseHTTPRequestHandler):
                 "status": "UP",
                 "service": "Nexus Cognitive Assistant",
                 "gemini_active": gemini_client is not None,
-                "model": "gemini-3.8-flash"
+                "model": ai_models()[0]
             }
             self.wfile.write(json.dumps(status).encode('utf-8'))
         elif clean_path in ('/api/nexus/mail/status', '/nexus/mail/status', '/mail/status'):

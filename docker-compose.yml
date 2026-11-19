@@ -56,6 +56,7 @@ services:
     environment:
       PORT: 8002
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      NEXUS_AI_MODELS: ${NEXUS_AI_MODELS:-}
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health')\" || exit 1"]
       interval: 10s
