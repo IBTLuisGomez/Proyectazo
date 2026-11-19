@@ -2,7 +2,49 @@
 // Vistas "Ahora" y "Hoy": dónde me quedé, proyecto sugerido, racha y proyectos quietos.
 // Métodos de ProyectazoApp (la clase base está en js/app.js).
 
+// Minutos aproximados por tamaño de tarea (campo effort que ya guarda el backend)
+const ProyectazoAhora = { EFFORT_MINUTES: { XS: 5, S: 15, M: 45, L: 90 } };
+
 defineAppMethods({
+
+  // Tareas candidatas para "Ahora", en orden. Con energía baja primero las pequeñas; con alta, las grandes.
+  ahoraCandidates(project, energy = 'media') {
+    const colRank = { enfoco: 0, proximo: 1, buzon: 2 };
+    const size = t => ProyectazoAhora.EFFORT_MINUTES[t.effort] || 15;
+    const energyRank = t => energy === 'baja' ? size(t) : energy === 'alta' ? -size(t) : 0;
+    return (project.tasks || [])
+      .filter(t => t.column in colRank)
+      .map((t, i) => ({ t, i }))
+      .sort((a, b) => (colRank[a.t.column] - colRank[b.t.column]) || (energyRank(a.t) - energyRank(b.t)) || (a.i - b.i))
+      .map(x => x.t);
+  },
+
+  getEnergyToday() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('nexus_energy') || 'null');
+      if (raw && raw.date === new Date().toDateString()) return raw.level;
+    } catch (e) {}
+    return 'media';
+  },
+
+  setEnergyToday(level) {
+    try { localStorage.setItem('nexus_energy', JSON.stringify({ date: new Date().toDateString(), level })); } catch (e) {}
+    this.ahoraOffset = 0;
+    this.render();
+  },
+
+  nextAhoraCandidate() {
+    this.ahoraOffset = (this.ahoraOffset || 0) + 1;
+    this.render();
+  },
+
+  // Anti-parálisis: 2 minutos con la tarea propuesta. Empezar es lo difícil; seguir suele venir solo.
+  startTinyStep() {
+    this.setTimerDuration(2);
+    if (!this.timer.isRunning) this.startPauseTimer();
+    if (this.currentView === 'ahora') this.render();
+    this.showToast('🤏 Solo 2 minutos. Si al acabar quieres seguir, sigue; si no, ya has empezado.');
+  },
 
   // ==========================================
   // VISTA 1: 🎯 AHORA (INICIO TDAH)
@@ -40,12 +82,17 @@ defineAppMethods({
       activeProject = projects.find(p => p.status === 'en_ejecucion') || projects.find(p => p.status === 'activo') || projects[0];
     }
 
-    const pendingTasks = (activeProject.tasks || []).filter(t => t.column !== 'victorias');
-    const activeTask = pendingTasks.find(t => t.column === 'enfoco') || pendingTasks.find(t => t.column === 'proximo') || pendingTasks[0] || {
+    const energy = this.getEnergyToday();
+    const candidates = this.ahoraCandidates(activeProject, energy);
+    const offset = candidates.length ? (this.ahoraOffset || 0) % candidates.length : 0;
+    const activeTask = candidates[offset] || {
       id: 'task-temp',
       title: activeProject.nextAction || 'Avanzar en el micro-paso de 15 minutos',
       notes: ''
     };
+    const estimate = ProyectazoAhora.EFFORT_MINUTES[activeTask.effort];
+    const energyBtn = (key, label) => `<button type="button" onclick="app.setEnergyToday('${key}')" aria-pressed="${energy === key}"
+      class="min-h-[36px] px-3 rounded-full text-xs font-semibold border transition ${energy === key ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-200' : 'border-slate-800 text-slate-400 hover:text-slate-200'}">${label}</button>`;
 
     const m = Math.floor(this.timer.secondsLeft / 60).toString().padStart(2, '0');
     const s = (this.timer.secondsLeft % 60).toString().padStart(2, '0');
@@ -61,7 +108,7 @@ defineAppMethods({
         <section class="flex flex-col items-center text-center space-y-2">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 shadow-sm text-xs">
             <span class="text-base">${activeProject.emoji || '🎯'}</span>
-            <span class="font-bold text-white">${activeProject.name}</span>
+            <span class="font-bold text-white">${this.escapeHtml(activeProject.name)}</span>
             <span class="text-slate-600">•</span>
             <button onclick="app.navigate('hacer')" class="text-cyan-400 hover:text-cyan-300 font-medium text-[11px] underline" title="Ver lista de tareas de este proyecto">
               Cambiar tarea
@@ -72,9 +119,23 @@ defineAppMethods({
           <div class="flex flex-col items-center px-2 max-w-lg">
             <span class="text-[11px] font-mono uppercase tracking-widest text-slate-400 font-semibold">¿Cuál es el micro-paso de 15 minutos?</span>
             <h1 class="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight leading-snug mt-1">
-              ${activeTask.title}
+              ${this.escapeHtml(activeTask.title)}
             </h1>
-            ${activeTask.notes ? `<p class="text-xs text-slate-400 mt-1 max-w-md italic truncate">"${activeTask.notes}"</p>` : ''}
+            ${estimate ? `<span class="mt-1.5 text-xs font-mono text-slate-400">⏱ ~${estimate} min</span>` : ''}
+            ${activeTask.notes ? `<p class="text-xs text-slate-400 mt-1 max-w-md italic truncate">"${this.escapeHtml(activeTask.notes)}"</p>` : ''}
+          </div>
+
+          <!-- Energía de hoy: ordena qué tarea se propone -->
+          <div class="flex items-center justify-center gap-1.5 flex-wrap" role="group" aria-label="Tu energía ahora">
+            <span class="text-[11px] text-slate-500">Energía:</span>
+            ${energyBtn('baja', '🪫 Baja')}${energyBtn('media', '🔋 Media')}${energyBtn('alta', '⚡ Alta')}
+          </div>
+
+          <div class="flex items-center justify-center gap-2 flex-wrap">
+            <button type="button" onclick="app.startTinyStep()" class="min-h-[44px] px-4 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition active:scale-95">
+              🤷 No sé por dónde empezar
+            </button>
+            ${candidates.length > 1 ? `<button type="button" onclick="app.nextAhoraCandidate()" class="min-h-[44px] px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800 text-xs font-semibold transition">↻ Otra</button>` : ''}
           </div>
         </section>
 

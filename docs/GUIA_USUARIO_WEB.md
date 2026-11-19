@@ -42,17 +42,14 @@ La pantalla principal de inicio presenta la esfera volumétrica 3D interactiva e
   - Al soltar el clic, el audio se procesa y se deposita automáticamente en el Pensadero o se envía al proyecto mencionado.
 - **Clic simple (Tap)**:
   - Genera una onda expansiva de dispersión de partículas y sonido dopamínico de alivio mental.
-- **Selector de Reactor de 9 Humos**:
-  - En la parte inferior del orbe tienes los botones de los 9 colores. Al hacer clic en uno, la esfera transforma su humo en tiempo real según la categoría cognitiva:
-    - ✨ **Cian**: General / Pensamiento puro libre.
-    - ⚪ **Blanco**: Soltar y olvidar sin culpa (descarga catártica).
-    - 🔴 **Rojo**: Fuego / Urgencia crítica.
-    - 🟡 **Dorado**: Chispa / Idea de alto valor masticable en micro-pasos de 15 min.
-    - 🔵 **Azul**: Deep Work / Concentración técnica en una tarea.
-    - 🟢 **Verde**: Hábitos, salud y estado físico.
-    - 🟣 **Púrpura**: CRM personal y compromisos con personas.
-    - 🟠 **Naranja**: Fricción de dinero consciente.
-    - 🔘 **Ceniza**: Hibernación *Someday / Maybe* (se oculta temporalmente para no saturar la vista).
+- **Selector de categorías**:
+  - Bajo el orbe tienes 5 categorías + "Sin clasificar". Normalmente las pone Nexus solo; tocar otra corrige y Nexus lo recuerda:
+    - ✨ **Sin clasificar**: recién capturado.
+    - 🔴 **Urgente**: tiene fecha o consecuencia.
+    - 🔵 **Proyecto**: trabajo de un proyecto o foco profundo.
+    - 🟢 **Vida**: rutina, salud, personas, dinero y recados (se muestra la etiqueta: 👥 personas, 💸 dinero…).
+    - 🟡 **Idea**: aún sin acción.
+    - ⚪ **Luego**: algún día, desahogo o hibernado.
 
 ### 3.2 Herramientas de la Barra Superior
 - 🎬 **Intro**: Vuelve a ver el video cinemático cuando desees.

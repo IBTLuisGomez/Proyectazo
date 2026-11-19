@@ -9,22 +9,13 @@
 
 ### 1. Esfera de Cristal Nexus Orb 3D (WebGL Volumétrico)
 - **Humo animado fluido real**: Simulación volumétrica en GLSL mediante *domain warping* con ruido Simplex 3D y FBM, produciendo corrientes de convección térmica, turbulencia y filamentos luminosos en tiempo real.
-- **Respuesta cromática pura de 9 colores nucleares**:
-  - ✨ **General (Cian)**: Pensamiento libre sin clasificar.
-  - ⚪ **Humo Blanco**: Descarga catártica para soltar pensamientos intrusivos y liberar memoria de trabajo.
-  - 🔴 **Humo Rojo**: Urgencia crítica y fuegos de alta prioridad.
-  - 🟡 **Humo Dorado**: Chispas de valor e ideas transformables en micro-pasos de 15 min.
-  - 🔵 **Humo Azul**: Deep Work, foco mono-tarea y arquitectura.
-  - 🟢 **Humo Verde**: Hábitos diarios, salud y energía física.
-  - 🟣 **Humo Púrpura**: CRM personal, vínculos y personas clave.
-  - 🟠 **Humo Naranja**: Fricción financiera y compras conscientes.
-  - 🔘 **Humo Ceniza**: Hibernación *Someday / Maybe* para evitar saturación cognitiva.
+- **5 categorías que pone Nexus** (ver [docs/PRODUCTO.md](docs/PRODUCTO.md)): 🔴 Urgente · 🔵 Proyecto · 🟢 Vida (salud, personas, dinero, recados) · 🟡 Idea · ⚪ Luego. ✨ Sin clasificar mientras no se repasa.
 - **Rendimiento ultra-optimizado a 60 FPS**: Clamping de resolución interna a 320x320 con escalado CSS suave y 15 pasos de raymarching, reduciendo la carga de GPU en más del 88% y eliminando sobrecalentamientos o congelamientos en móviles.
 - **Recuperación automática de contexto**: Protección contra pérdida de contexto WebGL (`webglcontextlost`) para evitar que la esfera se torne blanca al salir de modales o alternar vistas.
 
 ### 2. Control Gestual e Interacción Sensorial
 - **Walkie-Talkie Nexus IA (Mantener presionado para hablar)**: Al mantener presionado el orbe con el dedo o ratón durante más de 300 ms, se activa la captura de voz en tiempo real con un resplandor pulsante. Al soltar, el pensamiento se deposita instantáneamente en el Pensadero o se canaliza al proyecto indicado por voz (ej. *"Mandar a CytoHelix"*).
-- **Deslizamiento táctil (Swipe)**: Desliza hacia la derecha o izquierda sobre el orbe en pantallas táctiles para ciclar fluidamente entre los 9 colores del reactor con micro-vibración háptica.
+- **Deslizamiento táctil (Swipe)**: Desliza hacia la derecha o izquierda sobre el orbe en pantallas táctiles para ciclar entre las 5 categorías con micro-vibración háptica.
 - **Pulso resonante (Clic / Tap rápido)**: Dispara una onda expansiva de partículas y dopamina auditiva.
 
 ### 3. Logotipo Dinámico según Modo de Color
