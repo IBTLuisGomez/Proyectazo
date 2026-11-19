@@ -31,7 +31,7 @@ Las asigna el clasificador (local) o Jarvis; el usuario solo corrige.
 | ⚪ **Luego** | Algún día, desahogo, hibernado | humo_blanco, humo_ceniza | desahogo · algún día |
 | ✨ Sin clasificar | Pendiente de repaso | humo_general | — |
 
-Los datos se siguen guardando con las claves antiguas (`humo_*`); la agrupación se hace al mostrar (`js/categorias.js`). Así no hay migración ni cambios en el backend.
+Los datos se siguen guardando con las claves antiguas (`humo_*`); la agrupación se hace al mostrar (`categoriaVisible()` en `js/smoke-palette.js`). Así no hay migración ni cambios en el backend.
 
 ## Funciones TDAH que se mantienen
 Límite de tareas en curso, modo Zen con temporizador y ruido marrón, Checkout/cierre de sesión, reactivar o hibernar proyectos sin culpa, deconstruir metas en micro-pasos, avisos push, Baúl con PIN.
