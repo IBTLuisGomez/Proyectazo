@@ -146,6 +146,17 @@ Modelo por defecto `claude-opus-5-5` con esfuerzo `low` (respuestas rápidas). P
 
 Sustituye Postgres + Spring + Nexus por un solo servicio Python con SQLite. Pasos para migrar tus datos sin perderlos en [MIGRACION.md](MIGRACION.md). El volumen de Postgres no se borra hasta que tú lo decidas.
 
+## 5d. Frontend (Fase 4, rama `feat/frontend-modular`, encima de la Fase 3)
+
+Hecho:
+- `index.html` sin manejadores inline: atributos `data-on-*` y un único despachador (`js/app/ui/acciones.js`).
+- Plantillas `html\`\`` que escapan por defecto (`js/app/ui/html.js`), ya usadas en Repasar y Jarvis.
+- `npm run lint` (ESLint) y `npm run typecheck` (tsc) en CI.
+
+Pendiente, a propósito: módulos ES con un bundle único, componentes y un store central. Unir los scripts cambia el modo estricto y el ámbito de los globales, y eso solo se puede validar en un navegador. Se hará vista a vista, con pruebas E2E en CI (Playwright), cuando el CI vuelva a funcionar (ahora lo bloquea la facturación de GitHub).
+
+**Prueba manual que necesito de ti:** pulsa los botones de cada pantalla y de los modales (login, Ajustes, Baúl, Checkout, crear tarea, compartir…). Ahora todos pasan por el despachador nuevo; si alguno no responde, dime cuál.
+
 ## 6. A tener en cuenta
 
 - **Memoria del equipo**: durante el desarrollo había solo ~260 MB libres de 7,5 GB. Docker con Postgres, backend, Nexus y nginx necesita ~1–1,5 GB; cierra lo que no uses antes de `docker compose up`. Para los tests del backend en este equipo: `MAVEN_OPTS="-Xmx256m" ./mvnw test -DargLine="-Xmx320m"`.
