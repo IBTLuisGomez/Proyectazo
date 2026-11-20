@@ -121,7 +121,6 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 
 | Tema | Qué implica |
 |---|---|
-| **Migraciones Flyway** | Necesito el esquema real de tu Postgres: `docker exec nexus-postgres pg_dump -s -U <POSTGRES_USER> <POSTGRES_DB>` (solo estructura, sin datos) |
 | **Voz en iOS/Firefox** | No tienen reconocimiento de voz en el navegador. Requiere transcribir en el servidor (Whisper), que pide ~1–2 GB de RAM más |
 | **Google Calendar / Gmail con OAuth** | Sustituye la contraseña de aplicación de Gmail. Necesito que crees en [Google Cloud Console](https://console.cloud.google.com/) un proyecto, la pantalla de consentimiento OAuth y unas credenciales "Aplicación web" con tu dominio como URI de redirección, y me pases el *Client ID* |
 
@@ -137,11 +136,15 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 ## 5b. Activar Jarvis con IA (opcional)
 
 1. Crea una clave en https://console.anthropic.com y ponla en `.env`: `ANTHROPIC_API_KEY=...`
-2. `docker compose up -d --build nexus-ai`
+2. `docker compose up -d --build app` (en la versión anterior a la Fase 3: `nexus-ai`)
 3. Comprueba: `http://localhost:8080/nexus/health` debe mostrar `"jarvis": {"provider": "claude", ...}`.
 4. Prueba: abre Jarvis y di "mañana a las 10 recuérdame llamar al banco".
 
 Modelo por defecto `claude-opus-5-5` con esfuerzo `low` (respuestas rápidas). Para gastar menos: `JARVIS_MODEL=claude-sonnet-5-5` o `claude-haiku-5-5`. Sin clave, Jarvis funciona en modo local.
+
+## 5c. Backend único (Fase 3, rama `feat/backend-unico`)
+
+Sustituye Postgres + Spring + Nexus por un solo servicio Python con SQLite. Pasos para migrar tus datos sin perderlos en [MIGRACION.md](MIGRACION.md). El volumen de Postgres no se borra hasta que tú lo decidas.
 
 ## 6. A tener en cuenta
 

@@ -1,0 +1,7 @@
+# Backend único (API + IA). Versiones mínimas probadas.
+pydantic>=2.12
+python-dotenv>=1.0
+google-genai>=2.31
+anthropic>=2.11
+bcrypt>=5.0
+pywebpush>=2.0

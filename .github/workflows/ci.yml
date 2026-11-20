@@ -22,14 +22,14 @@ jobs:
       - run: chmod +x mvnw && ./mvnw -B verify
 
   nexus:
-    name: Nexus AI (Python)
+    name: Backend único + IA (Python)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pydantic python-dotenv google-genai pytest
+      - run: pip install -r server/requirements.txt pytest
       - run: python -m pytest -q tests
 
   frontend:
@@ -54,4 +54,4 @@ jobs:
     needs: [backend, nexus, frontend]
     steps:
       - uses: actions/checkout@v4
-      - run: POSTGRES_PASSWORD=ci docker compose build
+      - run: docker compose build

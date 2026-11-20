@@ -22,7 +22,7 @@ class ProyectazoApp {
 
     this.NEXUS_API_BASE = (isHttp && !isDevDirect)
       ? '/nexus/api/nexus'
-      : `http://${host}:8002/api/nexus`;
+      : `http://${host}:8081/api/nexus`; // backend único: API e IA en el mismo puerto
     this.installAuthFetch();
     this.currentView = 'soltar';
     this.hacerMode = 'lista'; // 'lista' | 'tablero'
