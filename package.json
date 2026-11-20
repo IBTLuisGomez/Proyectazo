@@ -5,9 +5,11 @@
   "description": "Herramientas de build del frontend (Tailwind compilado)",
   "scripts": {
     "build:css": "tailwindcss -c tailwind.config.js -i styles/tailwind.input.css -o assets/tailwind.css --minify",
-    "watch:css": "tailwindcss -c tailwind.config.js -i styles/tailwind.input.css -o assets/tailwind.css --watch"
+    "watch:css": "tailwindcss -c tailwind.config.js -i styles/tailwind.input.css -o assets/tailwind.css --watch",
+    "typecheck": "tsc -p tsconfig.check.json"
   },
   "devDependencies": {
-    "tailwindcss": "3.4.17"
+    "tailwindcss": "3.4.17",
+    "typescript": "^5.6.3"
   }
 }
