@@ -1,3 +1,4 @@
+/* exported PensaderoShaderEngine */
 // Motor WebGL del orbe (raymarching volumétrico). Depende de SMOKE_PALETTE.
 
 /**

@@ -650,7 +650,6 @@ defineAppMethods({
   },
 
   completeTinderVictory(projectId, taskId, taskTitle) {
-    const decoded = decodeURIComponent(taskTitle || '');
 
     // Acorde dopamínico C Major
     try {

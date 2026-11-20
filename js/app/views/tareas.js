@@ -36,7 +36,6 @@ defineAppMethods({
       const days = this.daysSince(t.createdAt);
       return (t.column === 'enfoco' || t.column === 'proximo') && days >= 7;
     }).length;
-    const congeladorCount = allTasks.filter(t => t.column === 'congelador').length;
     const victoriasCount = allTasks.filter(t => t.column === 'victorias').length;
 
     let filtered = allTasks;

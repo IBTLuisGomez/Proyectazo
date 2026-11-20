@@ -239,8 +239,6 @@ defineAppMethods({
 
     const rawMinutes = parseInt(estimatedMinutes) || 30;
     const antiOptimismMinutes = Math.round(rawMinutes * 1.3); // +30% anti-optimism
-    const bufferPrep = 15;
-    const bufferDecomp = 15;
 
     // Hueco mañana a las 10:00 AM
     const tomorrow = new Date();

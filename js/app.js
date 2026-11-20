@@ -1,4 +1,5 @@
-// Aplicación principal. Expone `app` como global para los onclick="app.…" del HTML.
+/* exported defineAppMethods, app */
+// Aplicación principal. Expone `app` como global: lo usan las acciones data-on-* (js/app/ui/acciones.js).
 
 /**
  * Proyectazo — FocusFlow OS
@@ -1007,7 +1008,6 @@ class ProyectazoApp {
     } catch (e) {}
     const coarse = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 1;
     const shortSide = Math.min(window.innerWidth, window.innerHeight);
-    const longSide = Math.max(window.innerWidth, window.innerHeight);
     if (coarse && shortSide >= 600) return 'tablet';
     if (coarse) return 'phone';
     if (window.innerWidth < 720) return 'phone';

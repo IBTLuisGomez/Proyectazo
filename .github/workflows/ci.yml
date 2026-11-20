@@ -43,6 +43,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:css
+      - name: Lint (variables sin declarar, duplicados, código muerto)
+        run: npm run lint
       - name: Comprobación de tipos (módulos autónomos)
         run: npm run typecheck
       - name: Tests del parser de captura

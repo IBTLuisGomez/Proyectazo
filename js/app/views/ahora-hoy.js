@@ -398,7 +398,6 @@ defineAppMethods({
     const allProjects = (this.state.projects || []).filter(p => !p.inBaul);
     const enEjecucionProjects = allProjects.filter(p => p.status === 'en_ejecucion');
     const activeProjects = allProjects.filter(p => p.status === 'activo');
-    const totalLive = enEjecucionProjects.length + activeProjects.length;
 
     const filterFn = p => {
       if (this.batteryLevel === 20) return p.energy === 'baja' || p.nextActionType === 'hacer';

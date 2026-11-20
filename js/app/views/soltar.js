@@ -393,7 +393,6 @@ defineAppMethods({
   processOrbVoiceInput(text) {
     if (!text || !text.trim()) return;
     const clean = text.trim();
-    const lower = clean.toLowerCase();
 
     // Feedback sonoro/háptico
     this.triggerDopamineReward();
@@ -795,7 +794,6 @@ defineAppMethods({
     if (!item) return;
 
     const text = item.content.trim();
-    const lower = text.toLowerCase();
 
     // 1. Detección de proyecto por nombre o palabras clave (configurables en cada proyecto)
     const targetProject = this.findProjectForText(text);
