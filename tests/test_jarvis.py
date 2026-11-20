@@ -27,6 +27,7 @@ def test_sin_credenciales_responde_modo_local():
 @pytest.mark.parametrize("messages", [
     None, [], [{"role": "assistant", "content": "x"}], [{"role": "system", "content": "x"}],
     [{"role": "user", "content": 5}], [{"role": "user", "content": "x"}] * (jarvis.MAX_MESSAGES + 1),
+    [{"role": "user", "content": [{"type": "image", "source": {"type": "url", "url": "https://x"}}]}],
 ])
 def test_valida_el_historial(messages):
     with pytest.raises(jarvis.JarvisError) as e:

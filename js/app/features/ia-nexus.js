@@ -256,7 +256,7 @@ defineAppMethods({
         <div class="p-4 rounded-2xl theme-card-subtle border theme-border">
           <div class="flex items-center gap-2 mb-1">
             <span class="text-xs font-mono font-bold uppercase text-blue-400">Tarea Seleccionada</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300">${p.emoji || '🎯'} ${p.name}</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300">${p.emoji || '🎯'} ${this.escapeHtml(p.name)}</span>
           </div>
           <h4 class="font-display font-bold text-base text-white">${task.title}</h4>
         </div>
@@ -401,7 +401,7 @@ defineAppMethods({
         <div class="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-mono font-bold uppercase text-purple-300 flex items-center gap-1.5">
-              <span>${p.emoji || '🎯'}</span> ${p.name}
+              <span>${p.emoji || '🎯'}</span> ${this.escapeHtml(p.name)}
             </span>
             <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-900 border theme-border theme-text-muted">
               ${daysInactive} días en pausa

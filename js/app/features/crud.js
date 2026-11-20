@@ -85,7 +85,7 @@ defineAppMethods({
       targetSelect.innerHTML = `
         <option value="pensadero">🧠 El Pensadero (descarga mental)</option>
         ${(this.state.projects || []).map(p => `
-          <option value="${p.id}">🎯 Tarea en: ${p.emoji || '🎯'} ${p.name}</option>
+          <option value="${p.id}">🎯 Tarea en: ${p.emoji || '🎯'} ${this.escapeHtml(p.name)}</option>
         `).join('')}
       `;
     }

@@ -92,7 +92,7 @@ defineAppMethods({
     };
     const estimate = ProyectazoAhora.EFFORT_MINUTES[activeTask.effort];
     const energyBtn = (key, label) => `<button type="button" onclick="app.setEnergyToday('${key}')" aria-pressed="${energy === key}"
-      class="min-h-[36px] px-3 rounded-full text-xs font-semibold border transition ${energy === key ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-200' : 'border-slate-800 text-slate-400 hover:text-slate-200'}">${label}</button>`;
+      class="min-h-[44px] px-3 rounded-full text-xs font-semibold border transition ${energy === key ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-200' : 'border-slate-800 text-slate-400 hover:text-slate-200'}">${label}</button>`;
 
     const m = Math.floor(this.timer.secondsLeft / 60).toString().padStart(2, '0');
     const s = (this.timer.secondsLeft % 60).toString().padStart(2, '0');

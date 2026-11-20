@@ -12,22 +12,25 @@ new Function('defineAppMethods', 'localStorage', src)(m => Object.assign(methods
 
 function fakeApp() {
   const calls = [];
+  let app;
   const project = { id: 'p1', name: 'CytoHelix', tasks: [{ id: 't1', title: 'Leer paper', column: 'proximo', effort: 'S' }] };
-  return Object.assign(Object.create(methods), {
+  app = Object.assign(Object.create(methods), {
     calls,
     state: { projects: [project], pensadero: [] },
     timer: { isRunning: false },
     backendAvailable: false,
     findProjectMatch: name => (/cyto/i.test(name) ? { project } : null),
-    captureThought: (t, o) => { calls.push(['captureThought', t, o]); return [{ id: 'n1' }]; },
+    captureThought: (t, o) => { calls.push(['captureThought', t, o]); return [app.nextCapture || { id: 'n1', content: t, dueAt: o.dueAt }]; },
     addTaskFromCapture: (p, parsed) => calls.push(['addTask', p.name, parsed]),
     quickDumpToOrbe: (t, c, x) => { calls.push(['dump', t, c, x]); return { item: { id: 'n1' }, created: Promise.resolve() }; },
     scheduleCaptureReminder: () => calls.push(['reminder']),
     formatDue: iso => iso.slice(0, 10),
     setTimerDuration: m => calls.push(['timer', m]),
     startPauseTimer: () => calls.push(['start']),
-    navigate: v => calls.push(['navigate', v])
+    navigate: v => calls.push(['navigate', v]),
+    closeJarvis: () => {}
   });
+  return app;
 }
 
 const run = (app, name, input) => app.runJarvisTool({ id: 'x', name, input });
@@ -76,4 +79,18 @@ test('recordar_dato guarda sin duplicar y empezar_foco limita minutos', () => {
 
 test('herramienta desconocida devuelve error, no excepción', () => {
   assert.equal(run(fakeApp(), 'borrar_todo', {}).is_error, true);
+});
+
+test('soltar_pensamiento informa lo que pasó de verdad', () => {
+  const app = fakeApp();
+  app.nextCapture = { id: 't9', kind: 'task', projectName: 'CytoHelix' };
+  assert.match(run(app, 'soltar_pensamiento', { texto: 'para cyto: x', categoria: 'auto' }).content, /tarea en CytoHelix/);
+  app.nextCapture = { id: 'n2', content: 'pan', count: 3 };
+  assert.match(run(app, 'soltar_pensamiento', { texto: 'pan', categoria: 'auto' }).content, /Ya estaba apuntado/);
+});
+
+test('programar_aviso falla si el pensamiento no quedó con fecha', () => {
+  const app = fakeApp();
+  app.nextCapture = { id: 'n3', content: 'banco' }; // p. ej. repetido sin dueAt
+  assert.equal(run(app, 'programar_aviso', { texto: 'banco', cuando: '2030-01-01T09:00:00Z' }).is_error, true);
 });

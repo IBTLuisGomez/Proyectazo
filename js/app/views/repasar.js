@@ -23,7 +23,7 @@ defineAppMethods({
       const active = t.view === activeView;
       // El Baúl pasa siempre por el PIN
       const action = t.view === 'baul' ? 'app.openBaul()' : `app.navigate('${t.view}')`;
-      return `<button type="button" onclick="${action}" role="tab" aria-selected="${active}"
+      return `<button type="button" onclick="${action}" role="tab" aria-selected="${active}" aria-controls="repasar-panel"
         class="shrink-0 min-h-[44px] px-3.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border transition ${
           active ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-200' : 'border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
         }"><span aria-hidden="true">${t.icon}</span>${t.label}</button>`;
@@ -32,7 +32,7 @@ defineAppMethods({
     container.innerHTML = `
       <div class="space-y-4">
         <div role="tablist" aria-label="Repasar" class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">${tabs}</div>
-        <div id="repasar-panel" class="min-w-0"></div>
+        <div id="repasar-panel" role="tabpanel" class="min-w-0"></div>
       </div>`;
     return document.getElementById('repasar-panel');
   },

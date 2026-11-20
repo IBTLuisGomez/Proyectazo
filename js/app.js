@@ -866,17 +866,11 @@ class ProyectazoApp {
       window.history.replaceState({ view: this.currentView }, '', `#${this.currentView}`);
     } else {
       const hashView = window.location.hash.replace('#', '');
-      if (hashView === 'zen' || hashView === 'ahora') {
-        this.currentView = 'ahora';
-      } else if (hashView === 'pensadero' || hashView === 'soltar' || hashView === 'gadget' || hashView === 'orbe') {
-        this.currentView = 'soltar';
-      } else if (hashView === 'kanban' || hashView === 'tareas' || hashView === 'pendientes' || hashView === 'hacer') {
-        this.currentView = 'hacer';
-      } else if (hashView === 'mas') {
-        this.currentView = 'mas';
-      } else if (hashView) {
-        this.currentView = hashView;
-      }
+      // Atajos del manifest que no son vistas: abren su herramienta sobre el Orbe
+      if (hashView === 'nexus-ai') setTimeout(() => this.openJarvis(), 300);
+      if (hashView === 'dual-widget') setTimeout(() => this.openDualWidgetModal(), 300);
+      this.currentView = this.normalizeView(hashView);
+      window.history.replaceState({ view: this.currentView }, '', `#${this.currentView}`);
     }
 
     // Initialize Splash Intro on mobile if not seen yet
@@ -2442,12 +2436,22 @@ class ProyectazoApp {
   }
 
   // --- NAVIGATION (4 DESTINOS TDAH) ---
+  // Alias y lista blanca de vistas. Secciones: soltar / ahora / repasar (repasar agrupa varias vistas en fichas).
+  normalizeView(viewName) {
+    const alias = { zen: 'ahora', pensadero: 'soltar', orbe: 'soltar', gadget: 'soltar', kanban: 'hacer', tareas: 'hacer', pendientes: 'hacer' };
+    let v = alias[viewName] || viewName;
+    if (v === 'repasar') v = this.lastRepasarTab();
+    // El Baúl bloqueado nunca se pinta vacío: se pide el PIN y se queda en la última ficha
+    if (v === 'baul' && !this.baulUnlocked) {
+      setTimeout(() => this.openBaul(), 0);
+      v = this.lastRepasarTab();
+    }
+    const known = ['soltar', 'ahora', ...ProyectazoApp.REPASAR_VIEWS];
+    return known.includes(v) ? v : 'soltar';
+  }
+
   navigate(viewName, pushHistory = true) {
-    // Normalizar alias. Secciones: soltar / ahora / repasar (repasar agrupa varias vistas en fichas).
-    if (viewName === 'zen') viewName = 'ahora';
-    if (viewName === 'pensadero' || viewName === 'orbe') viewName = 'soltar';
-    if (viewName === 'kanban' || viewName === 'tareas' || viewName === 'pendientes') viewName = 'hacer';
-    if (viewName === 'repasar') viewName = this.lastRepasarTab();
+    viewName = this.normalizeView(viewName);
     if (ProyectazoApp.REPASAR_VIEWS.includes(viewName) && viewName !== 'baul') this.rememberRepasarTab(viewName);
     const navKey = ProyectazoApp.REPASAR_VIEWS.includes(viewName) ? 'repasar' : viewName;
 

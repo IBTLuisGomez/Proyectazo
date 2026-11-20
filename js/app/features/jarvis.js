@@ -34,6 +34,7 @@ defineAppMethods({
       panel.id = 'jarvis-panel';
       panel.setAttribute('role', 'dialog');
       panel.setAttribute('aria-label', 'Jarvis');
+      panel.setAttribute('aria-modal', 'true');
       panel.className = 'fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm';
       panel.innerHTML = `
         <div class="w-full sm:max-w-lg h-[85dvh] sm:h-[70vh] flex flex-col rounded-t-3xl sm:rounded-3xl bg-slate-950 border border-slate-800 shadow-2xl">
@@ -61,6 +62,7 @@ defineAppMethods({
       document.body.appendChild(panel);
     }
     panel.classList.remove('hidden');
+    this._jarvisMode = undefined; // se vuelve a preguntar al servidor: puede haberse configurado la IA
     this.updateJarvisVoiceButton();
     this.renderJarvisLog();
     setTimeout(() => document.getElementById('jarvis-input')?.focus(), 50);
@@ -117,8 +119,11 @@ defineAppMethods({
     if (this._jarvisMode === 'local') return this.runJarvisLocal(text);
 
     let history = this.jarvisHistory();
-    if (history.length > JARVIS.MAX_HISTORY) history = [];
-    history.push({ role: 'user', content: [{ type: 'text', text }, { type: 'text', text: this.jarvisContext() }] });
+    let restarted = false;
+    if (history.length > JARVIS.MAX_HISTORY) { history = []; restarted = true; }
+    // El contexto completo (memoria, proyectos) va al empezar; después solo lo que cambia cada turno
+    history.push({ role: 'user', content: [{ type: 'text', text }, { type: 'text', text: this.jarvisContext(history.length === 0) }] });
+    if (restarted) this.showToast('🧹 Empecé una conversación nueva para no ir lento. Lo que te pedí recordar sigue guardado.');
     jarvisWrite(JARVIS.CHAT_KEY, history);
 
     this._jarvisBusy = true;
@@ -145,6 +150,12 @@ defineAppMethods({
         this.setJarvisMode(body.provider, body.model);
 
         history.push({ role: 'assistant', content: body.content || [] });
+        const calls = (body.content || []).filter(b => b.type === 'tool_use');
+        const incomplete = body.stop_reason === 'refusal' || body.stop_reason === 'max_tokens';
+        if (incomplete && calls.length) {
+          // Cada tool_use necesita su tool_result o la API rechazará los siguientes turnos
+          history.push({ role: 'user', content: calls.map(c => ({ type: 'tool_result', tool_use_id: c.id, content: 'No se ejecutó: la respuesta quedó incompleta.', is_error: true })) });
+        }
         jarvisWrite(JARVIS.CHAT_KEY, history);
 
         if (body.stop_reason === 'refusal') {
@@ -156,7 +167,6 @@ defineAppMethods({
           return;
         }
 
-        const calls = (body.content || []).filter(b => b.type === 'tool_use');
         if (body.stop_reason !== 'tool_use' || !calls.length) {
           this.renderJarvisLog();
           this.speakJarvis(body.content);
@@ -194,7 +204,7 @@ defineAppMethods({
   },
 
   // Contexto que acompaña a cada mensaje del usuario. Breve: Jarvis pide más con ver_tareas.
-  jarvisContext() {
+  jarvisContext(full = true) {
     const now = new Date();
     const projects = (this.state.projects || []).filter(p => !p.inBaul);
     const lines = [
@@ -202,6 +212,7 @@ defineAppMethods({
       `Energía hoy: ${this.getEnergyToday ? this.getEnergyToday() : 'media'}`,
       `Proyectos: ${projects.map(p => `${p.name} (${(p.tasks || []).filter(t => t.column !== 'victorias').length} pendientes)`).join('; ') || 'ninguno'}`
     ];
+    if (!full) return `<contexto>\n${lines.slice(0, 2).join('\n')}\n</contexto>`;
     const due = this.dueItems ? this.dueItems() : [];
     if (due.length) lines.push(`Para hoy: ${due.slice(0, 5).map(d => d.title).join('; ')}`);
     const memory = jarvisRead(JARVIS.MEMORY_KEY, []);
@@ -232,8 +243,10 @@ defineAppMethods({
           const texto = str(input.texto);
           if (!texto) return fail('Falta el texto.');
           const category = JARVIS.CATEGORY[input.categoria];
-          this.captureThought(texto, { source: 'jarvis', category, skipSplit: true, silent: true });
-          return ok(`Guardado en Soltar: "${texto}"`);
+          const [r] = this.captureThought(texto, { source: 'jarvis', category, skipSplit: true, silent: true });
+          if (!r) return fail('No se pudo guardar.');
+          if (r.kind === 'task') return ok(`Lo puse como tarea en ${r.projectName}: "${texto}"`);
+          return ok(r.count > 1 ? `Ya estaba apuntado (van ${r.count} veces): "${r.content}"` : `Guardado en Soltar: "${texto}"`);
         }
         case 'crear_tarea': {
           const titulo = str(input.titulo);
@@ -251,8 +264,9 @@ defineAppMethods({
           const cuando = isoOrNull(input.cuando);
           if (!texto || !cuando) return fail('Necesito texto y una fecha ISO 8601 válida.');
           if (new Date(cuando).getTime() < Date.now() - 60000) return fail('Esa hora ya pasó.');
-          const saved = this.captureThought(texto, { source: 'jarvis', category: 'humo_rojo', dueAt: cuando, skipSplit: true, silent: true });
-          if (!saved.length) return fail('No se pudo guardar (¿ya lo tenías apuntado?).');
+          const [saved] = this.captureThought(texto, { source: 'jarvis', category: 'humo_rojo', dueAt: cuando, skipSplit: true, silent: true });
+          if (!saved || !saved.dueAt) return fail('No se pudo programar el aviso.');
+          if (saved.kind === 'task') return ok(`Aviso para ${this.formatDue(cuando)} como tarea de ${saved.projectName}: "${texto}"`);
           const push = this.backendAvailable ? '' : ' (sin servidor: el aviso solo sonará con la app abierta)';
           return ok(`Aviso para ${this.formatDue(cuando)}: "${texto}"${push}`);
         }
@@ -278,11 +292,13 @@ defineAppMethods({
           if (!(min >= 1 && min <= 90)) return fail('Minutos entre 1 y 90.');
           this.setTimerDuration(min);
           if (!this.timer.isRunning) this.startPauseTimer();
+          this.closeJarvis();
           this.navigate('ahora');
           return ok(`Foco de ${min} min en marcha.`);
         }
         case 'ir_a': {
           if (!['soltar', 'ahora', 'repasar'].includes(input.seccion)) return fail('Sección no válida.');
+          this.closeJarvis();
           this.navigate(input.seccion);
           return ok(`Abierto ${input.seccion}.`);
         }

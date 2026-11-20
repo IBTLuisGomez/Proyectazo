@@ -29,12 +29,19 @@ defineAppMethods({
         ? this.findProjectMatch(parsed.projectName)
         : (opts.voiceRoute ? this.findProjectMatch(parsed.text, { byNameOnly: true }) : null);
       if (target) {
-        this.addTaskFromCapture(target.project, parsed, { silent: opts.silent || multiple });
+        const task = this.addTaskFromCapture(target.project, parsed, { silent: opts.silent || multiple });
+        results.push({ id: task.id, kind: 'task', projectName: target.project.name, dueAt: task.dueAt });
         continue;
       }
 
       const repeated = this.registerRepeatedThought(parsed.text);
       if (repeated) {
+        // Repetir algo ya apuntado con una hora nueva programa el aviso igualmente
+        if (parsed.dueAt) {
+          repeated.dueAt = new Date(parsed.dueAt).toISOString();
+          repeated.updatedAt = new Date().toISOString();
+          this.scheduleCaptureReminder(repeated, Promise.resolve());
+        }
         results.push(repeated);
         continue;
       }
@@ -63,7 +70,7 @@ defineAppMethods({
     }
 
     if (multiple && !opts.silent) {
-      const ids = results.map(r => r.id);
+      const ids = results.filter(r => r.kind !== 'task').map(r => r.id);
       this.showToast(`✂️ Separé ${ideas.length} ideas para que cada una vaya a su sitio`, () => {
         // Unir: deshacer la separación y guardar el texto como un solo pensamiento
         this.state.pensadero = (this.state.pensadero || []).filter(p => !ids.includes(p.id));
@@ -82,7 +89,7 @@ defineAppMethods({
   // Un pensamiento que ya estaba (sin resolver) no se duplica: cuenta las veces que vuelve.
   registerRepeatedThought(text) {
     const key = CapturaParser.normalize(text);
-    const existing = (this.state.pensadero || []).find(p => !p.isResolved && CapturaParser.normalize(p.content) === key);
+    const existing = (this.state.pensadero || []).find(p => !p.isResolved && !p.inBaul && CapturaParser.normalize(p.content) === key);
     if (!existing) return null;
     const ageMs = Date.now() - new Date(existing.lastSeenAt || existing.createdAt).getTime();
     if (ageMs < 10 * 60 * 1000) return existing; // doble envío accidental: se ignora

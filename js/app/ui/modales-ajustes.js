@@ -50,6 +50,7 @@ defineAppMethods({
     document.querySelectorAll('[id^="modal-"]').forEach(el => {
       if (!el.classList.contains('hidden')) this.closeModal(el.id);
     });
+    if (this.closeJarvis) this.closeJarvis();
   },
 
   openSettings() {

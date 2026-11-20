@@ -138,7 +138,7 @@ defineAppMethods({
               <option value="all" ${this.hacerProjectFilter === 'all' ? 'selected' : ''}>Todos los proyectos</option>
               ${projects.map(p => `
                 <option value="${p.id}" ${p.id === this.hacerProjectFilter ? 'selected' : ''}>
-                  ${p.emoji || '🎯'} ${p.name}
+                  ${p.emoji || '🎯'} ${this.escapeHtml(p.name)}
                 </option>
               `).join('')}
             </select>
@@ -380,7 +380,7 @@ defineAppMethods({
             <select onchange="app.changeKanbanProject(this.value)" class="text-xl sm:text-2xl font-display font-extrabold bg-transparent border-b theme-border pb-0.5 focus:outline-none cursor-pointer">
               ${projects.map(p => `
                 <option value="${p.id}" ${p.id === project.id ? 'selected' : ''} class="theme-card text-sm">
-                  ${p.emoji || '🎯'} ${p.name} (${p.status})
+                  ${p.emoji || '🎯'} ${this.escapeHtml(p.name)} (${p.status})
                 </option>
               `).join('')}
             </select>
@@ -534,7 +534,7 @@ defineAppMethods({
           <span class="text-xl">${project.emoji || '🎯'}</span>
           <select onchange="app.changeKanbanProject(this.value)" class="text-lg font-extrabold bg-transparent border-b theme-border focus:outline-none">
             ${(this.state.projects || []).map(p => `
-              <option value="${p.id}" ${p.id === project.id ? 'selected' : ''} class="theme-card text-xs">${p.emoji || '🎯'} ${p.name}</option>
+              <option value="${p.id}" ${p.id === project.id ? 'selected' : ''} class="theme-card text-xs">${p.emoji || '🎯'} ${this.escapeHtml(p.name)}</option>
             `).join('')}
           </select>
         </div>

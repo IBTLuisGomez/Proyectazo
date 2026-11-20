@@ -13,6 +13,7 @@ import os
 
 MAX_MESSAGES = 80          # tope de historial aceptado por petición
 MAX_CHARS = 200_000        # tope de tamaño total del historial
+USER_BLOCK_TYPES = {"text", "tool_result"}
 
 SYSTEM_PROMPT = """Eres Jarvis, el asistente personal dentro de la app Nexus Orb. La persona que te habla tiene TDAH y lleva varios proyectos a la vez.
 
@@ -103,6 +104,11 @@ def validate_messages(messages):
         content = m.get("content")
         if not isinstance(content, (str, list)):
             raise JarvisError("content debe ser texto o lista de bloques", 400)
+        if isinstance(content, list) and m["role"] == "user":
+            # El usuario solo manda texto y resultados de herramientas: nada de imágenes ni documentos
+            for block in content:
+                if not isinstance(block, dict) or block.get("type") not in USER_BLOCK_TYPES:
+                    raise JarvisError("Tipo de bloque no permitido en un mensaje de usuario", 400)
         total += len(str(content))
     if total > MAX_CHARS:
         raise JarvisError("Historial demasiado grande", 400)
@@ -145,6 +151,8 @@ class ClaudeProvider:
             raise JarvisError(f"Error de la API ({e.status_code})", 502)
         except a.APIConnectionError:
             raise JarvisError("Sin conexión con la API de Anthropic", 503)
+        except Exception as e:  # p. ej. SDK sin algún parámetro: responder JSON, no un 500 vacío
+            raise JarvisError(f"Error inesperado del proveedor: {type(e).__name__}", 502)
 
         # Los bloques se devuelven intactos: el navegador los reenvía tal cual en el siguiente turno
         data = response.to_dict()
