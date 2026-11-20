@@ -150,7 +150,7 @@ Sustituye Postgres + Spring + Nexus por un solo servicio Python con SQLite. Paso
 
 Hecho:
 - `index.html` sin manejadores inline: atributos `data-on-*` y un único despachador (`js/app/ui/acciones.js`).
-- Plantillas `html\`\`` que escapan por defecto (`js/app/ui/html.js`), ya usadas en Repasar y Jarvis.
+- Plantillas `` html`…` `` que escapan por defecto (`js/app/ui/html.js`), ya usadas en Repasar y Jarvis.
 - `npm run lint` (ESLint) y `npm run typecheck` (tsc) en CI.
 
 Pendiente, a propósito: módulos ES con un bundle único, componentes y un store central. Unir los scripts cambia el modo estricto y el ámbito de los globales, y eso solo se puede validar en un navegador. Se hará vista a vista, con pruebas E2E en CI (Playwright), cuando el CI vuelva a funcionar (ahora lo bloquea la facturación de GitHub).
