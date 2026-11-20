@@ -569,7 +569,7 @@
           <span class="text-[9px] font-mono text-cyan-400">Cognitive OS • Intro</span>
         </div>
       </div>
-      <button onclick="app.dismissSplash()" class="px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-300 hover:text-white backdrop-blur flex items-center gap-1 active:scale-95 transition shadow">
+      <button data-on-click='["dismissSplash"]' class="px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-300 hover:text-white backdrop-blur flex items-center gap-1 active:scale-95 transition shadow">
         <span>Omitir</span> <span>➔</span>
       </button>
     </div>
@@ -584,7 +584,7 @@
 
     <!-- Bottom Action / Enter -->
     <div class="w-full max-w-xs flex flex-col items-center gap-3 z-10 pb-4">
-      <button onclick="app.dismissSplash()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:brightness-110 text-white font-display font-extrabold text-sm shadow-xl shadow-cyan-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+      <button data-on-click='["dismissSplash"]' class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:brightness-110 text-white font-display font-extrabold text-sm shadow-xl shadow-cyan-500/30 active:scale-95 transition flex items-center justify-center gap-2">
         <span>✨</span> <span>Entrar al Sistema</span> <span>➔</span>
       </button>
       <p class="text-[10px] font-mono text-slate-400 text-center">Toca para comenzar tu sesión sin fricción</p>
@@ -608,7 +608,7 @@
         <p class="text-[11px] text-slate-400 mt-2">Introduce tus credenciales para acceder al sistema y tus proyectos.</p>
       </div>
 
-      <form onsubmit="app.handleLoginSubmit(event)" class="space-y-4 text-left" autocomplete="on">
+      <form data-on-submit='["handleLoginSubmit", "$event"]' class="space-y-4 text-left" autocomplete="on">
         <div>
           <label for="login-username-input" class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold mb-1">Usuario</label>
           <input type="text" id="login-username-input" name="username" autocomplete="username" maxlength="40" required placeholder="Tu usuario"
@@ -618,7 +618,7 @@
         <div>
           <div class="flex items-center justify-between mb-1">
             <label for="login-password-input" class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold">Contraseña</label>
-            <button type="button" onclick="app.toggleLoginPasswordVisibility()" class="text-[11px] text-cyan-400 hover:text-cyan-300 font-mono">
+            <button type="button" data-on-click='["toggleLoginPasswordVisibility"]' class="text-[11px] text-cyan-400 hover:text-cyan-300 font-mono">
               <span id="login-pwd-toggle-text">Ver</span> 👁️
             </button>
           </div>
@@ -657,7 +657,7 @@
           </span>
           <span class="text-xs theme-text-muted">Sin distracciones ni listas</span>
         </div>
-        <button onclick="app.closeZenMode()" class="px-3 py-1 rounded-xl theme-card-subtle theme-text-muted hover:text-white text-xs font-semibold">
+        <button data-on-click='["closeZenMode"]' class="px-3 py-1 rounded-xl theme-card-subtle theme-text-muted hover:text-white text-xs font-semibold">
           Salir (Esc) ✕
         </button>
       </div>
@@ -673,20 +673,20 @@
       <div class="p-6 rounded-2xl theme-card-subtle border theme-border text-center mb-6">
         <span id="zen-timer-display" class="text-5xl sm:text-6xl font-mono font-extrabold text-emerald-400 block tracking-tight">25:00</span>
         <div class="flex items-center justify-center gap-3 mt-4">
-          <button onclick="app.startPauseTimer()" id="zen-timer-btn" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+          <button data-on-click='["startPauseTimer"]' id="zen-timer-btn" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition">
             Pausar
           </button>
-          <button onclick="app.toggleBrownNoise()" id="zen-noise-btn" class="px-4 py-2.5 rounded-xl theme-card border theme-border text-xs font-semibold flex items-center gap-1.5 hover:brightness-110">
+          <button data-on-click='["toggleBrownNoise"]' id="zen-noise-btn" class="px-4 py-2.5 rounded-xl theme-card border theme-border text-xs font-semibold flex items-center gap-1.5 hover:brightness-110">
             <span>🎧</span> Ruido Marrón Focus: <span id="zen-noise-state">OFF</span>
           </button>
         </div>
       </div>
 
       <div class="flex items-center justify-between gap-3">
-        <button onclick="app.promptMasticarTask(document.getElementById('zen-task-title').textContent)" class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-semibold hover:brightness-110 flex items-center gap-1.5">
+        <button data-on-click='["promptMasticarTask", "$text:#zen-task-title"]' class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-semibold hover:brightness-110 flex items-center gap-1.5">
           <span>🍴</span> ¿Abrumado? Masticar en 3 pasos
         </button>
-        <button onclick="app.completeZenTask()" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 active:scale-95 transition">
+        <button data-on-click='["completeZenTask"]' class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 active:scale-95 transition">
           ✓ Marcar Victoria & Cerrar
         </button>
       </div>
@@ -708,7 +708,7 @@
           </span>
           <span class="text-xs text-slate-400">Todo el ruido exterior ha sido apagado</span>
         </div>
-        <button onclick="app.closeOneThingMode()" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-semibold">
+        <button data-on-click='["closeOneThingMode"]' class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-semibold">
           Salir (Esc) ✕
         </button>
       </div>
@@ -732,23 +732,23 @@
             <span class="text-[11px] text-slate-400">Sin decisiones secuenciales. Completa, pausa conscientemente o congela.</span>
           </div>
         </div>
-        <button onclick="app.toggleBrownNoise()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5 shrink-0">
+        <button data-on-click='["toggleBrownNoise"]' class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5 shrink-0">
           <span>🎧</span> Ruido Marrón
         </button>
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <button onclick="app.triggerAIDeconstructFromOneThing()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-semibold text-xs flex items-center gap-1.5">
+        <button data-on-click='["triggerAIDeconstructFromOneThing"]' class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-semibold text-xs flex items-center gap-1.5">
           <span>🪄</span> Desglose Atómico Gemini
         </button>
         <div class="flex items-center gap-2">
-          <button onclick="app.postponeOneThing()" class="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold" title="Pausar y anotar el Hilo de Ariadna">
+          <button data-on-click='["postponeOneThing"]' class="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold" title="Pausar y anotar el Hilo de Ariadna">
             ⏸️ Pausar
           </button>
-          <button onclick="app.freezeOneThing()" class="px-3 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-sky-400 hover:text-sky-300 text-xs font-semibold" title="Enviar al congelador sin culpa">
+          <button data-on-click='["freezeOneThing"]' class="px-3 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-sky-400 hover:text-sky-300 text-xs font-semibold" title="Enviar al congelador sin culpa">
             ❄️ Congelar
           </button>
-          <button onclick="app.completeOneThing()" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+          <button data-on-click='["completeOneThing"]' class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition">
             ✓ Hecha (Victoria)
           </button>
         </div>
@@ -766,7 +766,7 @@
           </span>
           <span class="text-xs theme-text-muted">Restauración de Contexto sin Parálisis</span>
         </div>
-        <button onclick="app.closeDespegue()" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeDespegue"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="flex items-start gap-3.5 mb-5">
@@ -803,15 +803,15 @@
 
       <!-- Acciones de Entrada -->
       <div class="space-y-2.5">
-        <button onclick="app.acceptDespegueAndStart()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-display font-extrabold text-sm shadow-xl shadow-emerald-500/25 active:scale-95 transition flex items-center justify-center gap-2">
+        <button data-on-click='["acceptDespegueAndStart"]' class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-display font-extrabold text-sm shadow-xl shadow-emerald-500/25 active:scale-95 transition flex items-center justify-center gap-2">
           <span>🚀</span> ¡Jalar el Hilo y Empezar en Modo Zen!
         </button>
 
         <div class="flex items-center gap-2">
-          <button onclick="app.acceptDespegueShowKanban()" class="flex-1 py-2.5 rounded-xl theme-card-subtle border theme-border font-semibold text-xs hover:brightness-110 transition">
+          <button data-on-click='["acceptDespegueShowKanban"]' class="flex-1 py-2.5 rounded-xl theme-card-subtle border theme-border font-semibold text-xs hover:brightness-110 transition">
             📋 Desplegar Tablero Completo
           </button>
-          <button onclick="app.skipDespegueWithoutGuilt()" class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-semibold theme-text-muted hover:text-white transition">
+          <button data-on-click='["skipDespegueWithoutGuilt"]' class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-semibold theme-text-muted hover:text-white transition">
             ⏳ Saltar sin culpa
           </button>
         </div>
@@ -830,7 +830,7 @@
           <h2 id="deepwork-task-title" class="text-xl font-display font-extrabold mt-1">Título de la tarea</h2>
           <span id="deepwork-project-badge" class="text-xs theme-text-muted"></span>
         </div>
-        <button onclick="app.closeModal('deepwork-modal')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "deepwork-modal"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="space-y-4 text-xs">
@@ -849,7 +849,7 @@
         <div>
           <div class="flex items-center justify-between mb-1.5">
             <label class="font-bold">Checklist de Micro-Pasos (≤5 min)</label>
-            <button onclick="app.addDeepworkSubstep()" class="text-xs text-sky-400 font-semibold hover:underline">+ Añadir paso</button>
+            <button data-on-click='["addDeepworkSubstep"]' class="text-xs text-sky-400 font-semibold hover:underline">+ Añadir paso</button>
           </div>
           <div id="deepwork-substeps-list" class="space-y-2">
             <!-- Micro pasos dinámicos -->
@@ -862,7 +862,7 @@
             <span class="font-bold text-amber-400">📑 Tarea Administrativa / Burocrática (Doble dopamina)</span>
           </label>
           <div class="flex items-center gap-2">
-            <button onclick="app.saveDeepworkCard()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold transition">
+            <button data-on-click='["saveDeepworkCard"]' class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold transition">
               Guardar Cambios
             </button>
           </div>
@@ -887,7 +887,7 @@
             <p class="text-[10px] sm:text-[11px] theme-text-muted">Audio Streaming con Extracción Semántica y Clasificación JSON</p>
           </div>
         </div>
-        <button onclick="app.closeNexusVoice()" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
+        <button data-on-click='["closeNexusVoice"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body space-y-3.5 text-xs">
@@ -904,7 +904,7 @@
 
         <!-- Visualizer de Ondas de Voz y Estado de Escucha -->
         <div class="p-4 sm:p-5 rounded-2xl theme-card-subtle border theme-border text-center relative overflow-hidden">
-          <div id="nexus-mic-waves" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-purple-500/20 border-2 border-purple-500/40 flex items-center justify-center mx-auto mb-2 cursor-pointer hover:scale-105 active:scale-95 transition" onclick="app.toggleNexusListening()">
+          <div id="nexus-mic-waves" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-purple-500/20 border-2 border-purple-500/40 flex items-center justify-center mx-auto mb-2 cursor-pointer hover:scale-105 active:scale-95 transition" data-on-click='["toggleNexusListening"]'>
             <span id="nexus-mic-icon" class="text-2xl">🎙️</span>
           </div>
           <p id="nexus-status-label" class="font-bold text-xs text-purple-300">Presiona el micrófono para hablar o di "Nexus..."</p>
@@ -917,7 +917,7 @@
           <div class="flex gap-2">
             <input type="text" id="nexus-input" placeholder="Habla o escribe tu pensamiento..." 
               class="flex-1 px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium" />
-            <button onclick="app.processNexusCommand()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shrink-0 transition text-xs">
+            <button data-on-click='["processNexusCommand"]' class="px-3.5 sm:px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shrink-0 transition text-xs">
               Analizar ↵
             </button>
           </div>
@@ -936,14 +936,14 @@
           <p id="nexus-parsed-summary" class="text-xs text-slate-200 leading-relaxed"></p>
           <pre id="nexus-json-preview" class="hidden"></pre>
 
-          <button id="nexus-apply-btn" onclick="app.confirmNexusAction()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md active:scale-95 transition">
+          <button id="nexus-apply-btn" data-on-click='["confirmNexusAction"]' class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md active:scale-95 transition">
             ✓ Guardar pensamiento
           </button>
         </div>
       </div>
 
       <div class="nexus-modal-footer bg-slate-950/40 flex justify-end">
-        <button onclick="app.closeNexusVoice()" class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+        <button data-on-click='["closeNexusVoice"]' class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
           Cerrar
         </button>
       </div>
@@ -955,7 +955,7 @@
     <div class="max-w-7xl mx-auto px-3 sm:px-6 min-h-16 h-auto py-1.5 flex items-center justify-between gap-2 sm:gap-3">
       
       <!-- Brand & Status -->
-      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none min-w-0" onclick="app.navigate('soltar')">
+      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none min-w-0" data-on-click='["navigate", "soltar"]'>
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 flex items-center justify-center shadow shrink-0">
           <img src="assets/logo_dark.png" alt="Nexus N" class="w-full h-full object-cover app-logo-dynamic">
         </div>
@@ -976,14 +976,14 @@
 
       <!-- Desktop Nav (3 secciones: Soltar / Ahora / Repasar) -->
       <nav class="hidden xl:flex items-center gap-1.5 p-1 rounded-xl border theme-card-subtle" id="desktop-nav">
-        <button onclick="app.navigate('soltar')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all relative" data-view="soltar">
+        <button data-on-click='["navigate", "soltar"]' class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all relative" data-view="soltar">
           <span>🔮</span> Soltar
           <span id="pensadero-count-badge" class="hidden w-2 h-2 rounded-full bg-cyan-400" aria-label="Hay pensamientos por repasar"></span>
         </button>
-        <button onclick="app.navigate('ahora')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="ahora">
+        <button data-on-click='["navigate", "ahora"]' class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="ahora">
           <span>🎯</span> Ahora
         </button>
-        <button onclick="app.navigate('repasar')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="repasar">
+        <button data-on-click='["navigate", "repasar"]' class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all" data-view="repasar">
           <span>🗂️</span> Repasar
         </button>
       </nav>
@@ -991,30 +991,30 @@
       <!-- Global Actions (Timer, Soltar Rápido, Tema & Ajustes) -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <!-- Sprint Timer Trigger (Visible on larger screens) -->
-        <button onclick="app.toggleTimerWidget()" id="timer-trigger-btn" class="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-card-subtle hover:brightness-110 text-xs font-mono font-semibold border theme-border transition" title="Temporizador de Sprint">
+        <button data-on-click='["toggleTimerWidget"]' id="timer-trigger-btn" class="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-card-subtle hover:brightness-110 text-xs font-mono font-semibold border theme-border transition" title="Temporizador de Sprint">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="timer-dot"></span>
           <span id="header-timer-display">25:00</span>
         </button>
 
         <!-- Quick Soltar Button -->
-        <button onclick="app.openQuickCapture()" class="flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-semibold shadow-sm active:scale-95 transition" title="Soltar pensamiento (Ctrl+K)">
+        <button data-on-click='["openQuickCapture"]' class="flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-semibold shadow-sm active:scale-95 transition" title="Soltar pensamiento (Ctrl+K)">
           <span>+</span>
           <span class="hidden sm:inline">Soltar</span>
           <kbd class="hidden lg:inline text-[9px] bg-slate-900 px-1.5 py-0.5 rounded font-mono ml-0.5 text-slate-400">Ctrl+K</kbd>
         </button>
 
         <!-- 3-Way Theme Selector (Claro / Oscuro Suave / Noche) -->
-        <button onclick="app.cycleTheme()" id="theme-btn" class="w-10 h-10 rounded-xl theme-card-subtle hover:brightness-110 flex items-center justify-center text-sm border theme-border transition" title="Cambiar tema">
+        <button data-on-click='["cycleTheme"]' id="theme-btn" class="w-10 h-10 rounded-xl theme-card-subtle hover:brightness-110 flex items-center justify-center text-sm border theme-border transition" title="Cambiar tema">
           <span id="theme-icon">🌙</span>
         </button>
 
         <!-- Botón Descarga / Instalación Escritorio y Móvil -->
-        <button onclick="app.triggerDesktopInstall()" class="desktop-install-btn flex w-10 h-10 rounded-xl theme-card-subtle hover:brightness-110 items-center justify-center text-sm border theme-border transition" title="Instalar o Descargar Nexus (Escritorio / Móvil)">
+        <button data-on-click='["triggerDesktopInstall"]' class="desktop-install-btn flex w-10 h-10 rounded-xl theme-card-subtle hover:brightness-110 items-center justify-center text-sm border theme-border transition" title="Instalar o Descargar Nexus (Escritorio / Móvil)">
           <span>📲</span>
         </button>
 
         <!-- Backup & Settings -->
-        <button onclick="app.openSettings()" class="w-10 h-10 rounded-xl theme-card-subtle hover:brightness-110 flex items-center justify-center text-sm border theme-border transition" title="Ajustes y Datos">
+        <button data-on-click='["openSettings"]' class="w-10 h-10 rounded-xl theme-card-subtle hover:brightness-110 flex items-center justify-center text-sm border theme-border transition" title="Ajustes y Datos">
           ⚙️
         </button>
       </div>
@@ -1031,26 +1031,26 @@
         <span>⏱️</span> Sprint de Enfoque
       </span>
       <div class="flex items-center gap-1">
-        <button onclick="app.setTimerDuration(15)" class="px-2.5 py-1 rounded-lg theme-card border theme-border font-mono text-[11px] hover:brightness-110">15m (Rápido)</button>
-        <button onclick="app.setTimerDuration(25)" class="px-2.5 py-1 rounded-lg theme-card border theme-border font-mono text-[11px] text-emerald-400 font-bold hover:brightness-110">25m (Pomodoro)</button>
-        <button onclick="app.setTimerDuration(45)" class="px-2.5 py-1 rounded-lg theme-card border theme-border font-mono text-[11px] hover:brightness-110">45m (Hiperfoco)</button>
+        <button data-on-click='["setTimerDuration", 15]' class="px-2.5 py-1 rounded-lg theme-card border theme-border font-mono text-[11px] hover:brightness-110">15m (Rápido)</button>
+        <button data-on-click='["setTimerDuration", 25]' class="px-2.5 py-1 rounded-lg theme-card border theme-border font-mono text-[11px] text-emerald-400 font-bold hover:brightness-110">25m (Pomodoro)</button>
+        <button data-on-click='["setTimerDuration", 45]' class="px-2.5 py-1 rounded-lg theme-card border theme-border font-mono text-[11px] hover:brightness-110">45m (Hiperfoco)</button>
       </div>
 
       <!-- Brown Noise Focus Sound Generator Button -->
-      <button onclick="app.toggleBrownNoise()" id="bar-noise-btn" class="px-3 py-1 rounded-lg theme-card border theme-border text-xs font-semibold flex items-center gap-1.5 hover:brightness-110 transition" title="Ruido Marrón sintetizado en tiempo real para silenciar el parloteo mental">
+      <button data-on-click='["toggleBrownNoise"]' id="bar-noise-btn" class="px-3 py-1 rounded-lg theme-card border theme-border text-xs font-semibold flex items-center gap-1.5 hover:brightness-110 transition" title="Ruido Marrón sintetizado en tiempo real para silenciar el parloteo mental">
         <span>🎧</span> Ruido Marrón: <span id="bar-noise-state" class="font-bold text-slate-400">OFF</span>
       </button>
     </div>
 
     <div class="flex items-center gap-3 font-mono">
       <span id="bar-timer-countdown" class="text-base font-bold text-emerald-400">25:00</span>
-      <button onclick="app.startPauseTimer()" id="timer-toggle-btn" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-semibold text-xs shadow-sm">
+      <button data-on-click='["startPauseTimer"]' id="timer-toggle-btn" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-semibold text-xs shadow-sm">
         Iniciar
       </button>
-      <button onclick="app.resetTimer()" class="px-2 py-1 rounded-lg theme-card border theme-border text-xs">
+      <button data-on-click='["resetTimer"]' class="px-2 py-1 rounded-lg theme-card border theme-border text-xs">
         Reiniciar
       </button>
-      <button onclick="app.toggleTimerWidget()" class="theme-text-muted hover:text-white text-base">✕</button>
+      <button data-on-click='["toggleTimerWidget"]' class="theme-text-muted hover:text-white text-base">✕</button>
     </div>
   </div>
 
@@ -1064,16 +1064,16 @@
   <!-- Mobile Bottom Navigation Bar (3 secciones) -->
   <nav id="mobile-nav-shell" class="xl:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl border-t border-slate-800 bg-slate-950/95 pb-[env(safe-area-inset-bottom,0px)] transition-colors shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
     <div class="grid grid-cols-3 h-16 items-center px-2" id="mobile-nav">
-      <button onclick="app.navigate('soltar')" class="bnav-btn relative flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="soltar">
+      <button data-on-click='["navigate", "soltar"]' class="bnav-btn relative flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="soltar">
         <span class="text-lg">🔮</span>
         <span id="pensadero-count-mobile" class="hidden absolute top-1 right-[34%] w-2 h-2 rounded-full bg-cyan-400" aria-label="Hay pensamientos por repasar"></span>
         <span class="text-[11px] font-sans font-semibold mt-0.5">Soltar</span>
       </button>
-      <button onclick="app.navigate('ahora')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="ahora">
+      <button data-on-click='["navigate", "ahora"]' class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="ahora">
         <span class="text-lg">🎯</span>
         <span class="text-[11px] font-sans font-semibold mt-0.5">Ahora</span>
       </button>
-      <button onclick="app.navigate('repasar')" class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="repasar">
+      <button data-on-click='["navigate", "repasar"]' class="bnav-btn flex flex-col items-center justify-center py-1 transition min-h-[44px]" data-view="repasar">
         <span class="text-lg">🗂️</span>
         <span class="text-[11px] font-sans font-semibold mt-0.5">Repasar</span>
       </button>
@@ -1089,7 +1089,7 @@
       </div>
 
       <!-- Botón 1: Orbe Directo (Vaciado Rápido) -->
-      <button type="button" onclick="app.openOrbeQuickGadget()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-cyan-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Abrir Orbe de Cristal (Vaciado Mental Rápido)">
+      <button type="button" data-on-click='["openOrbeQuickGadget"]' class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-cyan-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Abrir Orbe de Cristal (Vaciado Mental Rápido)">
         <span class="text-sm">🔮</span>
         <span>ORBE</span>
       </button>
@@ -1097,7 +1097,7 @@
       <div class="w-px h-4 bg-slate-700/60"></div>
 
       <!-- Botón 2: Nexus IA Directo (Voz e Inteligencia Gemini) -->
-      <button type="button" onclick="app.openJarvis()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-emerald-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Hablar con Jarvis">
+      <button type="button" data-on-click='["openJarvis"]' class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-800 text-emerald-400 font-mono text-[11px] font-bold active:scale-95 transition" title="Hablar con Jarvis">
         <span class="text-sm animate-pulse">🎙️</span>
         <span>NEXUS IA</span>
       </button>
@@ -1118,13 +1118,13 @@
             <p class="text-[10px] text-cyan-400 font-mono">Mantén presionado para hablar y vaciar al orbe</p>
           </div>
         </div>
-        <button onclick="app.closeModal('nexus-orbe-quick-gadget-modal')" class="w-7 h-7 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-xs">✕</button>
+        <button data-on-click='["closeModal", "nexus-orbe-quick-gadget-modal"]' class="w-7 h-7 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-xs">✕</button>
       </div>
 
       <!-- Centro Sensorial: Orbe Aislado con interacción Hold-to-Talk -->
       <div class="py-4 flex flex-col items-center justify-center relative select-none">
         <div id="gadget-orb-wrapper" class="relative w-40 h-40 rounded-full flex items-center justify-center cursor-pointer select-none transition-transform duration-300 active:scale-95 touch-none" 
-             onpointerdown="app.startGadgetHoldRecording()" onpointerup="app.stopGadgetHoldRecording()" onpointerleave="app.stopGadgetHoldRecording()"
+             data-on-pointerdown='["startGadgetHoldRecording"]' data-on-pointerup='["stopGadgetHoldRecording"]' data-on-pointerleave='["stopGadgetHoldRecording"]'
              title="Mantén presionado para hablar y soltar tu pensamiento">
           <div id="gadget-orb-glow" class="absolute inset-0 rounded-full blur-2xl opacity-70 bg-gradient-to-tr from-cyan-500/40 via-purple-600/40 to-pink-500/40 animate-pulse pointer-events-none"></div>
           <div class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-cyan-400/60 shadow-[0_0_40px_rgba(6,182,212,0.5)] flex items-center justify-center bg-black/80 backdrop-blur">
@@ -1152,34 +1152,34 @@
         <div>
           <span class="block text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Color de Humo en el Orbe</span>
           <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5 text-xs">
-            <button type="button" onclick="app.selectGadgetSmoke('humo_general')" class="gadget-smoke-btn p-2 rounded-xl border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 ring-2 ring-cyan-400 flex flex-col items-center gap-0.5" data-smoke="humo_general">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_general"]' class="gadget-smoke-btn p-2 rounded-xl border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 ring-2 ring-cyan-400 flex flex-col items-center gap-0.5" data-smoke="humo_general">
               <span>✨</span> <span class="text-[10px] font-bold">General</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_blanco')" class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_blanco">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_blanco"]' class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_blanco">
               <span>⚪</span> <span class="text-[10px]">Soltar</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_rojo')" class="gadget-smoke-btn p-2 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_rojo">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_rojo"]' class="gadget-smoke-btn p-2 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_rojo">
               <span>🔴</span> <span class="text-[10px]">Urgencia</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_dorado')" class="gadget-smoke-btn p-2 rounded-xl border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_dorado">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_dorado"]' class="gadget-smoke-btn p-2 rounded-xl border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_dorado">
               <span>🟡</span> <span class="text-[10px] font-bold">Idea</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_azul')" class="gadget-smoke-btn p-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_azul">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_azul"]' class="gadget-smoke-btn p-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_azul">
               <span>🔵</span> <span class="text-[10px]">Foco</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_verde')" class="gadget-smoke-btn p-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_verde">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_verde"]' class="gadget-smoke-btn p-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_verde">
               <span>🟢</span> <span class="text-[10px]">Salud</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_purpura')" class="gadget-smoke-btn p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_purpura">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_purpura"]' class="gadget-smoke-btn p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_purpura">
               <span>🟣</span> <span class="text-[10px]">CRM</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_naranja')" class="gadget-smoke-btn p-2 rounded-xl border border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_naranja">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_naranja"]' class="gadget-smoke-btn p-2 rounded-xl border border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_naranja">
               <span>🟠</span> <span class="text-[10px]">Dinero</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_ceniza')" class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-800/40 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_ceniza">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_ceniza"]' class="gadget-smoke-btn p-2 rounded-xl border border-slate-700 bg-slate-800/40 hover:bg-slate-800 flex flex-col items-center gap-0.5" data-smoke="humo_ceniza">
               <span>🔘</span> <span class="text-[10px]">Someday</span>
             </button>
-            <button type="button" onclick="app.selectGadgetSmoke('humo_tarea')" class="gadget-smoke-btn p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_tarea">
+            <button type="button" data-on-click='["selectGadgetSmoke", "humo_tarea"]' class="gadget-smoke-btn p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 flex flex-col items-center gap-0.5" data-smoke="humo_tarea">
               <span>☑️</span> <span class="text-[10px]">Tarea</span>
             </button>
           </div>
@@ -1192,10 +1192,10 @@
 
       <!-- Footer con botón de disparo al Orbe -->
       <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between gap-2">
-        <button onclick="app.closeModal('nexus-orbe-quick-gadget-modal')" class="px-3.5 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+        <button data-on-click='["closeModal", "nexus-orbe-quick-gadget-modal"]' class="px-3.5 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
           Cerrar
         </button>
-        <button onclick="app.submitGadgetDump()" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-display font-extrabold text-xs shadow-lg shadow-purple-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+        <button data-on-click='["submitGadgetDump"]' class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-display font-extrabold text-xs shadow-lg shadow-purple-500/30 active:scale-95 transition flex items-center justify-center gap-2">
           <span>🔮</span> <span>Lanzar al Orbe de Cristal</span> <span>✨</span>
         </button>
       </div>
@@ -1218,30 +1218,30 @@
 
       <div class="space-y-3">
         <input type="password" id="baul-pin-input" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="••••" autofocus
-          onkeydown="if(event.key==='Enter') app.submitBaulUnlock()"
+          data-on-enter='["submitBaulUnlock"]'
           class="w-full text-center py-3 px-4 rounded-2xl bg-slate-950/90 border-2 border-amber-500/40 text-2xl font-mono tracking-[0.5em] text-amber-300 placeholder-slate-700 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 transition" />
         
         <p id="baul-unlock-error" class="hidden text-xs text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl px-2.5 py-1.5"></p>
 
         <!-- Teclado rápido táctil -->
         <div class="grid grid-cols-3 gap-2 pt-1 font-mono">
-          <button type="button" onclick="app.baulKeypadPress('1')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">1</button>
-          <button type="button" onclick="app.baulKeypadPress('2')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">2</button>
-          <button type="button" onclick="app.baulKeypadPress('3')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">3</button>
-          <button type="button" onclick="app.baulKeypadPress('4')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">4</button>
-          <button type="button" onclick="app.baulKeypadPress('5')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">5</button>
-          <button type="button" onclick="app.baulKeypadPress('6')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">6</button>
-          <button type="button" onclick="app.baulKeypadPress('7')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">7</button>
-          <button type="button" onclick="app.baulKeypadPress('8')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">8</button>
-          <button type="button" onclick="app.baulKeypadPress('9')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">9</button>
-          <button type="button" onclick="app.baulKeypadClear()" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-rose-400 text-xs font-bold active:bg-rose-500/20 transition">⌫ Borrar</button>
-          <button type="button" onclick="app.baulKeypadPress('0')" class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">0</button>
-          <button type="button" onclick="app.submitBaulUnlock()" class="py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold active:scale-95 transition">Entrar ➔</button>
+          <button type="button" data-on-click='["baulKeypadPress", "1"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">1</button>
+          <button type="button" data-on-click='["baulKeypadPress", "2"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">2</button>
+          <button type="button" data-on-click='["baulKeypadPress", "3"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">3</button>
+          <button type="button" data-on-click='["baulKeypadPress", "4"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">4</button>
+          <button type="button" data-on-click='["baulKeypadPress", "5"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">5</button>
+          <button type="button" data-on-click='["baulKeypadPress", "6"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">6</button>
+          <button type="button" data-on-click='["baulKeypadPress", "7"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">7</button>
+          <button type="button" data-on-click='["baulKeypadPress", "8"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">8</button>
+          <button type="button" data-on-click='["baulKeypadPress", "9"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">9</button>
+          <button type="button" data-on-click='["baulKeypadClear"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-rose-400 text-xs font-bold active:bg-rose-500/20 transition">⌫ Borrar</button>
+          <button type="button" data-on-click='["baulKeypadPress", "0"]' class="py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-base font-bold active:bg-amber-500/20 active:text-amber-300 transition">0</button>
+          <button type="button" data-on-click='["submitBaulUnlock"]' class="py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold active:scale-95 transition">Entrar ➔</button>
         </div>
       </div>
 
       <div class="flex items-center justify-between pt-2 text-xs">
-        <button type="button" onclick="app.closeModal('modal-baul-unlock')" class="w-full py-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white transition">
+        <button type="button" data-on-click='["closeModal", "modal-baul-unlock"]' class="w-full py-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white transition">
           Cancelar
         </button>
       </div>
@@ -1266,11 +1266,11 @@
             Dale a tu yo del futuro la llave para retomar en 5 segundos sin pensar.
           </p>
         </div>
-        <button onclick="app.closeModal('modal-checkout')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
+        <button data-on-click='["closeModal", "modal-checkout"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body">
-        <form id="checkout-form" onsubmit="app.submitCheckout(event)" class="space-y-4">
+        <form id="checkout-form" data-on-submit='["submitCheckout", "$event"]' class="space-y-4">
           <input type="hidden" id="checkout-project-id" />
 
           <!-- 1. Logro alcanzado con Dictado de Voz -->
@@ -1279,7 +1279,7 @@
               <label class="block text-xs font-bold">
                 1. ¿Qué lograste avanzar hoy? <span class="text-emerald-500">*</span>
               </label>
-              <button type="button" onclick="app.dictateField('checkout-achievement')" class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
+              <button type="button" data-on-click='["dictateField", "checkout-achievement"]' class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
                 <span>🎙️</span> Dictar avance
               </button>
             </div>
@@ -1293,7 +1293,7 @@
               <label class="block text-xs font-bold flex items-center gap-1">
                 <span>🧵</span> 2. El Hilo de Ariadna (Próximo micro-paso ≤15 min) <span class="text-emerald-500">*</span>
               </label>
-              <button type="button" onclick="app.dictateField('checkout-next-action')" class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
+              <button type="button" data-on-click='["dictateField", "checkout-next-action"]' class="text-[11px] font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition" title="Dictar por voz">
                 <span>🎙️</span> Dictar hilo
               </button>
             </div>
@@ -1310,7 +1310,7 @@
               </span>
               <p class="text-[10px] theme-text-muted">Busca un bloque libre de 90-120 min la próxima semana con buffers de 15 min.</p>
             </div>
-            <button type="button" onclick="app.generateTimeblockForNextAction()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 font-bold text-[11px] shrink-0 transition flex items-center gap-1">
+            <button type="button" data-on-click='["generateTimeblockForNextAction"]' class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 font-bold text-[11px] shrink-0 transition flex items-center gap-1">
               <span>🗓️</span> Agendar
             </button>
           </div>
@@ -1356,7 +1356,7 @@
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-end gap-2 pt-2 -mx-4 -mb-4 px-4 pb-3">
-            <button type="button" onclick="app.closeModal('modal-checkout')" class="px-4 py-2.5 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110 transition">
+            <button type="button" data-on-click='["closeModal", "modal-checkout"]' class="px-4 py-2.5 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110 transition">
               Cancelar
             </button>
             <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition">
@@ -1376,7 +1376,7 @@
           <span class="text-lg">🧠</span>
           <h2 class="text-base font-display font-bold">Captura Rápida al Pensadero</h2>
         </div>
-        <button onclick="app.closeModal('modal-quick-capture')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-quick-capture"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body">
@@ -1384,7 +1384,7 @@
           Vuelca lo que se te ocurrió sin interrumpir tu flujo actual.
         </p>
 
-        <form id="quick-capture-form" onsubmit="app.submitQuickCapture(event)" class="space-y-4">
+        <form id="quick-capture-form" data-on-submit='["submitQuickCapture", "$event"]' class="space-y-4">
           <div>
             <textarea id="quick-capture-text" rows="3" required autofocus placeholder="Escribe tu pensamiento, idea o pendiente..."
               class="w-full px-3.5 py-2.5 rounded-xl theme-card-subtle border theme-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
@@ -1398,7 +1398,7 @@
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-end gap-2 pt-2 -mx-4 -mb-4 px-4 pb-3">
-            <button type="button" onclick="app.closeModal('modal-quick-capture')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+            <button type="button" data-on-click='["closeModal", "modal-quick-capture"]' class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
               Descartar
             </button>
             <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition">
@@ -1417,11 +1417,11 @@
         <h2 class="text-base sm:text-lg font-display font-extrabold" id="project-modal-title">
           Nuevo Proyecto
         </h2>
-        <button onclick="app.closeModal('modal-project')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-project"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body">
-        <form id="project-form" onsubmit="app.submitProjectForm(event)" class="space-y-4">
+        <form id="project-form" data-on-submit='["submitProjectForm", "$event"]' class="space-y-4">
           <input type="hidden" id="project-form-id" />
 
           <div class="grid grid-cols-[60px_1fr] gap-3">
@@ -1484,11 +1484,11 @@
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between pt-3 -mx-4 -mb-4 px-4 pb-3">
-            <button type="button" id="btn-delete-project" onclick="app.deleteCurrentProject()" class="text-xs text-rose-400 hover:text-rose-500 font-semibold hidden">
+            <button type="button" id="btn-delete-project" data-on-click='["deleteCurrentProject"]' class="text-xs text-rose-400 hover:text-rose-500 font-semibold hidden">
               Eliminar proyecto
             </button>
             <div class="flex items-center gap-2 ml-auto">
-              <button type="button" onclick="app.closeModal('modal-project')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+              <button type="button" data-on-click='["closeModal", "modal-project"]' class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
                 Cancelar
               </button>
               <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition">
@@ -1516,7 +1516,7 @@
       <div class="p-3 my-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-left text-xs text-amber-500 dark:text-amber-300">
         💡 <strong>Recomendación:</strong> Mueve una de las tareas actuales a "En Espera", regrésala a "Próximo Paso", o márcala como "Victoria" antes de agregar otra.
       </div>
-      <button onclick="app.closeModal('modal-wip-warning')" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition">
+      <button data-on-click='["closeModal", "modal-wip-warning"]' class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition">
         Entendido, proteger mi enfoque
       </button>
     </div>
@@ -1530,7 +1530,7 @@
           <span class="text-lg">⚙️</span>
           <h2 class="text-lg font-display font-bold">Ajustes, Sincronización y Datos</h2>
         </div>
-        <button onclick="app.closeModal('modal-settings')" class="theme-text-muted hover:text-white">✕</button>
+        <button data-on-click='["closeModal", "modal-settings"]' class="theme-text-muted hover:text-white">✕</button>
       </div>
 
       <div class="space-y-4 text-xs">
@@ -1539,15 +1539,15 @@
           <h4 class="font-bold mb-1">Paleta de Interfaz (Temas)</h4>
           <p class="theme-text-muted mb-2.5">Elige el contraste que mejor se adapte a tu nivel de energía sensorial:</p>
           <div class="grid grid-cols-3 gap-2">
-            <button onclick="app.setTheme('theme-light')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-white text-slate-800 border-slate-300 hover:border-cyan-500 shadow-sm transition">
+            <button data-on-click='["setTheme", "theme-light"]' class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-white text-slate-800 border-slate-300 hover:border-cyan-500 shadow-sm transition">
               <span class="text-base">☀️</span> <span>Versión Clara</span>
               <span class="text-[9px] font-mono text-cyan-600 font-bold">Stitch</span>
             </button>
-            <button onclick="app.setTheme('theme-dark-soft')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-[#1c1f2a] text-[#dfe2f1] border-cyan-500/50 shadow-sm transition">
+            <button data-on-click='["setTheme", "theme-dark-soft"]' class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-[#1c1f2a] text-[#dfe2f1] border-cyan-500/50 shadow-sm transition">
               <span class="text-base">🌙</span> <span>Versión Media</span>
               <span class="text-[9px] font-mono text-cyan-400 font-bold">Cyber-Slate</span>
             </button>
-            <button onclick="app.setTheme('theme-dark-deep')" class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-[#0a0e18] text-slate-400 border-slate-800 hover:border-slate-600 shadow-sm transition">
+            <button data-on-click='["setTheme", "theme-dark-deep"]' class="p-2 rounded-xl border text-center font-semibold text-xs flex flex-col items-center gap-1 bg-[#0a0e18] text-slate-400 border-slate-800 hover:border-slate-600 shadow-sm transition">
               <span class="text-base">🌌</span> <span>Noche Profunda</span>
               <span class="text-[9px] font-mono text-slate-500 font-bold">Void</span>
             </button>
@@ -1559,19 +1559,19 @@
           <h4 class="font-bold mb-1">Micro-recompensas Sensoriales</h4>
           <div class="space-y-1.5 mt-2">
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="setting-sound" checked onchange="app.updateSettings()" class="rounded text-brand-600 focus:ring-0">
+              <input type="checkbox" id="setting-sound" checked data-on-change='["updateSettings"]' class="rounded text-brand-600 focus:ring-0">
               <span class="font-medium">Sonido de victoria sutil (Web Audio API)</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="setting-vibration" checked onchange="app.updateSettings()" class="rounded text-brand-600 focus:ring-0">
+              <input type="checkbox" id="setting-vibration" checked data-on-change='["updateSettings"]' class="rounded text-brand-600 focus:ring-0">
               <span class="font-medium">Vibración háptica al avanzar (en móviles)</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="setting-auto-classify" checked onchange="app.setAutoClassify(this.checked)" class="rounded text-brand-600 focus:ring-0">
+              <input type="checkbox" id="setting-auto-classify" checked data-on-change='["setAutoClassify", "$checked"]' class="rounded text-brand-600 focus:ring-0">
               <span class="font-medium">Clasificar con Nexus lo que suelto sin color</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="setting-cloud-ai" onchange="app.setCloudAI(this.checked)" class="rounded text-brand-600 focus:ring-0">
+              <input type="checkbox" id="setting-cloud-ai" data-on-change='["setCloudAI", "$checked"]' class="rounded text-brand-600 focus:ring-0">
               <span class="font-medium">Usar IA en la nube (Gemini) solo para frases sin pistas <span class="theme-text-muted">— nunca "Soltar" ni el Baúl</span></span>
             </label>
           </div>
@@ -1590,18 +1590,18 @@
             Recibe alertas sonoras y del sistema para pensamientos críticos (🔴 Fuego) y recordatorios de ideas sin clasificar.
           </p>
           <div class="flex items-center gap-2 pt-1">
-            <button id="notification-toggle-btn" onclick="app.requestNotificationPermission(true)" class="flex-1 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-sm">
+            <button id="notification-toggle-btn" data-on-click='["requestNotificationPermission", true]' class="flex-1 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-sm">
               <span>🔔</span> <span>Activar Notificaciones</span>
             </button>
-            <button onclick="app.testNotificationNow()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition text-xs" title="Probar notificación en este dispositivo">
+            <button data-on-click='["testNotificationNow"]' class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition text-xs" title="Probar notificación en este dispositivo">
               🧪 Probar
             </button>
           </div>
           <div class="pt-2 border-t theme-border space-y-2">
             <p class="theme-text-muted">Con la app <strong>cerrada</strong>, el servidor te avisa de los recordatorios programados (Web Push).</p>
             <div class="flex items-center gap-2">
-              <button type="button" id="push-enable-btn" onclick="app.enableBackgroundPush()" class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition text-xs">📲 Activar avisos con la app cerrada</button>
-              <button type="button" onclick="app.testBackgroundPush()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition text-xs" title="Enviar un aviso de prueba desde el servidor">🧪 Probar</button>
+              <button type="button" id="push-enable-btn" data-on-click='["enableBackgroundPush"]' class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition text-xs">📲 Activar avisos con la app cerrada</button>
+              <button type="button" data-on-click='["testBackgroundPush"]' class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition text-xs" title="Enviar un aviso de prueba desde el servidor">🧪 Probar</button>
             </div>
             <p id="push-status" class="text-[11px] theme-text-muted" role="status" aria-live="polite"></p>
           </div>
@@ -1613,7 +1613,7 @@
             <h4 class="font-bold">Guía rápida</h4>
             <p class="theme-text-muted">Cómo soltar, qué significa cada color y cómo cerrar el día.</p>
           </div>
-          <button type="button" onclick="app.closeModal('modal-settings'); app.startOnboarding()" class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold shrink-0 transition">Ver guía</button>
+          <button type="button" data-on-click='[["closeModal", "modal-settings"], ["startOnboarding"]]' class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold shrink-0 transition">Ver guía</button>
         </div>
 
         <!-- Opciones avanzadas: plegadas para no saturar -->
@@ -1654,7 +1654,7 @@
               <div class="pt-1">
                 <input type="password" id="settings-auth-current-pass" placeholder="Contraseña actual para autorizar cambio..." class="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white outline-none" />
               </div>
-              <button type="button" id="settings-save-login-btn" onclick="app.saveLoginCredentialsFromSettings()" class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition">
+              <button type="button" id="settings-save-login-btn" data-on-click='["saveLoginCredentialsFromSettings"]' class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition">
                 Guardar Nuevo Login
               </button>
             </div>
@@ -1674,13 +1674,13 @@
                   <input type="password" id="settings-baul-new-code" inputmode="numeric" maxlength="6" placeholder="Nuevo PIN" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-white outline-none" />
                 </div>
               </div>
-              <button type="button" id="settings-save-baul-btn" onclick="app.saveBaulCodeFromSettings()" class="w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs transition">
+              <button type="button" id="settings-save-baul-btn" data-on-click='["saveBaulCodeFromSettings"]' class="w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs transition">
                 Guardar Código del Baúl
               </button>
             </div>
 
             <!-- Cerrar Sesión -->
-            <button type="button" onclick="app.logout()" class="w-full py-2 rounded-xl border border-rose-500/30 text-rose-300 font-semibold hover:bg-rose-500/10 transition text-xs flex items-center justify-center gap-1.5">
+            <button type="button" data-on-click='["logout"]' class="w-full py-2 rounded-xl border border-rose-500/30 text-rose-300 font-semibold hover:bg-rose-500/10 transition text-xs flex items-center justify-center gap-1.5">
               <span>🚪</span> <span>Cerrar sesión en este equipo</span>
             </button>
           </div>
@@ -1693,7 +1693,7 @@
             </div>
             <p class="theme-text-muted">Sincroniza tus proyectos entre tus dispositivos con la API REST de Spring Boot.</p>
             <div class="flex gap-2 pt-1">
-              <button onclick="app.syncWithBackend()" class="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold transition">
+              <button data-on-click='["syncWithBackend"]' class="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold transition">
                 🔄 Sincronizar Ahora
               </button>
             </div>
@@ -1745,17 +1745,17 @@
               <div id="google-mail-feedback" class="hidden p-2 rounded-xl text-[11px] font-mono"></div>
 
               <div class="flex items-center gap-2 pt-1">
-                <button onclick="app.saveGoogleMailConfig()" class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/30">
+                <button data-on-click='["saveGoogleMailConfig"]' class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/30">
                   <span>💾</span> Guardar Credenciales
                 </button>
-                <button onclick="app.testGoogleMailConnection()" class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
+                <button data-on-click='["testGoogleMailConnection"]' class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
                   <span>🧪</span> Probar Conexión
                 </button>
               </div>
 
               <div class="pt-1 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
                 <span class="text-slate-400">¿Envío rápido sin credenciales?</span>
-                <button onclick="app.openDirectGmailWeb()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                <button data-on-click='["openDirectGmailWeb"]' class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
                   <span>🌐</span> Redactar en Gmail Web ↗
                 </button>
               </div>
@@ -1775,10 +1775,10 @@
               Ejecuta FocusFlow OS como app independiente sin barra de navegador, con ventana propia, atajos y arranque rápido.
             </p>
             <div class="flex items-center gap-2 pt-1">
-              <button onclick="app.triggerDesktopInstall()" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/30">
+              <button data-on-click='["triggerDesktopInstall"]' class="flex-1 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/30">
                 <span>⬇️</span> <span>Instalar en Escritorio</span>
               </button>
-              <button onclick="app.openModal('modal-desktop-download')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition text-xs">
+              <button data-on-click='["openModal", "modal-desktop-download"]' class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition text-xs">
                 ℹ️ Opciones
               </button>
             </div>
@@ -1789,17 +1789,17 @@
             <h4 class="font-bold">Copia de Seguridad y Portabilidad</h4>
             <p class="theme-text-muted">Exporta un archivo JSON de respaldo para transferirlo a cualquier equipo.</p>
             <div class="flex gap-2 pt-1">
-              <button onclick="app.exportDataJSON()" class="flex-1 py-2 rounded-xl theme-card border theme-border font-semibold hover:brightness-110 transition">
+              <button data-on-click='["exportDataJSON"]' class="flex-1 py-2 rounded-xl theme-card border theme-border font-semibold hover:brightness-110 transition">
                 ⬇ Exportar JSON
               </button>
               <label class="flex-1 py-2 rounded-xl theme-card border theme-border font-semibold text-center cursor-pointer hover:brightness-110 transition">
                 ⬆ Importar JSON
-                <input type="file" accept=".json" onchange="app.importDataJSON(event)" class="hidden">
+                <input type="file" accept=".json" data-on-change='["importDataJSON", "$event"]' class="hidden">
               </label>
             </div>
           </div>
 
-            <button onclick="app.clearAllUserData()" class="text-rose-400 hover:text-rose-300 font-semibold text-xs py-1.5 px-3 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 transition">
+            <button data-on-click='["clearAllUserData"]' class="text-rose-400 hover:text-rose-300 font-semibold text-xs py-1.5 px-3 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 transition">
               🗑️ Vaciar todo y empezar desde cero
             </button>
           </div>
@@ -1816,7 +1816,7 @@
         <h3 class="text-base font-display font-bold">🧹 Repaso rápido</h3>
         <div class="flex items-center gap-3">
           <span id="quick-review-progress" class="text-[11px] font-mono theme-text-muted"></span>
-          <button type="button" onclick="app.finishQuickReview()" class="text-xs theme-text-muted hover:text-white">Terminar</button>
+          <button type="button" data-on-click='["finishQuickReview"]' class="text-xs theme-text-muted hover:text-white">Terminar</button>
         </div>
       </div>
       <div id="quick-review-body" class="space-y-3 text-sm"></div>
@@ -1828,12 +1828,12 @@
     <div class="theme-card border rounded-3xl max-w-md w-full max-h-[92dvh] overflow-y-auto p-6 shadow-2xl fade-enter space-y-4">
       <div class="flex items-center justify-between">
         <span id="onboarding-progress" class="text-[11px] font-mono theme-text-muted">Paso 1 de 3</span>
-        <button type="button" onclick="app.finishOnboarding()" class="text-xs theme-text-muted hover:text-white">Saltar</button>
+        <button type="button" data-on-click='["finishOnboarding"]' class="text-xs theme-text-muted hover:text-white">Saltar</button>
       </div>
       <div id="onboarding-body" class="space-y-3 text-sm"></div>
       <div class="flex gap-2 pt-1">
-        <button type="button" id="onboarding-prev" onclick="app.prevOnboardingStep()" class="px-4 py-2.5 rounded-xl border theme-border text-xs font-semibold">Atrás</button>
-        <button type="button" id="onboarding-next" autofocus onclick="app.nextOnboardingStep()" class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition">Siguiente</button>
+        <button type="button" id="onboarding-prev" data-on-click='["prevOnboardingStep"]' class="px-4 py-2.5 rounded-xl border theme-border text-xs font-semibold">Atrás</button>
+        <button type="button" id="onboarding-next" autofocus data-on-click='["nextOnboardingStep"]' class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition">Siguiente</button>
       </div>
     </div>
   </div>
@@ -1849,7 +1849,7 @@
             <p class="text-[10px] font-mono text-cyan-400">Acceso Directo Windows, App Nativa PWA y Móvil</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-desktop-download')" class="theme-text-muted hover:text-white text-base">✕</button>
+        <button data-on-click='["closeModal", "modal-desktop-download"]' class="theme-text-muted hover:text-white text-base">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body space-y-4 text-xs">
@@ -1864,7 +1864,7 @@
           <p class="text-slate-300 text-xs leading-relaxed">
             Descarga un acceso directo ligero para tu escritorio. Al hacer doble clic, abre Nexus en su propia ventana dedicada.
           </p>
-          <button onclick="app.downloadDesktopShortcut()" class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+          <button data-on-click='["downloadDesktopShortcut"]' class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-md transition flex items-center justify-center gap-2 active:scale-95">
             <span>📥</span> <span>Descargar Acceso Directo (Nexus.url)</span>
           </button>
         </div>
@@ -1880,7 +1880,7 @@
           <p class="text-slate-300 text-xs leading-relaxed">
             Se ancla a la barra de tareas de Windows, Dock de Mac o escritorio mediante Chrome/Edge sin marcos de navegador.
           </p>
-          <button onclick="app.installPWA()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+          <button data-on-click='["installPWA"]' class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md transition flex items-center justify-center gap-2 active:scale-95">
             <span>⚡</span> <span>Instalar App en el Navegador</span>
           </button>
         </div>
@@ -1896,7 +1896,7 @@
           <p class="text-slate-400 text-xs leading-relaxed">
             Script ejecutable para Windows que inicia Nexus en modo ventana aislada:
           </p>
-          <button onclick="app.downloadWindowsBat()" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-2 active:scale-95">
+          <button data-on-click='["downloadWindowsBat"]' class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-2 active:scale-95">
             <span>📥</span> <span>Descargar iniciar_nexus.bat</span>
           </button>
         </div>
@@ -1907,14 +1907,14 @@
             <span class="font-bold text-xs text-purple-300 block">📱 ¿Estás en Celular o Tablet?</span>
             <span class="text-[11px] text-slate-400">Instálalo en Android o iPhone con soporte de gestos táctiles.</span>
           </div>
-          <button onclick="app.closeModal('modal-desktop-download'); app.openModal('modal-mobile-app')" class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition shrink-0">
+          <button data-on-click='[["closeModal", "modal-desktop-download"], ["openModal", "modal-mobile-app"]]' class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition shrink-0">
             Ver Opciones Móvil →
           </button>
         </div>
       </div>
 
       <div class="nexus-modal-footer bg-slate-950/40 flex justify-end">
-        <button onclick="app.closeModal('modal-desktop-download')" class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+        <button data-on-click='["closeModal", "modal-desktop-download"]' class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
           Cerrar
         </button>
       </div>
@@ -1934,7 +1934,7 @@
             <p class="text-[11px] sm:text-xs theme-text-muted">App nativa instalable para Android, iPhone, iPad y PC</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-mobile-app')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
+        <button data-on-click='["closeModal", "modal-mobile-app"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body space-y-4 text-xs">
@@ -1947,7 +1947,7 @@
             </div>
             <span class="text-[11px] theme-text-muted block mt-0.5">Se agrega como aplicación real a tu pantalla de inicio, sin barra de navegador y con icono de Nexus.</span>
           </div>
-          <button onclick="app.installPWA()" id="pwa-direct-install-btn" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider shrink-0 shadow-xl shadow-emerald-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <button data-on-click='["installPWA"]' id="pwa-direct-install-btn" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider shrink-0 shadow-xl shadow-emerald-500/30 active:scale-95 transition flex items-center justify-center gap-2">
             <span>⚡</span> <span id="pwa-btn-label">Instalar Aquí</span>
           </button>
         </div>
@@ -1978,7 +1978,7 @@
             </p>
             <div class="flex items-center gap-2 pt-1">
               <input type="text" id="mobile-app-url" readonly class="flex-1 px-2.5 py-1 rounded-lg theme-card border theme-border text-[11px] font-mono truncate" />
-              <button onclick="app.copyAppUrl()" id="copy-url-btn" class="px-2.5 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-[11px] shrink-0 transition">
+              <button data-on-click='["copyAppUrl"]' id="copy-url-btn" class="px-2.5 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-[11px] shrink-0 transition">
                 Copiar
               </button>
             </div>
@@ -1997,7 +1997,7 @@
             Envía el enlace a tu celular o al de tu equipo para instalar la app de inmediato:
           </p>
 
-          <button onclick="app.shareWhatsApp()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 transition">
+          <button data-on-click='["shareWhatsApp"]' class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 transition">
             <span>💬</span> Abrir WhatsApp y Enviar Enlace
           </button>
 
@@ -2005,7 +2005,7 @@
           <div class="flex items-center gap-2 pt-1">
             <input type="tel" id="whatsapp-phone-input" placeholder="O ingresa núm. con lada (ej: +521...)" 
               class="flex-1 px-3 py-1.5 rounded-xl theme-card border theme-border text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500" />
-            <button onclick="app.shareWhatsAppToNumber()" class="px-3 py-1.5 rounded-xl theme-card border theme-border font-semibold hover:brightness-110 text-xs shrink-0">
+            <button data-on-click='["shareWhatsAppToNumber"]' class="px-3 py-1.5 rounded-xl theme-card border theme-border font-semibold hover:brightness-110 text-xs shrink-0">
               Enviar directo →
             </button>
           </div>
@@ -2035,7 +2035,7 @@
       </div>
 
       <div class="nexus-modal-footer bg-slate-950/40 flex justify-end">
-        <button onclick="app.closeModal('modal-mobile-app')" class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+        <button data-on-click='["closeModal", "modal-mobile-app"]' class="px-4 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
           Cerrar
         </button>
       </div>
@@ -2057,7 +2057,7 @@
             <p class="text-[11px] theme-text-muted">Metas complejas reducidas a micro-pasos de 15 a 20 minutos</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-ai-deconstruction')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-ai-deconstruction"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div id="ai-deconstruct-body" class="space-y-4 text-xs">
@@ -2082,7 +2082,7 @@
             <p class="text-[11px] theme-text-muted">Colchón de transición para prevenir parálisis por cambio de contexto</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-gap-filling')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-gap-filling"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div id="gap-filling-body" class="space-y-4 text-xs">
@@ -2107,7 +2107,7 @@
             <p class="text-[11px] theme-text-muted">Aviso diferido por correo para tareas pendientes</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-schedule-email')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-schedule-email"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="space-y-3.5 text-xs">
@@ -2122,19 +2122,19 @@
         <div>
           <label class="block font-semibold text-slate-300 mb-1.5">Atajos rápidos de tiempo:</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="app.setScheduleEmailPreset(15)" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+            <button type="button" data-on-click='["setScheduleEmailPreset", 15]' class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
               <span class="font-bold block text-xs">⏱️ En 15 minutos</span>
               <span class="text-[10px] text-slate-400">Micro-pausa de café</span>
             </button>
-            <button type="button" onclick="app.setScheduleEmailPreset(60)" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+            <button type="button" data-on-click='["setScheduleEmailPreset", 60]' class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
               <span class="font-bold block text-xs">⏳ En 1 hora</span>
               <span class="text-[10px] text-slate-400">Siguiente bloque</span>
             </button>
-            <button type="button" onclick="app.setScheduleEmailPreset('tonight')" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+            <button type="button" data-on-click='["setScheduleEmailPreset", "tonight"]' class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
               <span class="font-bold block text-xs">🌙 Esta noche (8:00 PM)</span>
               <span class="text-[10px] text-slate-400">Cierre del día</span>
             </button>
-            <button type="button" onclick="app.setScheduleEmailPreset('tomorrow_9am')" class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
+            <button type="button" data-on-click='["setScheduleEmailPreset", "tomorrow_9am"]' class="p-2.5 rounded-xl border border-slate-700 bg-slate-900/90 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-slate-200 transition text-left">
               <span class="font-bold block text-xs">🌅 Mañana (9:00 AM)</span>
               <span class="text-[10px] text-slate-400">Arranque matutino</span>
             </button>
@@ -2160,14 +2160,14 @@
       </div>
 
       <div class="flex items-center justify-between gap-2 mt-5 pt-3 border-t theme-border">
-        <button onclick="app.openDirectGmailWebFromModal()" class="px-3 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition" title="Redactar inmediatamente en Gmail Web">
+        <button data-on-click='["openDirectGmailWebFromModal"]' class="px-3 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition" title="Redactar inmediatamente en Gmail Web">
           <span>🌐</span> Abrir en Gmail Web
         </button>
         <div class="flex items-center gap-2">
-          <button onclick="app.closeModal('modal-schedule-email')" class="px-3 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
+          <button data-on-click='["closeModal", "modal-schedule-email"]' class="px-3 py-2 rounded-xl theme-card-subtle text-xs font-semibold theme-text-muted hover:text-white transition">
             Cancelar
           </button>
-          <button onclick="app.confirmScheduleEmail()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
+          <button data-on-click='["confirmScheduleEmail"]' class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
             <span>⚡</span> Programar Aviso
           </button>
         </div>
@@ -2191,7 +2191,7 @@
             <p class="text-[11px] theme-text-muted">Retoma cualquier proyecto tras semanas de pausa sin culpa</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-reactivation-briefing')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-reactivation-briefing"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div id="reactivation-briefing-body" class="space-y-4 text-xs">
@@ -2216,7 +2216,7 @@
             <p class="text-[11px] theme-text-muted truncate">Canaliza tu pensamiento a un tablero Kanban o nuevo proyecto</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-dispatch-thought')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
+        <button data-on-click='["closeModal", "modal-dispatch-thought"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm shrink-0">✕</button>
       </div>
 
       <div id="dispatch-thought-body" class="nexus-modal-scroll-body space-y-4 text-xs">
@@ -2242,7 +2242,7 @@
             <p class="text-[11px] text-slate-400">Acceso simultáneo: Vaciado al Orbe y Asistente Nexus IA</p>
           </div>
         </div>
-        <button onclick="app.closeModal('modal-dual-widget')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-dual-widget"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <!-- Body: Cabina Dual -->
@@ -2260,10 +2260,10 @@
             </div>
             
             <div class="space-y-2">
-              <button onclick="app.closeModal('modal-dual-widget'); app.openOrbeQuickGadget()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+              <button data-on-click='[["closeModal", "modal-dual-widget"], ["openOrbeQuickGadget"]]' class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
                 <span>🔮</span> <span>Vaciado Rápido</span>
               </button>
-              <button onclick="app.closeModal('modal-dual-widget'); app.navigate('pensadero')" class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
+              <button data-on-click='[["closeModal", "modal-dual-widget"], ["navigate", "pensadero"]]' class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
                 Ver Cuenca Completa ➔
               </button>
             </div>
@@ -2280,10 +2280,10 @@
             </div>
 
             <div class="space-y-2">
-              <button onclick="app.closeModal('modal-dual-widget'); app.openJarvis()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+              <button data-on-click='[["closeModal", "modal-dual-widget"], ["openJarvis"]]' class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
                 <span class="animate-pulse">🎙️</span> <span>Hablar con IA</span>
               </button>
-              <button onclick="app.closeModal('modal-dual-widget'); app.openNexusVoice('pensadero')" class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
+              <button data-on-click='[["closeModal", "modal-dual-widget"], ["openNexusVoice", "pensadero"]]' class="w-full py-2 rounded-xl bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
                 Comandos de Texto ➔
               </button>
             </div>
@@ -2295,7 +2295,7 @@
           <span class="flex items-center gap-1.5">
             <span>💡</span> <span>Puedes añadir este widget a tu pantalla de inicio desde el menú de la app.</span>
           </span>
-          <button onclick="app.openMobileAppModal()" class="text-cyan-400 font-bold hover:underline shrink-0">Ver cómo</button>
+          <button data-on-click='["openMobileAppModal"]' class="text-cyan-400 font-bold hover:underline shrink-0">Ver cómo</button>
         </div>
       </div>
     </div>
@@ -2308,11 +2308,11 @@
         <h2 class="text-base sm:text-lg font-display font-extrabold flex items-center gap-2">
           <span>✏️</span> <span>Editar Pensamiento</span>
         </h2>
-        <button onclick="app.closeModal('modal-edit-thought')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-edit-thought"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body">
-        <form id="edit-thought-form" onsubmit="app.saveThoughtEdit(event)" class="space-y-4">
+        <form id="edit-thought-form" data-on-submit='["saveThoughtEdit", "$event"]' class="space-y-4">
           <input type="hidden" id="edit-thought-id" />
 
           <div>
@@ -2372,11 +2372,11 @@
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between pt-3 -mx-4 -mb-4 px-4 pb-3">
-            <button type="button" onclick="app.deletePensaderoFromEditModal()" class="text-xs text-rose-400 hover:text-rose-500 font-semibold flex items-center gap-1">
+            <button type="button" data-on-click='["deletePensaderoFromEditModal"]' class="text-xs text-rose-400 hover:text-rose-500 font-semibold flex items-center gap-1">
               <span>🗑️</span> Eliminar Pensamiento
             </button>
             <div class="flex items-center gap-2 ml-auto">
-              <button type="button" onclick="app.closeModal('modal-edit-thought')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+              <button type="button" data-on-click='["closeModal", "modal-edit-thought"]' class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
                 Cancelar
               </button>
               <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition">
@@ -2396,11 +2396,11 @@
         <h2 class="text-base sm:text-lg font-display font-extrabold flex items-center gap-2">
           <span>✏️</span> <span>Editar Tarea</span>
         </h2>
-        <button onclick="app.closeModal('modal-edit-task')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-edit-task"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body">
-        <form id="edit-task-form" onsubmit="app.saveTaskEdit(event)" class="space-y-4">
+        <form id="edit-task-form" data-on-submit='["saveTaskEdit", "$event"]' class="space-y-4">
           <input type="hidden" id="edit-task-original-project-id" />
           <input type="hidden" id="edit-task-id" />
 
@@ -2463,11 +2463,11 @@
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between pt-3 -mx-4 -mb-4 px-4 pb-3">
-            <button type="button" onclick="app.deleteTaskFromEditModal()" class="text-xs text-rose-400 hover:text-rose-500 font-semibold flex items-center gap-1">
+            <button type="button" data-on-click='["deleteTaskFromEditModal"]' class="text-xs text-rose-400 hover:text-rose-500 font-semibold flex items-center gap-1">
               <span>🗑️</span> Eliminar Tarea
             </button>
             <div class="flex items-center gap-2 ml-auto">
-              <button type="button" onclick="app.closeModal('modal-edit-task')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+              <button type="button" data-on-click='["closeModal", "modal-edit-task"]' class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
                 Cancelar
               </button>
               <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
@@ -2487,11 +2487,11 @@
         <h2 class="text-base sm:text-lg font-display font-extrabold flex items-center gap-2">
           <span>➕</span> <span>Nueva Tarea</span>
         </h2>
-        <button onclick="app.closeModal('modal-add-task')" class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
+        <button data-on-click='["closeModal", "modal-add-task"]' class="w-8 h-8 rounded-full theme-card-subtle theme-text-muted hover:text-white flex items-center justify-center text-sm">✕</button>
       </div>
 
       <div class="nexus-modal-scroll-body">
-        <form id="add-task-form" onsubmit="app.submitCreateTask(event)" class="space-y-4">
+        <form id="add-task-form" data-on-submit='["submitCreateTask", "$event"]' class="space-y-4">
           <div>
             <label class="block text-xs font-bold mb-1">Proyecto Asignado <span class="text-brand-500">*</span></label>
             <select id="add-task-project-id" required class="w-full px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-semibold">
@@ -2544,7 +2544,7 @@
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-end gap-2 pt-3 -mx-4 -mb-4 px-4 pb-3">
-            <button type="button" onclick="app.closeModal('modal-add-task')" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
+            <button type="button" data-on-click='["closeModal", "modal-add-task"]' class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-muted hover:brightness-110">
               Cancelar
             </button>
             <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
@@ -2583,5 +2583,7 @@
   <script src="js/app/ui/contraste.js"></script>
   <script src="js/app/features/fechas.js"></script>
   <script src="js/app/features/jarvis.js"></script>
+  <!-- Delegación de eventos: atributos data-on-* en lugar de onclick inline -->
+  <script src="js/app/ui/acciones.js"></script>
 </body>
 </html>
