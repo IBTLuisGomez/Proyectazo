@@ -126,3 +126,11 @@ def test_deletes_go_through_the_offline_queue():
             if "method: 'DELETE'" in line:
                 offenders.append(f"{path.relative_to(ROOT)}:{n}")
     assert not offenders, "DELETE directo (usar this.deleteOnServer): " + ", ".join(offenders)
+
+
+def test_acciones_en_plantillas_js_existen():
+    # accion('metodo', ...) en las plantillas html`` debe apuntar a un método de ProyectazoApp
+    defined = defined_methods()
+    used = set(re.findall(r"\baccion\(\s*'([A-Za-z_]\w*)'", APP_JS))
+    assert used, "se esperaba al menos un uso de accion()"
+    assert not (used - defined), f"Acciones sin método: {used - defined}"

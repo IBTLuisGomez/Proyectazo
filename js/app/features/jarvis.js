@@ -84,28 +84,28 @@ defineAppMethods({
   },
 
   // Vista: texto del usuario (sin el bloque de contexto), texto de Jarvis y acciones realizadas.
-  renderJarvisLog(extraHtml = '') {
+  // extra: fragmento html`` opcional al final (estado, errores)
+  renderJarvisLog(extra = null) {
     const log = document.getElementById('jarvis-log');
     if (!log) return;
     const rows = [];
-    const briefing = this._briefingHtml;
-    if (briefing) rows.push(`<div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-100 text-xs leading-relaxed">${briefing}</div>`);
+    if (this._briefingHtml) rows.push(html`<div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-100 text-xs leading-relaxed">${this._briefingHtml}</div>`);
     for (const m of this.jarvisHistory()) {
       const blocks = typeof m.content === 'string' ? [{ type: 'text', text: m.content }] : (m.content || []);
       if (m.role === 'user') {
         const said = blocks.find(b => b.type === 'text' && !b.text.startsWith('<contexto>'));
-        if (said) rows.push(`<div class="ml-10 p-3 rounded-2xl bg-cyan-600/20 border border-cyan-600/30 text-white">${this.escapeHtml(said.text)}</div>`);
+        if (said) rows.push(html`<div class="ml-10 p-3 rounded-2xl bg-cyan-600/20 border border-cyan-600/30 text-white">${said.text}</div>`);
         blocks.filter(b => b.type === 'tool_result').forEach(b => {
-          rows.push(`<div class="text-[11px] ${b.is_error ? 'text-rose-300' : 'text-emerald-300'}">${b.is_error ? '⚠️' : '✓'} ${this.escapeHtml(String(b.content).slice(0, 160))}</div>`);
+          rows.push(html`<div class="text-[11px] ${b.is_error ? 'text-rose-300' : 'text-emerald-300'}">${b.is_error ? '⚠️' : '✓'} ${String(b.content).slice(0, 160)}</div>`);
         });
       } else {
         blocks.filter(b => b.type === 'text' && b.text.trim()).forEach(b => {
-          rows.push(`<div class="mr-10 p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 whitespace-pre-wrap">${this.escapeHtml(b.text)}</div>`);
+          rows.push(html`<div class="mr-10 p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 whitespace-pre-wrap">${b.text}</div>`);
         });
       }
     }
-    if (!rows.length) rows.push('<p class="text-xs text-slate-500 text-center py-8">Puedes pedirme que apunte algo, que te avise, que parta una tarea o qué hacer ahora.</p>');
-    log.innerHTML = rows.join('') + extraHtml;
+    if (!rows.length) rows.push(html`<p class="text-xs text-slate-500 text-center py-8">Puedes pedirme que apunte algo, que te avise, que parta una tarea o qué hacer ahora.</p>`);
+    log.innerHTML = html`${rows}${extra}`;
     log.scrollTop = log.scrollHeight;
   },
 
@@ -131,7 +131,7 @@ defineAppMethods({
     if (sendBtn) sendBtn.disabled = true;
     try {
       for (let round = 0; round < JARVIS.MAX_TOOL_ROUNDS; round++) {
-        this.renderJarvisLog('<p class="text-xs text-slate-500 animate-pulse">Jarvis está pensando…</p>');
+        this.renderJarvisLog(html`<p class="text-xs text-slate-500 animate-pulse">Jarvis está pensando…</p>`);
         const res = await fetch(`${this.NEXUS_API_BASE}/jarvis`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -159,11 +159,11 @@ defineAppMethods({
         jarvisWrite(JARVIS.CHAT_KEY, history);
 
         if (body.stop_reason === 'refusal') {
-          this.renderJarvisLog('<p class="text-xs text-amber-300">No puedo ayudar con eso. Prueba a decirlo de otra forma.</p>');
+          this.renderJarvisLog(html`<p class="text-xs text-amber-300">No puedo ayudar con eso. Prueba a decirlo de otra forma.</p>`);
           return;
         }
         if (body.stop_reason === 'max_tokens') {
-          this.renderJarvisLog('<p class="text-xs text-amber-300">La respuesta se cortó. Pídeme que siga.</p>');
+          this.renderJarvisLog(html`<p class="text-xs text-amber-300">La respuesta se cortó. Pídeme que siga.</p>`);
           return;
         }
 
@@ -177,9 +177,9 @@ defineAppMethods({
         history.push({ role: 'user', content: results });
         jarvisWrite(JARVIS.CHAT_KEY, history);
       }
-      this.renderJarvisLog('<p class="text-xs text-amber-300">He hecho varias acciones seguidas y me paro aquí. ¿Sigo?</p>');
+      this.renderJarvisLog(html`<p class="text-xs text-amber-300">He hecho varias acciones seguidas y me paro aquí. ¿Sigo?</p>`);
     } catch (err) {
-      this.renderJarvisLog(`<p class="text-xs text-rose-300">⚠️ ${this.escapeHtml(err.message || 'Sin conexión con Jarvis')}. Lo que escribiste no se ha perdido: está arriba.</p>`);
+      this.renderJarvisLog(html`<p class="text-xs text-rose-300">⚠️ ${err.message || 'Sin conexión con Jarvis'}. Lo que escribiste no se ha perdido: está arriba.</p>`);
     } finally {
       this._jarvisBusy = false;
       if (sendBtn) sendBtn.disabled = false;
@@ -343,19 +343,19 @@ defineAppMethods({
     const due = this.dueItems ? this.dueItems() : [];
     const urgent = (this.state.pensadero || []).filter(x => !x.inBaul && x.category === 'humo_rojo' && !x.isResolved);
     const hour = new Date().getHours();
-    parts.push(`<strong>${hour < 13 ? '☀️ Buenos días' : hour < 20 ? '🌤️ Buenas tardes' : '🌙 Buenas noches'}.</strong>`);
-    if (due.length) parts.push(`📅 Para hoy: ${due.slice(0, 3).map(d => this.escapeHtml(d.title)).join(' · ')}${due.length > 3 ? ` y ${due.length - 3} más` : ''}.`);
-    if (urgent.length) parts.push(`🔴 ${urgent.length === 1 ? 'Hay 1 cosa urgente' : `Hay ${urgent.length} cosas urgentes`} en Soltar.`);
+    parts.push(html`<strong>${hour < 13 ? '☀️ Buenos días' : hour < 20 ? '🌤️ Buenas tardes' : '🌙 Buenas noches'}.</strong>`);
+    if (due.length) parts.push(html`📅 Para hoy: ${due.slice(0, 3).map(d => d.title).join(' · ')}${due.length > 3 ? ` y ${due.length - 3} más` : ''}.`);
+    if (urgent.length) parts.push(html`🔴 ${urgent.length === 1 ? 'Hay 1 cosa urgente' : `Hay ${urgent.length} cosas urgentes`} en Soltar.`);
     const active = projects.find(p => p.status === 'en_ejecucion') || projects[0];
     if (active && this.ahoraCandidates) {
       const next = this.ahoraCandidates(active, this.getEnergyToday())[0];
-      if (next) parts.push(`🎯 Lo primero podría ser: <em>${this.escapeHtml(next.title)}</em> (${this.escapeHtml(active.name)}).`);
+      if (next) parts.push(html`🎯 Lo primero podría ser: <em>${next.title}</em> (${active.name}).`);
     }
     const stalled = projects.filter(p => (p.status === 'en_ejecucion' || p.status === 'activo') && this.daysSince(p.lastActivity) >= 7)
       .sort((a, b) => this.daysSince(b.lastActivity) - this.daysSince(a.lastActivity))[0];
-    if (stalled) parts.push(`💤 ${this.escapeHtml(stalled.name)} lleva ${this.daysSince(stalled.lastActivity)} días quieto. ¿Un paso pequeño o lo hibernamos sin culpa?`);
-    if (parts.length === 1) parts.push('Nada urgente. Elige una cosa y empieza por 2 minutos.');
-    return parts.join('<br>');
+    if (stalled) parts.push(html`💤 ${stalled.name} lleva ${this.daysSince(stalled.lastActivity)} días quieto. ¿Un paso pequeño o lo hibernamos sin culpa?`);
+    if (parts.length === 1) parts.push(html`Nada urgente. Elige una cosa y empieza por 2 minutos.`);
+    return html`${parts.map((p, i) => i ? html`<br>${p}` : p)}`;
   },
 
   // Se muestra una vez al día, a partir de las 6:00, al abrir la app.

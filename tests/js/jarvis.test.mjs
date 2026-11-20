@@ -8,7 +8,9 @@ const src = readFileSync(new URL('../../js/app/features/jarvis.js', import.meta.
 const methods = {};
 const store = new Map();
 const localStorage = { getItem: k => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)) };
-new Function('defineAppMethods', 'localStorage', src)(m => Object.assign(methods, m), localStorage);
+import { createRequire } from 'node:module';
+const { html } = createRequire(import.meta.url)('../../js/app/ui/html.js');
+new Function('defineAppMethods', 'localStorage', 'html', src)(m => Object.assign(methods, m), localStorage, html);
 
 function fakeApp() {
   const calls = [];
@@ -93,4 +95,22 @@ test('programar_aviso falla si el pensamiento no quedó con fecha', () => {
   const app = fakeApp();
   app.nextCapture = { id: 'n3', content: 'banco' }; // p. ej. repetido sin dueAt
   assert.equal(run(app, 'programar_aviso', { texto: 'banco', cuando: '2030-01-01T09:00:00Z' }).is_error, true);
+});
+
+test('el resumen del día escapa nombres y conserva el formato', () => {
+  const app = fakeApp();
+  app.state.projects[0].name = '<img src=x onerror=alert(1)>';
+  app.state.projects[0].status = 'activo';
+  app.state.projects[0].lastActivity = '2020-01-01T00:00:00Z';
+  Object.assign(app, {
+    dueItems: () => [{ title: 'Pagar <b>luz</b>' }],
+    getEnergyToday: () => 'media',
+    ahoraCandidates: p => p.tasks,
+    daysSince: () => 30
+  });
+  const out = String(app.buildBriefing());
+  assert.ok(!out.includes('<img') && !out.includes('<b>'));
+  assert.match(out, /&lt;img src=x/);
+  assert.match(out, /<strong>/);
+  assert.match(out, /<br>/);
 });
