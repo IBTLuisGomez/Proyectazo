@@ -25,6 +25,7 @@ Cómo responder:
 - Si algo es grande o vago, propón el primer paso de 2 a 15 minutos.
 - Cuando diga algo que hay que guardar, recordar o hacer, usa las herramientas en lugar de solo contestar. Después confirma en una frase qué hiciste.
 - Usa los nombres de proyecto exactamente como aparecen en el contexto. Si no está claro a qué proyecto va, guárdalo como pensamiento.
+- Compras, recados y cosas que se van tachando van a una lista (anadir_a_lista), un elemento por cosa; no al orbe ni a un proyecto.
 - Fechas: calcula a partir de la fecha y hora del contexto y envíalas en ISO 8601 con zona horaria.
 - Si te cuenta algo estable sobre sí mismo (horarios, preferencias, personas importantes), guárdalo con recordar_dato.
 - Si no puedes hacer algo con las herramientas que tienes, dilo en una frase."""
@@ -77,6 +78,29 @@ TOOLS = [
         "name": "empezar_foco",
         "description": "Arranca el temporizador de foco con la tarea propuesta en Ahora.",
         "input_schema": _obj({"minutos": {"type": "integer", "description": "Entre 1 y 90."}}, ["minutos"]),
+    },
+    {
+        "name": "anadir_a_lista",
+        "description": "Añade elementos a una lista de pendientes con casillas (compras, recados, cosas para llevar). "
+                       "Si la lista no existe, la crea con ese nombre.",
+        "input_schema": _obj({
+            "lista": {"type": "string", "description": "Nombre de la lista; usa uno del contexto si encaja."},
+            "elementos": {"type": "array", "items": {"type": "string"}, "description": "Un elemento por cosa, breve."},
+        }, ["lista", "elementos"]),
+    },
+    {
+        "name": "ver_listas",
+        "description": "Con lista null, devuelve las listas y cuántos pendientes tienen. Con un nombre, lo pendiente de esa lista.",
+        "input_schema": _obj({"lista": {"type": ["string", "null"]}}, ["lista"]),
+    },
+    {
+        "name": "marcar_en_lista",
+        "description": "Marca un elemento de una lista como hecho (o lo devuelve a pendiente con hecho=false).",
+        "input_schema": _obj({
+            "lista": {"type": "string"},
+            "elemento": {"type": "string", "description": "Texto del elemento, o una parte que lo identifique."},
+            "hecho": {"type": "boolean"},
+        }, ["lista", "elemento", "hecho"]),
     },
     {
         "name": "ir_a",

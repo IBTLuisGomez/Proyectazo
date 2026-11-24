@@ -213,11 +213,22 @@ defineAppMethods({
       `Proyectos: ${projects.map(p => `${p.name} (${(p.tasks || []).filter(t => t.column !== 'victorias').length} pendientes)`).join('; ') || 'ninguno'}`
     ];
     if (!full) return `<contexto>\n${lines.slice(0, 2).join('\n')}\n</contexto>`;
+    const listas = this.listaNotas ? NotasCore.visibles(this.listaNotas()).filter(n => n.kind === 'lista' && n.title) : [];
+    if (listas.length) lines.push(`Listas: ${listas.slice(0, 20).map(n => `${n.title} (${NotasCore.pendientes(n).length} pendientes)`).join('; ')}`);
     const due = this.dueItems ? this.dueItems() : [];
     if (due.length) lines.push(`Para hoy: ${due.slice(0, 5).map(d => d.title).join('; ')}`);
     const memory = jarvisRead(JARVIS.MEMORY_KEY, []);
     if (memory.length) lines.push(`Sabes de la persona: ${memory.join('; ')}`);
     return `<contexto>\n${lines.join('\n')}\n</contexto>`;
+  },
+
+  // Lista por nombre: exacto primero, después por coincidencia parcial ("compra" encuentra "Compras")
+  jarvisFindList(nombre) {
+    const n = String(nombre || '').trim().toLowerCase();
+    if (!n) return null;
+    const listas = NotasCore.visibles(this.listaNotas()).filter(x => x.kind === 'lista');
+    const titulo = x => String(x.title || '').trim().toLowerCase();
+    return listas.find(x => titulo(x) === n) || listas.find(x => titulo(x) && (titulo(x).includes(n) || n.includes(titulo(x)))) || null;
   },
 
   // ---------- Herramientas ----------
@@ -295,6 +306,51 @@ defineAppMethods({
           this.closeJarvis();
           this.navigate('ahora');
           return ok(`Foco de ${min} min en marcha.`);
+        }
+        // Listas de pendientes tipo Keep (js/app/views/notas.js)
+        case 'anadir_a_lista': {
+          const nombre = str(input.lista, 300);
+          const elementos = (Array.isArray(input.elementos) ? input.elementos : []).map(e => str(e, 2000)).filter(Boolean).slice(0, 50);
+          if (!nombre || !elementos.length) return fail('Necesito el nombre de la lista y al menos un elemento.');
+          let lista = this.jarvisFindList(nombre);
+          const nueva = !lista;
+          if (nueva) {
+            lista = NotasCore.crear({ kind: 'lista', title: nombre });
+            this.listaNotas().push(lista);
+          }
+          // Lo que ya está pendiente con el mismo texto no se duplica
+          const ya = new Set(NotasCore.pendientes(lista).map(i => i.text.trim().toLowerCase()));
+          const anadir = elementos.filter(e => !ya.has(e.toLowerCase()));
+          lista.items = [...(lista.items || []), ...anadir.map(e => NotasCore.crearItem(e))];
+          this.notaCambiada(lista, { meta: nueva });
+          this.refrescarNotas();
+          if (!anadir.length) return ok(`Ya estaba todo en ${lista.title}.`);
+          return ok(`${nueva ? 'Lista nueva' : 'Añadido a'} ${lista.title}: ${anadir.join(', ')}`);
+        }
+        case 'ver_listas': {
+          const listas = NotasCore.visibles(this.listaNotas()).filter(n => n.kind === 'lista');
+          if (!input.lista) {
+            return ok(listas.length ? listas.map(n => `${n.title || 'Lista sin título'} (${NotasCore.pendientes(n).length} pendientes)`).join('\n') : 'No hay listas.');
+          }
+          const lista = this.jarvisFindList(input.lista);
+          if (!lista) return fail(`No existe la lista "${str(input.lista)}". Listas: ${listas.map(n => n.title).join(', ') || 'ninguna'}`);
+          const pendientes = NotasCore.pendientes(lista).map(i => i.text);
+          return ok(pendientes.length ? `${lista.title}: ${pendientes.slice(0, 60).join('; ')}` : `${lista.title}: nada pendiente.`);
+        }
+        case 'marcar_en_lista': {
+          const lista = this.jarvisFindList(input.lista);
+          const buscado = str(input.elemento, 2000).toLowerCase();
+          if (!lista) return fail(`No existe la lista "${str(input.lista)}".`);
+          if (!buscado) return fail('Falta el elemento.');
+          const hecho = input.hecho !== false;
+          const candidatos = NotasCore.itemsVivos(lista).filter(i => i.done !== hecho);
+          const item = candidatos.find(i => i.text.trim().toLowerCase() === buscado) || candidatos.find(i => i.text.toLowerCase().includes(buscado));
+          if (!item) return fail(`No encuentro "${str(input.elemento)}" ${hecho ? 'pendiente' : 'completado'} en ${lista.title}.`);
+          item.done = hecho;
+          item.updatedAt = new Date().toISOString();
+          this.notaCambiada(lista);
+          this.refrescarNotas();
+          return ok(`${hecho ? 'Hecho' : 'De vuelta a pendiente'} en ${lista.title}: ${item.text}`);
         }
         case 'ir_a': {
           if (!['soltar', 'ahora', 'repasar'].includes(input.seccion)) return fail('Sección no válida.');

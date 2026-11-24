@@ -10,7 +10,8 @@ const store = new Map();
 const localStorage = { getItem: k => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)) };
 import { createRequire } from 'node:module';
 const { html } = createRequire(import.meta.url)('../../js/app/ui/html.js');
-new Function('defineAppMethods', 'localStorage', 'html', src)(m => Object.assign(methods, m), localStorage, html);
+const NotasCore = createRequire(import.meta.url)('../../js/notas-core.js');
+new Function('defineAppMethods', 'localStorage', 'html', 'NotasCore', src)(m => Object.assign(methods, m), localStorage, html, NotasCore);
 
 function fakeApp() {
   const calls = [];
@@ -18,7 +19,10 @@ function fakeApp() {
   const project = { id: 'p1', name: 'CytoHelix', tasks: [{ id: 't1', title: 'Leer paper', column: 'proximo', effort: 'S' }] };
   app = Object.assign(Object.create(methods), {
     calls,
-    state: { projects: [project], pensadero: [] },
+    state: { projects: [project], pensadero: [], notas: [] },
+    listaNotas: () => app.state.notas,
+    notaCambiada: (n, o) => calls.push(['notaCambiada', n.title, o]),
+    refrescarNotas: () => {},
     timer: { isRunning: false },
     backendAvailable: false,
     findProjectMatch: name => (/cyto/i.test(name) ? { project } : null),
@@ -113,4 +117,45 @@ test('el resumen del día escapa nombres y conserva el formato', () => {
   assert.match(out, /&lt;img src=x/);
   assert.match(out, /<strong>/);
   assert.match(out, /<br>/);
+});
+
+test('anadir_a_lista crea la lista, encuentra la existente y no duplica pendientes', () => {
+  const app = fakeApp();
+  assert.equal(run(app, 'anadir_a_lista', { lista: '', elementos: ['x'] }).is_error, true);
+  assert.equal(run(app, 'anadir_a_lista', { lista: 'Compras', elementos: [] }).is_error, true);
+  const r = run(app, 'anadir_a_lista', { lista: 'Compras', elementos: ['Pan', ' Leche ', ''] });
+  assert.match(r.content, /Lista nueva Compras: Pan, Leche/);
+  assert.equal(app.state.notas.length, 1);
+  // "compra" encuentra "Compras"; «pan» ya está pendiente
+  const r2 = run(app, 'anadir_a_lista', { lista: 'compra', elementos: ['pan', 'Huevos'] });
+  assert.match(r2.content, /Añadido a Compras: Huevos/);
+  assert.equal(app.state.notas.length, 1);
+  assert.deepEqual(app.state.notas[0].items.map(i => i.text), ['Pan', 'Leche', 'Huevos']);
+  assert.match(run(app, 'anadir_a_lista', { lista: 'Compras', elementos: ['PAN'] }).content, /Ya estaba todo/);
+});
+
+test('ver_listas y marcar_en_lista', () => {
+  const app = fakeApp();
+  assert.equal(run(app, 'ver_listas', { lista: null }).content, 'No hay listas.');
+  run(app, 'anadir_a_lista', { lista: 'Compras', elementos: ['Pan integral', 'Leche'] });
+  assert.equal(run(app, 'ver_listas', { lista: null }).content, 'Compras (2 pendientes)');
+  assert.equal(run(app, 'ver_listas', { lista: 'compras' }).content, 'Compras: Pan integral; Leche');
+  assert.equal(run(app, 'ver_listas', { lista: 'Viaje' }).is_error, true);
+
+  assert.match(run(app, 'marcar_en_lista', { lista: 'Compras', elemento: 'pan', hecho: true }).content, /Hecho en Compras: Pan integral/);
+  assert.equal(app.state.notas[0].items[0].done, true);
+  assert.equal(run(app, 'marcar_en_lista', { lista: 'Compras', elemento: 'pan', hecho: true }).is_error, true, 'ya estaba hecho');
+  assert.equal(run(app, 'ver_listas', { lista: 'Compras' }).content, 'Compras: Leche');
+  assert.match(run(app, 'marcar_en_lista', { lista: 'Compras', elemento: 'pan', hecho: false }).content, /De vuelta a pendiente/);
+  assert.equal(run(app, 'marcar_en_lista', { lista: 'Nada', elemento: 'pan', hecho: true }).is_error, true);
+  // Una lista archivada o borrada no se toca
+  app.state.notas[0].archived = true;
+  assert.equal(run(app, 'marcar_en_lista', { lista: 'Compras', elemento: 'leche', hecho: true }).is_error, true);
+});
+
+test('el contexto de Jarvis incluye las listas', () => {
+  const app = fakeApp();
+  run(app, 'anadir_a_lista', { lista: 'Compras', elementos: ['Pan'] });
+  assert.match(app.jarvisContext(true), /Listas: Compras \(1 pendientes\)/);
+  assert.ok(!app.jarvisContext(false).includes('Listas:'));
 });
