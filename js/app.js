@@ -75,7 +75,8 @@ class NexusHiveBrainApp {
     this.freeMoneyMonthly = 450; // Buffer mensual de dinero libre para fricción financiera TDAH
 
     this.loadState();
-    this.hydrateFromIndexedDB();
+    // Lo marcado en el widget de Android se recoge cuando el estado definitivo ya está cargado
+    this.hydrateFromIndexedDB().then(() => this.recogerCambiosDelWidget());
     // Al cerrar o esconder la pestaña, no esperar al temporizador de escritura
     window.addEventListener('pagehide', () => this.flushIndexedDBWrite());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.flushIndexedDBWrite(); });
@@ -153,6 +154,9 @@ class NexusHiveBrainApp {
     }
     if (!Array.isArray(this.state.pendingDeletes)) {
       this.state.pendingDeletes = [];
+    }
+    if (!Array.isArray(this.state.notas)) {
+      this.state.notas = [];
     }
   }
 
@@ -675,6 +679,7 @@ class NexusHiveBrainApp {
       pensadero: [],
       inbox: [],
       projects: [],
+      notas: [],
       freeformNotes: []
     };
   }
@@ -836,6 +841,7 @@ class NexusHiveBrainApp {
       } else {
         if (this._orbPausedByVisibility && this.shaderEngine) this.shaderEngine.startLoop();
         this._orbPausedByVisibility = false;
+        this.recogerCambiosDelWidget();
         this.checkBackendConnection();
       }
     });
@@ -1234,6 +1240,7 @@ class NexusHiveBrainApp {
   clearLocalSession() {
     localStorage.removeItem('nexus_session_token');
     localStorage.removeItem('nexus_session_expires');
+    this.enlazarWidgetNativo(); // sin sesión: el widget de Android deja de pedir datos al servidor
   }
 
   handleSessionExpired() {
@@ -2207,6 +2214,7 @@ class NexusHiveBrainApp {
       const res = await fetch(`${this.API_BASE}/projects`, { method: 'GET', headers: { 'Accept': 'application/json' } });
       if (res.ok) {
         this.backendAvailable = true;
+        this.enlazarWidgetNativo();
         if (badge) {
           badge.textContent = '🟢 Conectado';
           badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
@@ -2294,6 +2302,10 @@ class NexusHiveBrainApp {
       if (!remote || !remote.id) continue;
       if (!this.state.inbox.some(item => item.id === remote.id)) this.state.inbox.push(remote);
     }
+    if (Array.isArray(data.notas)) {
+      this.state.notas = NotasCore.mezclarListas(this.state.notas, data.notas);
+      this.publicarNotasEnWidget();
+    }
     if (typeof this.cleanDuplicateThoughts === 'function') this.cleanDuplicateThoughts();
   }
 
@@ -2331,7 +2343,8 @@ class NexusHiveBrainApp {
         deviceLabel: document.documentElement.dataset.form || 'unknown',
         projects: this.changedSince(this.state.projects, since),
         inbox: this.changedSince(this.state.inbox, since),
-        pensadero: this.changedSince(this.state.pensadero, since)
+        pensadero: this.changedSince(this.state.pensadero, since),
+        notas: this.changedSince(this.state.notas, since)
       };
       const res = await fetch(`${this.API_BASE}/sync`, {
         method: 'POST',
@@ -2438,7 +2451,7 @@ class NexusHiveBrainApp {
   // --- NAVIGATION (4 DESTINOS TDAH) ---
   // Alias y lista blanca de vistas. Secciones: soltar / ahora / repasar (repasar agrupa varias vistas en fichas).
   normalizeView(viewName) {
-    const alias = { zen: 'ahora', pensadero: 'soltar', orbe: 'soltar', gadget: 'soltar', kanban: 'hacer', tareas: 'hacer', pendientes: 'hacer' };
+    const alias = { listas: 'notas', keep: 'notas', zen: 'ahora', pensadero: 'soltar', orbe: 'soltar', gadget: 'soltar', kanban: 'hacer', tareas: 'hacer', pendientes: 'hacer' };
     let v = alias[viewName] || viewName;
     if (v === 'repasar') v = this.lastRepasarTab();
     // El Baúl bloqueado nunca se pinta vacío: se pide el PIN y se queda en la última ficha
@@ -2478,6 +2491,7 @@ class NexusHiveBrainApp {
         ahora: '🎯 Ahora',
         hacer: '🗂️ Repasar · Tareas',
         mas: '🗂️ Repasar · Ajustes',
+        notas: '📝 Listas y notas',
         baul: '🔒 Baúl Confidencial',
         hoy: '💼 Proyectos',
         freeform: '🎨 Lienzo Freeform',
@@ -2563,6 +2577,9 @@ class NexusHiveBrainApp {
       case 'mas':
         this.renderViewMas(target);
         break;
+      case 'notas':
+        this.renderViewNotas(target);
+        break;
       case 'hoy':
         this.renderViewHoy(target);
         break;
@@ -2585,7 +2602,7 @@ class NexusHiveBrainApp {
 
   // Vistas que viven como fichas dentro de "Repasar"
   static get REPASAR_VIEWS() {
-    return ['hacer', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas'];
+    return ['hacer', 'notas', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas'];
   }
 
   // Contenedor donde pinta la vista actual (dentro de Repasar es el panel bajo las fichas)

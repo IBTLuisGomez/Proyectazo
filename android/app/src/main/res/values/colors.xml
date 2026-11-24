@@ -3,4 +3,11 @@
     <color name="cyan_400">#22D3EE</color>
     <color name="cyan_500">#06B6D4</color>
     <color name="purple_600">#9333EA</color>
+
+    <!-- Widgets -->
+    <color name="widget_bg">#F21C1F2A</color>
+    <color name="widget_border">#3D494C</color>
+    <color name="widget_field">#262A35</color>
+    <color name="widget_text">#DFE2F1</color>
+    <color name="widget_text_muted">#94A3B8</color>
 </resources>

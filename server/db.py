@@ -58,6 +58,12 @@ CREATE TABLE IF NOT EXISTS inbox (
   owner_id INTEGER NOT NULL,
   doc TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS notas (
+  id TEXT PRIMARY KEY,
+  owner_id INTEGER NOT NULL,
+  doc TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_notas_owner ON notas(owner_id);
 CREATE TABLE IF NOT EXISTS push_subscriptions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
@@ -81,7 +87,7 @@ CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 """
 
 # Campos de fecha que se normalizan a ISO UTC al guardar
-DATE_FIELDS = ("createdAt", "updatedAt", "lastActivity", "dueAt", "date")
+DATE_FIELDS = ("createdAt", "updatedAt", "lastActivity", "dueAt", "date", "metaAt")
 
 
 def now():

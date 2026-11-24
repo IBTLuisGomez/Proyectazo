@@ -8,4 +8,11 @@
     <style name="Theme.NexusOrb.Splash" parent="Theme.NexusOrb">
         <item name="android:windowFullscreen">true</item>
     </style>
+
+    <!-- Cuadros que abren los widgets sobre la pantalla de inicio -->
+    <style name="Theme.NexusOrb.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog.MinWidth">
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/cyan_500</item>
+        <item name="colorSecondary">@color/cyan_500</item>
+    </style>
 </resources>

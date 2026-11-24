@@ -75,6 +75,12 @@ Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegado
 - [ ] Tema claro (Ajustes → Versión Clara): revisar que los textos se lean bien; dime cuáles no.
 - [ ] Android con la app instalada: **Compartir → Nexus Orb** desde el navegador guarda el enlace.
 
+**Listas y notas (Repasar → 📝 Listas)**
+- [ ] Crear una lista, añadir tres pendientes (pega varias líneas: uno por línea), marcar uno: baja a «completados».
+- [ ] Color, fijar, archivar y borrar; cada borrado ofrece **Deshacer**.
+- [ ] En otro dispositivo: la lista aparece; marca un pendiente en cada uno y sincroniza: se conservan los dos.
+- [ ] Tema claro: los colores de las tarjetas se leen bien.
+
 **Sin red**
 - [ ] Modo avión, borrar un pensamiento, volver a conectar: no debe reaparecer.
 
@@ -104,6 +110,14 @@ Pulsa `Ctrl+Shift+Espacio` desde cualquier programa: debe abrir la captura rápi
 
 ### 2.5 App Android
 La app carga la URL del servidor (configurable dentro de la app). Apúntala a tu dirección HTTPS para tener push y voz.
+
+**Widgets de listas (sin compilar ni probar en un teléfono todavía):** este equipo no tiene Android SDK, así que el código de `android/app/src/main/java/com/nexus/orb/notas/` está escrito pero no compilado. Abre `android/` en Android Studio, compila e instala, y prueba:
+- [ ] La app compila (si falla algo, pásame el error tal cual).
+- [ ] Pantalla de inicio → Widgets → Nexus Orb: aparecen **Lista de pendientes** y **Añadir pendiente**.
+- [ ] Marcar una casilla en el widget y abrir la app: el pendiente sale marcado; mirar también en el ordenador.
+- [ ] **＋** en el widget con el modo avión: se añade; al volver la red llega al servidor.
+- [ ] Marcar algo en el ordenador: el widget lo refleja al abrir la app o en ~30 min.
+- [ ] Tocar el título cambia de lista; **↗** abre la app en esa lista.
 
 ---
 

@@ -33,6 +33,11 @@
 ### 6. Despacho Directo a Proyectos sin Bloqueos
 - Botón **"🚀 Mandar a Proyecto"** en cada pensamiento o desde la consola Jarvis: canaliza la idea como tarea al Buzón o Próximo Paso del proyecto activo (`FocusFlow OS`, `CytoHelix`, `CytoCore`) mediante una notificación toast interactiva sin alertas bloqueantes.
 
+### 7. Listas de pendientes y notas (tipo Google Keep)
+- En **Repasar → 📝 Listas**: listas con casillas y notas de texto, con color, fijar, archivar y búsqueda.
+- Sin red y sincronizadas entre dispositivos (mezcla pendiente a pendiente, sin pisar cambios).
+- **Widgets en Android**: *Lista de pendientes* (marcar sin abrir la app) y *Añadir pendiente*. Ver [guía móvil](docs/GUIA_USUARIO_MOVIL.md).
+
 ---
 
 ## 🏗️ Arquitectura Técnica
@@ -53,6 +58,8 @@ Proyectazo/
 │   ├── auth.py / push.py      # Sesiones (BCrypt) y avisos Web Push
 │   └── importar_postgres.py   # Migración desde la versión anterior (ver docs/MIGRACION.md)
 ├── nexus_service.py, jarvis.py # IA: clasificación, desglose y asistente Jarvis
+├── js/notas-core.js           # Listas y notas: modelo y mezcla entre dispositivos (vista en js/app/views/notas.js)
+├── android/                   # App Android (WebView) y widgets de listas (app/src/main/java/com/nexus/orb/notas/)
 └── backend/                   # Versión anterior en Spring Boot (se retirará tras migrar)
 ```
 
@@ -93,7 +100,7 @@ La imagen de nginx lo recompila sola en `docker compose build`.
 ### Tests
 ```bash
 python -m pytest -q tests          # backend único (API, sync, push, migración), IA y Jarvis
-node --test tests/js/*.test.mjs    # captura, categorías y herramientas de Jarvis
+node --test tests/js/*.test.mjs    # captura, categorías, herramientas de Jarvis y listas
 ```
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) ejecuta ambos, compila el CSS, valida la sintaxis de todo `js/` y construye las imágenes Docker.
 

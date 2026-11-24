@@ -8,6 +8,7 @@ defineAppMethods({
   repasarTabs() {
     return [
       { view: 'hacer', icon: '⚡', label: 'Tareas' },
+      { view: 'notas', icon: '📝', label: 'Listas' },
       { view: 'hoy', icon: '💼', label: 'Proyectos' },
       { view: 'freeform', icon: '🎨', label: 'Ideas' },
       { view: 'bitacora', icon: '📜', label: 'Historial' },

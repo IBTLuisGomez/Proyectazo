@@ -26,6 +26,18 @@
       ]
     },
     {
+      "name": "📝 Listas de pendientes",
+      "short_name": "Listas",
+      "url": "./index.html#notas",
+      "description": "Tus listas con casillas y notas",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
       "name": "🔴 Algo urgente",
       "short_name": "Urgente",
       "url": "./index.html?capturar=urgente",

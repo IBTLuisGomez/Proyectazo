@@ -186,7 +186,7 @@ def test_sync_gana_lo_mas_nuevo_y_conserva_campos(api):
     assert api.call("POST", "/api/sync", {"wipe": True})[0] == 428  # sin confirmación no se borra nada
     assert api.call("GET", "/api/sync")[1]["projects"]
     status, data, _ = api.call("POST", "/api/sync", {"wipe": True}, headers={"X-Confirm-Wipe": "BORRAR-TODO"})
-    assert data == {"projects": [], "inbox": [], "pensadero": []}
+    assert data == {"projects": [], "inbox": [], "pensadero": [], "notas": []}
 
 
 def test_push_un_aviso_por_tarea_y_envio(api):
@@ -282,3 +282,89 @@ def test_importa_esquema_antiguo_sin_usuarios(tmp_path, monkeypatch):
     owner = db.one("SELECT id FROM users WHERE username = 'fer'")["id"]
     item = Store(db).list_pensadero(owner)[0]
     assert item["createdAt"] == "2026-10-18T08:03:18.682Z" and item["isPinned"] is False
+
+# ---------------- Listas y notas (tipo Keep) ----------------
+T1, T2, T3 = "2026-01-01T10:00:00.000Z", "2026-01-01T11:00:00.000Z", "2026-01-01T12:00:00.000Z"
+
+
+def _lista(**extra):
+    nota = {"id": "n1", "kind": "lista", "title": "Compras", "createdAt": T1, "updatedAt": T1, "metaAt": T1,
+            "items": [{"id": "a", "text": "Pan", "done": False, "updatedAt": T1},
+                      {"id": "b", "text": "Leche", "done": False, "updatedAt": T1}]}
+    nota.update(extra)
+    return nota
+
+
+def test_notas_sync_y_mezcla_por_elemento(api):
+    api.login()
+    status, data, _ = api.call("POST", "/api/sync", {"notas": [_lista()]})
+    assert status == 200 and [n["id"] for n in data["notas"]] == ["n1"]
+    # Otro dispositivo marca «Leche» (más nuevo) con el título viejo; la web había cambiado título y «Pan»
+    web = _lista(title="Compras del sábado", metaAt=T2, updatedAt=T2)
+    web["items"][0] = {"id": "a", "text": "Pan integral", "done": False, "updatedAt": T2}
+    api.call("POST", "/api/sync", {"notas": [web]})
+    widget = _lista(updatedAt=T3)
+    widget["items"][1] = {"id": "b", "text": "Leche", "done": True, "updatedAt": T3}
+    nota = api.call("POST", "/api/sync", {"notas": [widget]})[1]["notas"][0]
+    assert nota["title"] == "Compras del sábado" and nota["updatedAt"] == T3
+    assert [(i["text"], i["done"]) for i in nota["items"]] == [("Pan integral", False), ("Leche", True)]
+    # Una copia vieja no deshace nada
+    nota = api.call("POST", "/api/sync", {"notas": [_lista()]})[1]["notas"][0]
+    assert nota["title"] == "Compras del sábado" and nota["items"][1]["done"] is True
+
+
+def test_notas_api_del_widget(api):
+    api.login()
+    assert api.call("GET", "/api/notas", token=None)[0] == 401
+    status, nota, _ = api.call("POST", "/api/notas", {"id": "n1", "title": "Pendientes", "items": [{"id": "a", "text": "Pan"}]})
+    assert status == 201 and nota["kind"] == "lista" and nota["items"][0]["done"] is False and nota["createdAt"]
+    status, nota, _ = api.call("POST", "/api/notas/n1/items", {"id": "b", "text": "  Leche  "})
+    assert status == 201 and [i["text"] for i in nota["items"]] == ["Pan", "Leche"]
+    # Reintento del mismo envío (el widget sin cobertura): no duplica
+    assert len(api.call("POST", "/api/notas/n1/items", {"id": "b", "text": "Leche"})[1]["items"]) == 2
+    assert api.call("POST", "/api/notas/n1/items", {"text": "  "})[0] == 400
+    assert api.call("POST", "/api/notas/nope/items", {"text": "x"})[0] == 404
+    status, nota, _ = api.call("PUT", "/api/notas/n1/items/a", {"done": True})
+    assert status == 200 and nota["items"][0]["done"] is True
+    # Un cambio con fecha anterior a la guardada no pisa
+    assert api.call("PUT", "/api/notas/n1/items/a", {"done": False, "updatedAt": T1})[1]["items"][0]["done"] is True
+    assert api.call("PUT", "/api/notas/n1/items/zzz", {"done": True})[0] == 404
+    # Quitar un elemento: desaparece de la API pero queda la marca para la sincronización
+    assert [i["id"] for i in api.call("PUT", "/api/notas/n1/items/b", {"deleted": True})[1]["items"]] == ["a"]
+    synced = api.call("GET", "/api/sync")[1]["notas"][0]
+    assert [(i["id"], i.get("deleted", False)) for i in synced["items"]] == [("a", False), ("b", True)]
+    # Fijadas primero
+    api.call("POST", "/api/notas", {"id": "n2", "title": "Fijada", "pinned": True, "createdAt": T1})
+    assert [n["id"] for n in api.call("GET", "/api/notas")[1]] == ["n2", "n1"]
+
+
+def test_notas_borradas_no_resucitan(api):
+    api.login()
+    api.call("POST", "/api/sync", {"notas": [_lista()]})
+    assert api.call("DELETE", "/api/notas/n1")[0] == 204
+    assert api.call("GET", "/api/notas")[1] == []
+    assert api.call("POST", "/api/notas/n1/items", {"text": "x"})[0] == 404
+    # Un dispositivo que aún la tiene la reenvía: sigue borrada, y recibe la marca para borrarla también
+    notas = api.call("POST", "/api/sync", {"notas": [_lista(updatedAt=T3)]})[1]["notas"]
+    assert notas[0]["deleted"] is True and notas[0]["items"] == []
+    # Deshacer el borrado (versión más nueva que la marca) sí la devuelve
+    futuro = "2999-01-01T00:00:00.000Z"
+    api.call("POST", "/api/sync", {"notas": [_lista(updatedAt=futuro, metaAt=futuro)]})
+    assert [n["title"] for n in api.call("GET", "/api/notas")[1]] == ["Compras"]
+
+
+def test_notas_separadas_por_usuario_y_borrado_total(api):
+    api.login()
+    api.call("POST", "/api/sync", {"notas": [_lista()]})
+    api.db.execute("INSERT INTO users(username, password_hash) VALUES ('bea', ?)", (auth_mod.hash_password("clave-de-bea"),))
+    ana = api.token
+    api.login("bea", "clave-de-bea")
+    assert api.call("GET", "/api/notas")[1] == []
+    assert api.call("PUT", "/api/notas/n1/items/a", {"done": True})[0] == 404
+    # El mismo id desde otra cuenta no pisa la nota ajena: se guarda aparte
+    mine = api.call("POST", "/api/notas", _lista(title="De Bea"))[1]
+    assert mine["id"] != "n1"
+    api.token = ana
+    assert [n["title"] for n in api.call("GET", "/api/notas")[1]] == ["Compras"]
+    api.call("POST", "/api/sync", {"wipe": True}, headers={"X-Confirm-Wipe": "BORRAR-TODO"})
+    assert api.call("GET", "/api/sync")[1]["notas"] == []

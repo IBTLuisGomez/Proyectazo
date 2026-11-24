@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">Nexus Orb</string>
+
+    <!-- Widgets de listas de pendientes -->
+    <string name="widget_lista_nombre">Lista de pendientes</string>
+    <string name="widget_lista_descripcion">Una de tus listas con casillas: marca pendientes sin abrir la app.</string>
+    <string name="widget_anadir_nombre">Añadir pendiente</string>
+    <string name="widget_anadir_descripcion">Una barra para apuntar un pendiente al momento.</string>
+    <string name="widget_anadir_hint">Añadir pendiente…</string>
+    <string name="widget_anadir">Añadir pendiente</string>
+    <string name="widget_abrir_app">Abrir mis listas en Nexus Orb</string>
+    <string name="widget_cambiar_lista">Cambiar de lista</string>
+    <string name="widget_marcar">Marcar como hecho</string>
+    <string name="widget_desmarcar">Volver a pendiente</string>
+    <string name="widget_vacio">Nada pendiente aquí.\nToca + para añadir.</string>
+    <string name="widget_sin_listas">Toca + para empezar</string>
+    <string name="widget_todo_hecho">Todo hecho</string>
+    <plurals name="widget_pendientes">
+        <item quantity="one">%d pendiente</item>
+        <item quantity="other">%d pendientes</item>
+    </plurals>
+
+    <string name="quick_add_titulo">Añadir a «%1$s»</string>
+    <string name="quick_add_hint">¿Qué hay que hacer?</string>
+    <string name="quick_add_anadir">Añadir</string>
+    <string name="quick_add_cerrar">Cerrar</string>
+    <string name="quick_add_hecho">✓ «%1$s» añadido a %2$s</string>
+
+    <string name="config_titulo">¿Qué lista quieres ver?</string>
+    <string name="config_vacio">Aún no hay listas. Coloca el widget y toca + para crear «Pendientes», o créalas en la app (Repasar → Listas).</string>
+    <string name="config_aceptar">Colocar</string>
 </resources>

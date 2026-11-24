@@ -2,6 +2,7 @@ package com.nexus.orb
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.content.res.Configuration
@@ -32,6 +33,15 @@ class MainActivity : AppCompatActivity() {
     private val PREFS_NAME = "NexusOrbPrefs"
     private val KEY_SERVER_URL = "server_url"
 
+    // Lista que pidió abrir un widget; se abre cuando la página termina de cargar
+    private var pendingNotaId: String? = null
+    private var pageReady = false
+
+    companion object {
+        const val EXTRA_OPEN_NOTAS = "open_notas"
+        const val EXTRA_OPEN_NOTA_ID = "open_nota_id"
+    }
+
     private fun getServerUrl(): String {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         return prefs.getString(KEY_SERVER_URL, DEFAULT_URL) ?: DEFAULT_URL
@@ -55,7 +65,40 @@ class MainActivity : AppCompatActivity() {
 
         checkAudioPermissions()
 
-        webView.loadUrl(getServerUrl())
+        val url = getServerUrl()
+        if (intent?.getBooleanExtra(EXTRA_OPEN_NOTAS, false) == true) {
+            pendingNotaId = safeId(intent.getStringExtra(EXTRA_OPEN_NOTA_ID))
+            webView.loadUrl(if (url.contains("#")) url else "$url#notas")
+        } else {
+            webView.loadUrl(url)
+        }
+    }
+
+    // La app ya estaba abierta y se toca un widget
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (!intent.getBooleanExtra(EXTRA_OPEN_NOTAS, false)) return
+        pendingNotaId = safeId(intent.getStringExtra(EXTRA_OPEN_NOTA_ID))
+        if (pageReady) openNotasInPage()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Recoger lo marcado o añadido en los widgets mientras la app estaba en segundo plano
+        if (pageReady) {
+            webView.evaluateJavascript("if(typeof app!=='undefined'&&app&&app.recogerCambiosDelWidget)app.recogerCambiosDelWidget();", null)
+        }
+    }
+
+    // El id viaja dentro de un fragmento de JavaScript: solo los caracteres que generan la web y el widget
+    private fun safeId(id: String?): String = (id ?: "").filter { it.isLetterOrDigit() || it == '-' || it == '_' }
+
+    // La variable global de la web (app) se declara con let: existe, pero no como window.app
+    private fun openNotasInPage() {
+        val id = pendingNotaId ?: return
+        pendingNotaId = null
+        webView.evaluateJavascript("if(typeof app!=='undefined'&&app&&app.abrirDesdeWidget)app.abrirDesdeWidget('$id');", null)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -88,11 +131,14 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 progressBar.visibility = View.VISIBLE
+                pageReady = false
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 progressBar.visibility = View.GONE
                 injectFormFactor()
+                pageReady = true
+                openNotasInPage()
             }
 
             override fun onReceivedError(
