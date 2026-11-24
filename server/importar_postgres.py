@@ -87,7 +87,7 @@ class Importer:
         owner = lambda row: row.get("owner_id") or first_user  # noqa: E731 · huérfanos al primer usuario
         with self.db.transaction() as conn:
             for u in users:
-                conn.execute("INSERT INTO users(id, username, password_hash, created_at) VALUES (?, ?, ?, ?)",
+                conn.execute("INSERT OR REPLACE INTO users(id, username, password_hash, created_at) VALUES (?, ?, ?, ?)",
                              (u["id"], u["username"], u["password_hash"], self.ts(u.get("created_at"))))
             self.counts["usuarios"] = len(users)
 
@@ -101,21 +101,21 @@ class Importer:
             for p in projects:
                 if owner(p) is None:
                     continue
-                conn.execute("INSERT INTO projects(id, owner_id, doc) VALUES (?, ?, ?)", (p["id"], owner(p), dumps(self.to_doc(p))))
+                conn.execute("INSERT OR REPLACE INTO projects(id, owner_id, doc) VALUES (?, ?, ?)", (p["id"], owner(p), dumps(self.to_doc(p))))
             self.counts["proyectos"] = len(projects)
 
             known = {p["id"] for p in projects}
             for table, target, prefix in (("tasks", "tasks", "tareas"), ("session_logs", "session_logs", "bitácora")):
                 rows = [r for r in read_jsonl(folder, table) if r.get("project_id") in known]
                 for r in rows:
-                    conn.execute(f"INSERT INTO {target}(id, project_id, doc) VALUES (?, ?, ?)",
+                    conn.execute(f"INSERT OR REPLACE INTO {target}(id, project_id, doc) VALUES (?, ?, ?)",
                                  (r["id"], r["project_id"], dumps(self.to_doc(r))))
                 self.counts[prefix] = len(rows)
 
             for table, target, label in (("pensadero_items", "pensadero", "pensamientos"), ("inbox_items", "inbox", "bandeja")):
                 rows = [r for r in read_jsonl(folder, table) if owner(r) is not None]
                 for r in rows:
-                    conn.execute(f"INSERT INTO {target}(id, owner_id, doc) VALUES (?, ?, ?)",
+                    conn.execute(f"INSERT OR REPLACE INTO {target}(id, owner_id, doc) VALUES (?, ?, ?)",
                                  (r["id"], owner(r), dumps(self.to_doc(r))))
                 self.counts[label] = len(rows)
 
