@@ -84,6 +84,12 @@ CREATE TABLE IF NOT EXISTS push_reminders (
 );
 CREATE INDEX IF NOT EXISTS idx_reminders_due ON push_reminders(sent_at, send_at);
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS client_errors (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  at TEXT NOT NULL,
+  doc TEXT NOT NULL
+);
 """
 
 # Campos de fecha que se normalizan a ISO UTC al guardar

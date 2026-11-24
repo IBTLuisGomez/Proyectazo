@@ -9,6 +9,7 @@ import threading
 from datetime import datetime, timedelta, timezone
 
 from .db import iso, now, parse_dt
+from .secretbox import SecretBox
 
 KEY_PUBLIC = "vapid.public"
 KEY_PRIVATE = "vapid.private"
@@ -52,20 +53,28 @@ class WebPushSender:
 
 
 class Push:
-    def __init__(self, db, public_key=None, private_key=None, subject="mailto:admin@localhost", sender=None, log=print):
+    def __init__(self, db, public_key=None, private_key=None, subject="mailto:admin@localhost", sender=None, log=print,
+                 box=None):
         self.db = db
         self.log = log
         self.enabled = False
         self.public_key = None
         self.sender = sender
+        box = box or SecretBox()
         try:
             if not public_key or not private_key:
-                public_key, private_key = db.get_setting(KEY_PUBLIC), db.get_setting(KEY_PRIVATE)
+                public_key, stored = db.get_setting(KEY_PUBLIC), db.get_setting(KEY_PRIVATE)
+                # Con NEXUS_SECRET_KEY la privada se guarda cifrada. Si no se puede descifrar, push queda
+                # desactivado (no se generan otras claves: pisarían las que usan los dispositivos ya suscritos)
+                private_key = box.open(stored) if stored else None
                 if not public_key or not private_key:
                     public_key, private_key = generate_vapid_keys()
                     db.set_setting(KEY_PUBLIC, public_key)
-                    db.set_setting(KEY_PRIVATE, private_key)
+                    db.set_setting(KEY_PRIVATE, box.seal(private_key))
                     log("Claves VAPID generadas y guardadas en la base de datos.")
+                elif box.enabled and not box.is_sealed(stored):
+                    db.set_setting(KEY_PRIVATE, box.seal(private_key))
+                    log("Clave privada VAPID cifrada con NEXUS_SECRET_KEY.")
             if self.sender is None:
                 self.sender = WebPushSender(private_key, subject)
             self.public_key = public_key

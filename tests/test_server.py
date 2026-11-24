@@ -368,3 +368,14 @@ def test_notas_separadas_por_usuario_y_borrado_total(api):
     assert [n["title"] for n in api.call("GET", "/api/notas")[1]] == ["Compras"]
     api.call("POST", "/api/sync", {"wipe": True}, headers={"X-Confirm-Wipe": "BORRAR-TODO"})
     assert api.call("GET", "/api/sync")[1]["notas"] == []
+
+
+def test_errores_del_cliente(api):
+    assert api.call("POST", "/api/client-errors", {"message": "x"}, token=None)[0] == 401
+    api.login()
+    status, body, _ = api.call("POST", "/api/client-errors", {"message": "Cannot read properties of null", "source": "js/app.js",
+                                                              "line": 12, "view": "notas", "version": "v3.16"})
+    assert status == 202 and body == {"stored": True}
+    assert api.call("POST", "/api/client-errors", {"stack": "sin mensaje"})[1] == {"stored": False}
+    rows = api.call("GET", "/api/client-errors")[1]
+    assert len(rows) == 1 and rows[0]["message"].startswith("Cannot read") and rows[0]["view"] == "notas"

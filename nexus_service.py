@@ -297,6 +297,11 @@ def generate_reactivation_briefing(project_name: str, context: str, logs: list) 
 
 # --- GESTOR DE CONEXIÓN CON CORREO GOOGLE (GMAIL SMTP & RECORDATORIOS) ---
 
+def _secret_box():
+    from server.secretbox import from_env
+    return from_env()
+
+
 class GoogleMailManager:
     """
     Gestor de integración con Google Mail (Gmail SMTP / Google Workspace)
@@ -328,7 +333,24 @@ class GoogleMailManager:
                     cfg.update(saved)
             except Exception as e:
                 print(f"[GoogleMailManager] Error cargando config: {e}")
+        # Con NEXUS_SECRET_KEY la contraseña está cifrada en el archivo (server/secretbox.py)
+        box = _secret_box()
+        stored = cfg.get("gmail_app_password") or ""
+        try:
+            cfg["gmail_app_password"] = box.open(stored)
+        except Exception as e:
+            print(f"[GoogleMailManager] No se pudo descifrar la contraseña de Gmail ({e}); el correo queda sin configurar.")
+            cfg["gmail_app_password"] = ""
+            return cfg
+        if stored and box.enabled and not box.is_sealed(stored) and os.path.exists(self.config_file):
+            self._write_config(cfg)  # estaba en texto plano: se cifra en cuanto hay clave
         return cfg
+
+    def _write_config(self, cfg: dict):
+        on_disk = dict(cfg)
+        on_disk["gmail_app_password"] = _secret_box().seal(on_disk.get("gmail_app_password") or "")
+        with open(self.config_file, "w", encoding="utf-8") as f:
+            json.dump(on_disk, f, indent=2, ensure_ascii=False)
 
     def save_config(self, new_cfg: dict) -> dict:
         with self.lock:
@@ -336,8 +358,7 @@ class GoogleMailManager:
                 if k in new_cfg and new_cfg[k] is not None:
                     self.config[k] = new_cfg[k]
             try:
-                with open(self.config_file, "w", encoding="utf-8") as f:
-                    json.dump(self.config, f, indent=2, ensure_ascii=False)
+                self._write_config(self.config)
             except Exception as e:
                 print(f"[GoogleMailManager] Error guardando config: {e}")
         return self.get_status()

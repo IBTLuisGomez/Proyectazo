@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
   './favicon.svg',
   './assets/tailwind.css',
   './assets/contraste.css',
+  './js/errores.js',
   './js/idb-store.js',
   './js/smoke-palette.js',
   './js/clasificador-reglas.js',

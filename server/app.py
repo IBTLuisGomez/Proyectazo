@@ -11,7 +11,10 @@ from urllib.parse import parse_qs, urlsplit
 
 import nexus_service
 
+from . import secretbox
 from .auth import Auth, AuthError, LoginRateLimiter
+from .backup import Backups
+from .clientlog import ClientLog
 from .db import Database
 from .push import Push
 from .store import BadRequest, NotFound, Store
@@ -38,6 +41,7 @@ class Context:
         self.store = Store(db)
         self.auth = Auth(db)
         self.push = push
+        self.client_log = ClientLog(db)
         self.limiter = LoginRateLimiter()
         self.allowed_origins = {o.strip() for o in allowed_origins.split(",") if o.strip()}
 
@@ -272,6 +276,17 @@ def push_cancel(h, user, id, **_):
     return (204, None) if h.ctx.push.cancel(user["id"], int(id)) else (404, None)
 
 
+# Errores de JavaScript del navegador (js/app/features/errores.js)
+@route("POST", "/api/client-errors")
+def client_errors_add(h, user, body, **_):
+    return 202, {"stored": h.ctx.client_log.add(user["id"], body)}
+
+
+@route("GET", "/api/client-errors")
+def client_errors_list(h, user, **_):
+    return 200, h.ctx.client_log.recent(user["id"])
+
+
 # ---------------- Manejador ----------------
 class AppHandler(nexus_service.NexusRequestHandler):
     ctx = None  # Context, asignado al crear el servidor
@@ -410,14 +425,25 @@ def create_context_from_env():
     db = Database(os.getenv("NEXUS_DB_PATH", os.path.join("data", "nexus.db")))
     Auth(db).bootstrap_admin(os.getenv("NEXUS_ADMIN_USER", "admin"), os.getenv("NEXUS_ADMIN_PASSWORD", ""))
     push = Push(db, os.getenv("NEXUS_VAPID_PUBLIC_KEY") or None, os.getenv("NEXUS_VAPID_PRIVATE_KEY") or None,
-                os.getenv("NEXUS_PUSH_SUBJECT", "mailto:admin@localhost"))
+                os.getenv("NEXUS_PUSH_SUBJECT", "mailto:admin@localhost"), box=secretbox.from_env())
     return Context(db, push, os.getenv("CORS_ALLOWED_ORIGINS", DEFAULT_ORIGINS))
+
+
+def backups_from_env(db):
+    try:
+        keep = int(os.getenv("NEXUS_BACKUP_KEEP") or 14)
+    except ValueError:
+        keep = 14
+    return Backups(db, os.getenv("NEXUS_BACKUP_DIR") or None, keep)
 
 
 def main():
     ctx = create_context_from_env()
     if ctx.push.enabled:
         ctx.push.start_scheduler()
+    backups = backups_from_env(ctx.db)
+    backups.start_scheduler()
+    print(f"[Nexus Orb] Copias de seguridad: {'diarias en ' + backups.directory if backups.enabled else 'desactivadas'}")
     port = int(os.getenv("PORT", "8081"))
     httpd = build_server(ctx, port=port)
     print(f"[Nexus Orb] Servidor único escuchando en http://0.0.0.0:{port} (API + IA)")
