@@ -1,6 +1,6 @@
 'use strict';
 // Apertura y cierre accesible de modales y pantalla de Ajustes.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 
@@ -82,7 +82,7 @@ defineAppMethods({
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
     const a = document.createElement('a');
     a.setAttribute("href", dataStr);
-    a.setAttribute("download", `proyectazo_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    a.setAttribute("download", `nexushivebrain_backup_${new Date().toISOString().slice(0, 10)}.json`);
     document.body.appendChild(a);
     a.click();
     a.remove();

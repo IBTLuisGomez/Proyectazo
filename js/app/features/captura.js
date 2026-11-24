@@ -1,7 +1,7 @@
 'use strict';
 // Embudo único de captura: todo lo que se suelta (orbe, gadget, voz, Ctrl+K, consola Nexus, compartir)
 // entra por captureThought(). Guarda al instante y clasifica después, sin preguntar nada.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
   /**

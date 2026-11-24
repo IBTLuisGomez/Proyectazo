@@ -1,5 +1,5 @@
 """
-Nexus Cognitive Service for Hive Brain / Proyectazo (TDAH Executive Assistant)
+Nexus Cognitive Service for Hive Brain (TDAH Executive Assistant)
 Powered by Gemini 2.5 Flash / Google GenAI SDK with Structured Outputs (Pydantic).
 Handles thought classification, atomic goal deconstruction, gap filling, and dormant project reactivation.
 """
@@ -471,7 +471,7 @@ class GoogleMailManager:
                     </a>
                   </div>
                   <div style="border-top: 1px solid #1e293b; margin-top: 24px; padding-top: 14px; text-align: center; font-size: 11px; color: #64748b;">
-                    Enviado automáticamente por el servicio de recordatorios de Proyectazo / Nexus.
+                    Enviado automáticamente por el servicio de recordatorios de NexusHiveBrain.
                   </div>
                 </div>
                 """

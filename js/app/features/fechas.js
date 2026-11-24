@@ -1,6 +1,6 @@
 'use strict';
 // Fechas de tareas y pensamientos: "Para hoy" en la vista Hoy, sin culpa por lo que quedó de antes.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
   // <input type="datetime-local"> ⇄ ISO

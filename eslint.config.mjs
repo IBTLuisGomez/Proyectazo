@@ -3,7 +3,7 @@ import globals from 'globals';
 
 // Nombres globales que un script define y otros usan
 const proyecto = {
-  app: 'writable', ProyectazoApp: 'readonly', defineAppMethods: 'readonly',
+  app: 'writable', NexusHiveBrainApp: 'readonly', ProyectazoApp: 'readonly', defineAppMethods: 'readonly',
   SMOKE_PALETTE: 'readonly', SMOKE_GROUPS: 'readonly', SMOKE_TAGS: 'readonly', SMOKE_VISIBLE_KEYS: 'readonly',
   categoriaVisible: 'readonly', etiquetaDe: 'readonly',
   CLASIFICADOR_REGLAS: 'readonly', CapturaParser: 'readonly', NexusIDB: 'readonly', PensaderoShaderEngine: 'readonly',

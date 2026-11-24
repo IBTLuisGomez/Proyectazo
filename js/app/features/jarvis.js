@@ -3,7 +3,7 @@
 // El servidor (/jarvis en Nexus) solo llama al modelo; las herramientas se ejecutan aquí,
 // donde están los datos, y funcionan igual sin conexión con el backend.
 // Sin proveedor de IA configurado, Jarvis usa el intérprete local de comandos (processNexusCommand).
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 const JARVIS = {
   CHAT_KEY: 'nexus_jarvis_chat',

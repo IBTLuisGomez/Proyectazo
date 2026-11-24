@@ -24,3 +24,4 @@ replay_pid*.log
 
 # Exportaciones de Postgres para migrar (contienen hashes y claves)
 export-postgres-*/
+*.sql

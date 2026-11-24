@@ -1,7 +1,7 @@
 {
-  "name": "Nexus Orb — Ecosistema Cognitivo TDAH",
-  "short_name": "Nexus Orb",
-  "description": "Sistema cognitivo de gestión multiproyecto diseñado para TDAH con Nexus Orb 3D, Ruido Marrón y Lienzo Creativo Freeform.",
+  "name": "NexusHiveBrain — Ecosistema Cognitivo TDAH",
+  "short_name": "NexusHiveBrain",
+  "description": "NexusHiveBrain: Sistema cognitivo de gestión multiproyecto diseñado para TDAH con Nexus Orb 3D, Ruido Marrón y Lienzo Creativo Freeform.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

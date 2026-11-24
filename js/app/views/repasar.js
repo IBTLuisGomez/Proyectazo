@@ -1,7 +1,7 @@
 'use strict';
 // Sección "Repasar": fichas que agrupan las vistas de consulta (tareas, proyectos, ideas,
 // historial, radar, baúl y ajustes). Cada ficha reutiliza su renderView* existente.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 
