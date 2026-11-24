@@ -2,7 +2,7 @@
 // Guardia de contraste del tema claro: la interfaz reutiliza colores pensados para fondo oscuro.
 // Tras cada render mide el texto contra su fondo real y marca con .on-light lo que no llega a
 // WCAG AA; assets/contraste.css lo oscurece conservando el tono. En temas oscuros no hace nada.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
   initContrastGuard() {

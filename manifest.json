@@ -1,7 +1,7 @@
 {
-  "name": "Nexus Orb — Ecosistema Cognitivo TDAH",
-  "short_name": "Nexus Orb",
-  "description": "Sistema cognitivo de gestión multiproyecto diseñado para TDAH con Nexus Orb 3D, Ruido Marrón y Lienzo Creativo Freeform.",
+  "name": "NexusHiveBrain — Ecosistema Cognitivo TDAH",
+  "short_name": "NexusHiveBrain",
+  "description": "NexusHiveBrain: Sistema cognitivo de gestión multiproyecto diseñado para TDAH con Nexus Orb 3D, Ruido Marrón y Lienzo Creativo Freeform.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -18,6 +18,18 @@
       "short_name": "Soltar",
       "url": "./index.html?capturar=1",
       "description": "Captura rápida: escribe o dicta y listo",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "📝 Listas de pendientes",
+      "short_name": "Listas",
+      "url": "./index.html#notas",
+      "description": "Tus listas con casillas y notas",
       "icons": [
         {
           "src": "./assets/icon-192.png",

@@ -194,6 +194,34 @@ def pensadero_delete(h, user, id, **_):
     return 204, None
 
 
+# Notas y listas de pendientes (tipo Keep). La app web las sincroniza por /api/sync;
+# estas rutas las usan los widgets de Android (solo GET, POST y PUT: HttpURLConnection no admite PATCH).
+@route("GET", "/api/notas")
+def notas_list(h, user, **_):
+    return 200, h.ctx.store.list_notas(user["id"])
+
+
+@route("POST", "/api/notas")
+def notas_save(h, user, body, **_):
+    return 201, h.ctx.store.save_nota(user["id"], body)
+
+
+@route("DELETE", "/api/notas/{id}")
+def notas_delete(h, user, id, **_):
+    h.ctx.store.delete_nota(user["id"], id)
+    return 204, None
+
+
+@route("POST", "/api/notas/{id}/items")
+def notas_item_add(h, user, id, body, **_):
+    return 201, h.ctx.store.add_nota_item(user["id"], id, body)
+
+
+@route("PUT", "/api/notas/{id}/items/{item}")
+def notas_item_update(h, user, id, item, body, **_):
+    return 200, h.ctx.store.update_nota_item(user["id"], id, item, body)
+
+
 @route("GET", "/api/push/public-key")
 def push_key(h, user, **_):
     if not h.ctx.push.enabled:

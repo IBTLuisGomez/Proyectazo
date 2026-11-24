@@ -1,6 +1,6 @@
 'use strict';
 // Instalación en móvil/tablet y envío del enlace por WhatsApp.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 
@@ -19,7 +19,7 @@ defineAppMethods({
     if (qrContainer) {
       qrContainer.innerHTML = `
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentUrl)}&bgcolor=ffffff&color=0f172a" 
-             alt="Código QR de Proyectazo" 
+             alt="Código QR de NexusHiveBrain" 
              class="w-36 h-36 rounded-xl shadow-md border-2 border-slate-700/50 bg-white p-1 mx-auto"
              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'p-3 text-[10px] font-mono theme-card border theme-border\'>${currentUrl}</div>';" />
       `;
@@ -40,7 +40,7 @@ defineAppMethods({
 
   shareWhatsApp(customPhone = '') {
     const currentUrl = window.location.href;
-    const text = `⚡ ¡Prueba Proyectazo (FocusFlow OS) en tu celular o tablet! Diseñado para TDAH con El Pensadero, Ruido Marrón y Lienzo Libre Freeform: ${currentUrl}`;
+    const text = `⚡ ¡Prueba NexusHiveBrain (FocusFlow OS) en tu celular o tablet! Diseñado para TDAH con El Pensadero, Ruido Marrón y Lienzo Libre Freeform: ${currentUrl}`;
 
     const phone = customPhone || (document.getElementById('whatsapp-phone-input') ? document.getElementById('whatsapp-phone-input').value.trim() : '');
     const cleanPhone = phone.replace(/[^0-9]/g, '');

@@ -1,6 +1,6 @@
 'use strict';
 // Modos de foco: Despegue (restaurar contexto) y Modo Una Sola Cosa.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 

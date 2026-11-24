@@ -1,6 +1,6 @@
 'use strict';
 // Checkout, captura rápida y altas/ediciones de proyectos, pensamientos y tareas.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 

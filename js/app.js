@@ -2,11 +2,11 @@
 // Aplicación principal. Expone `app` como global: lo usan las acciones data-on-* (js/app/ui/acciones.js).
 
 /**
- * Proyectazo — FocusFlow OS
+ * NexusHiveBrain — FocusFlow OS
  * Sistema Unificado de Gestión Multiproyecto para TDAH
  * Con El Pensadero, Ruido Marrón Sintetizado, Modo Zen y Soporte Spring Boot
  */
-class ProyectazoApp {
+class NexusHiveBrainApp {
   constructor() {
     this.STORAGE_KEY = 'nexus_orb_v3';
     const isHttp = window.location.protocol.startsWith('http');
@@ -75,7 +75,8 @@ class ProyectazoApp {
     this.freeMoneyMonthly = 450; // Buffer mensual de dinero libre para fricción financiera TDAH
 
     this.loadState();
-    this.hydrateFromIndexedDB();
+    // Lo marcado en el widget de Android se recoge cuando el estado definitivo ya está cargado
+    this.hydrateFromIndexedDB().then(() => this.recogerCambiosDelWidget());
     // Al cerrar o esconder la pestaña, no esperar al temporizador de escritura
     window.addEventListener('pagehide', () => this.flushIndexedDBWrite());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.flushIndexedDBWrite(); });
@@ -153,6 +154,9 @@ class ProyectazoApp {
     }
     if (!Array.isArray(this.state.pendingDeletes)) {
       this.state.pendingDeletes = [];
+    }
+    if (!Array.isArray(this.state.notas)) {
+      this.state.notas = [];
     }
   }
 
@@ -675,6 +679,7 @@ class ProyectazoApp {
       pensadero: [],
       inbox: [],
       projects: [],
+      notas: [],
       freeformNotes: []
     };
   }
@@ -836,6 +841,7 @@ class ProyectazoApp {
       } else {
         if (this._orbPausedByVisibility && this.shaderEngine) this.shaderEngine.startLoop();
         this._orbPausedByVisibility = false;
+        this.recogerCambiosDelWidget();
         this.checkBackendConnection();
       }
     });
@@ -1234,6 +1240,7 @@ class ProyectazoApp {
   clearLocalSession() {
     localStorage.removeItem('nexus_session_token');
     localStorage.removeItem('nexus_session_expires');
+    this.enlazarWidgetNativo(); // sin sesión: el widget de Android deja de pedir datos al servidor
   }
 
   handleSessionExpired() {
@@ -2207,6 +2214,7 @@ class ProyectazoApp {
       const res = await fetch(`${this.API_BASE}/projects`, { method: 'GET', headers: { 'Accept': 'application/json' } });
       if (res.ok) {
         this.backendAvailable = true;
+        this.enlazarWidgetNativo();
         if (badge) {
           badge.textContent = '🟢 Conectado';
           badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
@@ -2294,6 +2302,10 @@ class ProyectazoApp {
       if (!remote || !remote.id) continue;
       if (!this.state.inbox.some(item => item.id === remote.id)) this.state.inbox.push(remote);
     }
+    if (Array.isArray(data.notas)) {
+      this.state.notas = NotasCore.mezclarListas(this.state.notas, data.notas);
+      this.publicarNotasEnWidget();
+    }
     if (typeof this.cleanDuplicateThoughts === 'function') this.cleanDuplicateThoughts();
   }
 
@@ -2331,7 +2343,8 @@ class ProyectazoApp {
         deviceLabel: document.documentElement.dataset.form || 'unknown',
         projects: this.changedSince(this.state.projects, since),
         inbox: this.changedSince(this.state.inbox, since),
-        pensadero: this.changedSince(this.state.pensadero, since)
+        pensadero: this.changedSince(this.state.pensadero, since),
+        notas: this.changedSince(this.state.notas, since)
       };
       const res = await fetch(`${this.API_BASE}/sync`, {
         method: 'POST',
@@ -2438,7 +2451,7 @@ class ProyectazoApp {
   // --- NAVIGATION (4 DESTINOS TDAH) ---
   // Alias y lista blanca de vistas. Secciones: soltar / ahora / repasar (repasar agrupa varias vistas en fichas).
   normalizeView(viewName) {
-    const alias = { zen: 'ahora', pensadero: 'soltar', orbe: 'soltar', gadget: 'soltar', kanban: 'hacer', tareas: 'hacer', pendientes: 'hacer' };
+    const alias = { listas: 'notas', keep: 'notas', zen: 'ahora', pensadero: 'soltar', orbe: 'soltar', gadget: 'soltar', kanban: 'hacer', tareas: 'hacer', pendientes: 'hacer' };
     let v = alias[viewName] || viewName;
     if (v === 'repasar') v = this.lastRepasarTab();
     // El Baúl bloqueado nunca se pinta vacío: se pide el PIN y se queda en la última ficha
@@ -2446,14 +2459,14 @@ class ProyectazoApp {
       setTimeout(() => this.openBaul(), 0);
       v = this.lastRepasarTab();
     }
-    const known = ['soltar', 'ahora', ...ProyectazoApp.REPASAR_VIEWS];
+    const known = ['soltar', 'ahora', ...NexusHiveBrainApp.REPASAR_VIEWS];
     return known.includes(v) ? v : 'soltar';
   }
 
   navigate(viewName, pushHistory = true) {
     viewName = this.normalizeView(viewName);
-    if (ProyectazoApp.REPASAR_VIEWS.includes(viewName) && viewName !== 'baul') this.rememberRepasarTab(viewName);
-    const navKey = ProyectazoApp.REPASAR_VIEWS.includes(viewName) ? 'repasar' : viewName;
+    if (NexusHiveBrainApp.REPASAR_VIEWS.includes(viewName) && viewName !== 'baul') this.rememberRepasarTab(viewName);
+    const navKey = NexusHiveBrainApp.REPASAR_VIEWS.includes(viewName) ? 'repasar' : viewName;
 
     // Auto-bloqueo del Baúl al salir a cualquier otra pantalla
     if (viewName !== 'baul') {
@@ -2478,13 +2491,14 @@ class ProyectazoApp {
         ahora: '🎯 Ahora',
         hacer: '🗂️ Repasar · Tareas',
         mas: '🗂️ Repasar · Ajustes',
+        notas: '📝 Listas y notas',
         baul: '🔒 Baúl Confidencial',
         hoy: '💼 Proyectos',
         freeform: '🎨 Lienzo Freeform',
         bitacora: '📜 Bitácora',
         radar: '📡 Radar de Enfoque'
       };
-      sub.textContent = titles[viewName] || 'Proyectazo';
+      sub.textContent = titles[viewName] || 'NexusHiveBrain';
     }
 
     // Destacar botones en Desktop Nav
@@ -2541,7 +2555,7 @@ class ProyectazoApp {
     this.updateBadges();
 
     let target = container;
-    if (ProyectazoApp.REPASAR_VIEWS.includes(this.currentView)) {
+    if (NexusHiveBrainApp.REPASAR_VIEWS.includes(this.currentView)) {
       target = this.renderRepasarShell(container, this.currentView);
     }
 
@@ -2562,6 +2576,9 @@ class ProyectazoApp {
         break;
       case 'mas':
         this.renderViewMas(target);
+        break;
+      case 'notas':
+        this.renderViewNotas(target);
         break;
       case 'hoy':
         this.renderViewHoy(target);
@@ -2585,7 +2602,7 @@ class ProyectazoApp {
 
   // Vistas que viven como fichas dentro de "Repasar"
   static get REPASAR_VIEWS() {
-    return ['hacer', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas'];
+    return ['hacer', 'notas', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas'];
   }
 
   // Contenedor donde pinta la vista actual (dentro de Repasar es el panel bajo las fichas)
@@ -2596,7 +2613,7 @@ class ProyectazoApp {
   lastRepasarTab() {
     try {
       const v = localStorage.getItem('nexus_repasar_tab');
-      if (v && v !== 'baul' && ProyectazoApp.REPASAR_VIEWS.includes(v)) return v;
+      if (v && v !== 'baul' && NexusHiveBrainApp.REPASAR_VIEWS.includes(v)) return v;
     } catch (e) {}
     return 'hacer';
   }
@@ -2627,15 +2644,20 @@ class ProyectazoApp {
 // porque en una clase el segundo método taparía al primero sin avisar.
 function defineAppMethods(methods) {
   for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(methods))) {
-    if (Object.prototype.hasOwnProperty.call(ProyectazoApp.prototype, name)) {
-      throw new Error(`Método duplicado en ProyectazoApp: ${name}`);
+    if (Object.prototype.hasOwnProperty.call(NexusHiveBrainApp.prototype, name)) {
+      throw new Error(`Método duplicado en NexusHiveBrainApp: ${name}`);
     }
-    Object.defineProperty(ProyectazoApp.prototype, name, { ...descriptor, enumerable: false });
+    Object.defineProperty(NexusHiveBrainApp.prototype, name, { ...descriptor, enumerable: false });
   }
 }
 
+const ProyectazoApp = NexusHiveBrainApp;
+if (typeof window !== 'undefined') {
+  window.NexusHiveBrainApp = NexusHiveBrainApp;
+  window.ProyectazoApp = ProyectazoApp;
+}
 
 let app;
 window.addEventListener('DOMContentLoaded', () => {
-  app = new ProyectazoApp();
+  app = new NexusHiveBrainApp();
 });

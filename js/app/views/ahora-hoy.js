@@ -1,16 +1,16 @@
 'use strict';
 // Vistas "Ahora" y "Hoy": dónde me quedé, proyecto sugerido, racha y proyectos quietos.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 // Minutos aproximados por tamaño de tarea (campo effort que ya guarda el backend)
-const ProyectazoAhora = { EFFORT_MINUTES: { XS: 5, S: 15, M: 45, L: 90 } };
+const NexusAhora = { EFFORT_MINUTES: { XS: 5, S: 15, M: 45, L: 90 } };
 
 defineAppMethods({
 
   // Tareas candidatas para "Ahora", en orden. Con energía baja primero las pequeñas; con alta, las grandes.
   ahoraCandidates(project, energy = 'media') {
     const colRank = { enfoco: 0, proximo: 1, buzon: 2 };
-    const size = t => ProyectazoAhora.EFFORT_MINUTES[t.effort] || 15;
+    const size = t => NexusAhora.EFFORT_MINUTES[t.effort] || 15;
     const energyRank = t => energy === 'baja' ? size(t) : energy === 'alta' ? -size(t) : 0;
     return (project.tasks || [])
       .filter(t => t.column in colRank)
@@ -90,7 +90,7 @@ defineAppMethods({
       title: activeProject.nextAction || 'Avanzar en el micro-paso de 15 minutos',
       notes: ''
     };
-    const estimate = ProyectazoAhora.EFFORT_MINUTES[activeTask.effort];
+    const estimate = NexusAhora.EFFORT_MINUTES[activeTask.effort];
     const energyBtn = (key, label) => `<button type="button" onclick="app.setEnergyToday('${key}')" aria-pressed="${energy === key}"
       class="min-h-[44px] px-3 rounded-full text-xs font-semibold border transition ${energy === key ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-200' : 'border-slate-800 text-slate-400 hover:text-slate-200'}">${label}</button>`;
 

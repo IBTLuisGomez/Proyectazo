@@ -1,6 +1,6 @@
 'use strict';
 // Vista "Soltar" (orbe y Pensadero): captura, gestos, colores, auto-clasificación y enrutado a proyectos.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 
@@ -979,7 +979,7 @@ defineAppMethods({
       return; // Sin servicio Nexus: el pensamiento se queda "Sin clasificar", como siempre
     }
     if (!data || data.matched === false) return;
-    const cat = ProyectazoApp.NEXUS_TYPE_TO_SMOKE[data.thought_type];
+    const cat = NexusHiveBrainApp.NEXUS_TYPE_TO_SMOKE[data.thought_type];
     if (!cat || !SMOKE_PALETTE[cat]) return;
 
     // No pisar una decisión del usuario tomada mientras esperábamos la respuesta

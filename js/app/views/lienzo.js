@@ -1,6 +1,6 @@
 'use strict';
 // Vista "Lienzo libre" (freeform).
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 
@@ -187,7 +187,7 @@ defineAppMethods({
     this.drawFreeformGrid(ctx, width, height);
 
     // Restaurar boceto previo guardado
-    const saved = localStorage.getItem('proyectazo_freeform_saved');
+    const saved = localStorage.getItem('nexushivebrain_freeform_saved') || localStorage.getItem('proyectazo_freeform_saved');
     if (saved) {
       const img = new Image();
       img.onload = () => {
@@ -524,7 +524,7 @@ defineAppMethods({
     if (!this.freeform.canvas) return;
     try {
       const dataUrl = this.freeform.canvas.toDataURL('image/png');
-      localStorage.setItem('proyectazo_freeform_saved', dataUrl);
+      localStorage.setItem('nexushivebrain_freeform_saved', dataUrl);
     } catch(e) {}
   },
 
@@ -749,7 +749,7 @@ defineAppMethods({
     if (!this.freeform.canvas) return;
     const a = document.createElement('a');
     a.href = this.freeform.canvas.toDataURL('image/png');
-    a.download = `proyectazo_freeform_${new Date().toISOString().slice(0, 10)}.png`;
+    a.download = `nexushivebrain_freeform_${new Date().toISOString().slice(0, 10)}.png`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -759,7 +759,7 @@ defineAppMethods({
     const item = (this.state.pensadero || []).find(x => x.id === pensaderoItemId);
     if (!item || !item.drawingData) return;
 
-    localStorage.setItem('proyectazo_freeform_saved', item.drawingData);
+    localStorage.setItem('nexushivebrain_freeform_saved', item.drawingData);
     this.navigate('freeform');
   },
 });

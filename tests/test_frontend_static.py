@@ -129,7 +129,7 @@ def test_deletes_go_through_the_offline_queue():
 
 
 def test_acciones_en_plantillas_js_existen():
-    # accion('metodo', ...) en las plantillas html`` debe apuntar a un método de ProyectazoApp
+    # accion('metodo', ...) en las plantillas html`` debe apuntar a un método de NexusHiveBrainApp
     defined = defined_methods()
     used = set(re.findall(r"\baccion\(\s*'([A-Za-z_]\w*)'", APP_JS))
     assert used, "se esperaba al menos un uso de accion()"

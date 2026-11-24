@@ -53,6 +53,89 @@ def _is_newer(incoming, existing):
     return a > b
 
 
+# ---------------- Notas: limpieza y mezcla (la misma regla que js/notas-core.js) ----------------
+NOTA_TEXT_MAX = 2000
+NOTA_ITEMS_MAX = 500
+EPOCH = parse_dt("1970-01-01T00:00:00Z")
+
+
+def _stamp(value):
+    return parse_dt(value) or EPOCH
+
+
+def _latest(a, b):
+    return a if _stamp(a) >= _stamp(b) else b
+
+
+def _meta_stamp(nota):
+    return _stamp(nota.get("metaAt") or nota.get("updatedAt"))
+
+
+def clean_nota(incoming):
+    """Valida y normaliza una nota que llega del cliente. Lanza BadRequest si no es una nota."""
+    if not isinstance(incoming, dict):
+        raise BadRequest("Nota no válida.")
+    doc = normalize_dates(_clean(incoming))
+    doc.pop("ownerId", None)
+    stamp = iso(now())
+    doc["id"] = str(doc["id"]) if not _blank(doc.get("id")) else short_id("n")
+    doc["title"] = str(doc.get("title") or "")[:300]
+    doc["text"] = str(doc.get("text") or "")[:20000]
+    doc["kind"] = "nota" if doc.get("kind") == "nota" else "lista"
+    for flag in ("pinned", "archived", "deleted"):
+        doc[flag] = doc.get(flag) is True
+    doc["updatedAt"] = doc.get("updatedAt") or stamp
+    doc["createdAt"] = doc.get("createdAt") or doc["updatedAt"]
+    doc["metaAt"] = doc.get("metaAt") or doc["updatedAt"]
+    items, seen = [], set()
+    for raw in (doc.get("items") if isinstance(doc.get("items"), list) else [])[:NOTA_ITEMS_MAX]:
+        if not isinstance(raw, dict) or _blank(raw.get("id")) or raw["id"] in seen:
+            continue
+        seen.add(raw["id"])
+        item = {"id": str(raw["id"]), "text": str(raw.get("text") or "")[:NOTA_TEXT_MAX], "done": raw.get("done") is True,
+                "updatedAt": iso(parse_dt(raw.get("updatedAt"))) or doc["updatedAt"]}
+        if raw.get("deleted") is True:
+            item["deleted"] = True
+        items.append(item)
+    doc["items"] = [] if doc["deleted"] else items
+    return doc
+
+
+def merge_nota(existing, incoming):
+    """Mezcla dos versiones de la misma nota sin perder cambios hechos en dispositivos distintos.
+
+    - Título, texto, color, fijada, archivada, borrada y el orden: gana la versión con metaAt más reciente.
+    - Cada elemento de la lista: gana su versión con updatedAt más reciente (marcar uno en el widget
+      no pisa otro que se editó a la vez en la web).
+    Con fechas iguales gana la versión guardada.
+    """
+    win, lose = (incoming, existing) if _meta_stamp(incoming) > _meta_stamp(existing) else (existing, incoming)
+    out = {**lose, **win}
+    for flag in ("pinned", "archived", "deleted"):
+        out[flag] = win.get(flag) is True
+    by_id, order = {}, []
+    for item in list(win.get("items") or []) + list(lose.get("items") or []):
+        current = by_id.get(item.get("id"))
+        if current is None:
+            by_id[item["id"]] = item
+            order.append(item["id"])
+        elif _stamp(item.get("updatedAt")) > _stamp(current.get("updatedAt")):
+            by_id[item["id"]] = item
+    out["items"] = [] if out["deleted"] else [by_id[i] for i in order][:NOTA_ITEMS_MAX]
+    out["id"] = existing["id"]
+    created = [c for c in (existing.get("createdAt"), incoming.get("createdAt")) if c]
+    out["createdAt"] = min(created, key=_stamp) if created else None
+    out["updatedAt"] = _latest(existing.get("updatedAt"), incoming.get("updatedAt"))
+    out["metaAt"] = win.get("metaAt") or win.get("updatedAt")
+    return out
+
+
+def nota_public(doc):
+    out = dict(doc)
+    out["items"] = [i for i in doc.get("items") or [] if not i.get("deleted")]
+    return out
+
+
 class Store:
     def __init__(self, db):
         self.db = db
@@ -325,19 +408,104 @@ class Store:
     def delete_pensadero(self, owner, item_id):
         self.db.execute("DELETE FROM pensadero WHERE id = ? AND owner_id = ?", (item_id, owner))
 
+    # ---------------- Notas y listas de pendientes (tipo Keep) ----------------
+    # Una nota borrada se queda como marca (deleted) para que otro dispositivo no la resucite al sincronizar.
+    def _nota_doc(self, owner, nota_id):
+        row = self._item_row("notas", nota_id)
+        if not row or row["owner_id"] != owner:
+            raise NotFound(f"Lista no encontrada: {nota_id}")
+        doc = loads(row["doc"])
+        if doc.get("deleted"):
+            raise NotFound(f"Lista no encontrada: {nota_id}")
+        return doc
+
+    def _write_nota(self, owner, doc):
+        self.db.execute("INSERT INTO notas(id, owner_id, doc) VALUES (?, ?, ?) "
+                        "ON CONFLICT(id) DO UPDATE SET doc = excluded.doc", (doc["id"], owner, dumps(doc)))
+
+    def list_notas(self, owner, include_deleted=False):
+        """Sin include_deleted: solo notas y elementos vivos, fijadas primero (lo que pintan los widgets)."""
+        docs = [loads(r["doc"]) for r in self.db.query("SELECT doc FROM notas WHERE owner_id = ?", (owner,))]
+        if include_deleted:
+            return docs
+        docs = [nota_public(d) for d in docs if not d.get("deleted")]
+        docs.sort(key=lambda d: _stamp(d.get("createdAt")), reverse=True)
+        docs.sort(key=lambda d: bool(d.get("pinned")), reverse=True)
+        return docs
+
+    def save_nota(self, owner, incoming):
+        """Crea la nota o la mezcla con la guardada (ver merge_nota). De otra cuenta: se guarda con id nuevo."""
+        incoming = clean_nota(incoming)
+        with self.db.transaction() as conn:
+            row = conn.execute("SELECT owner_id, doc FROM notas WHERE id = ?", (incoming["id"],)).fetchone()
+            if row and row["owner_id"] != owner:
+                incoming["id"] = short_id("n")
+                row = None
+            doc = merge_nota(loads(row["doc"]), incoming) if row else incoming
+            conn.execute("INSERT INTO notas(id, owner_id, doc) VALUES (?, ?, ?) "
+                         "ON CONFLICT(id) DO UPDATE SET doc = excluded.doc", (doc["id"], owner, dumps(doc)))
+        return nota_public(doc)
+
+    def delete_nota(self, owner, nota_id):
+        row = self._item_row("notas", nota_id)
+        if not row or row["owner_id"] != owner:
+            return
+        doc = loads(row["doc"])
+        stamp = iso(now())
+        self._write_nota(owner, {"id": nota_id, "deleted": True, "title": "", "items": [],
+                                 "createdAt": doc.get("createdAt"), "updatedAt": stamp, "metaAt": stamp})
+
+    def add_nota_item(self, owner, nota_id, body):
+        body = body or {}
+        text = str(body.get("text") or "").strip()
+        if not text:
+            raise BadRequest("El pendiente está vacío.")
+        with self.db.transaction():
+            doc = self._nota_doc(owner, nota_id)
+            items = doc.setdefault("items", [])
+            item_id = body.get("id") if not _blank(body.get("id")) else short_id("i")
+            if not any(i.get("id") == item_id for i in items):  # reintento del mismo envío: idempotente
+                stamp = iso(parse_dt(body.get("updatedAt"))) or iso(now())
+                items.append({"id": str(item_id), "text": text[:NOTA_TEXT_MAX], "done": False, "updatedAt": stamp})
+                doc["kind"] = "lista"
+                doc["updatedAt"] = _latest(doc.get("updatedAt"), stamp)
+                self._write_nota(owner, doc)
+        return nota_public(doc)
+
+    def update_nota_item(self, owner, nota_id, item_id, body):
+        body = body or {}
+        with self.db.transaction():
+            doc = self._nota_doc(owner, nota_id)
+            item = next((i for i in doc.get("items") or [] if i.get("id") == item_id and not i.get("deleted")), None)
+            if item is None:
+                raise NotFound(f"Pendiente no encontrado: {item_id}")
+            stamp = iso(parse_dt(body.get("updatedAt"))) or iso(now())
+            if _stamp(stamp) >= _stamp(item.get("updatedAt")):  # un cambio más viejo que el guardado no pisa
+                if isinstance(body.get("done"), bool):
+                    item["done"] = body["done"]
+                if not _blank(body.get("text")):
+                    item["text"] = str(body["text"]).strip()[:NOTA_TEXT_MAX]
+                if body.get("deleted") is True:
+                    item["deleted"] = True
+                item["updatedAt"] = stamp
+                doc["updatedAt"] = _latest(doc.get("updatedAt"), stamp)
+                self._write_nota(owner, doc)
+        return nota_public(doc)
+
     # ---------------- Sincronización ----------------
     def pull(self, owner):
         inbox = [loads(r["doc"]) for r in self.db.query("SELECT doc FROM inbox WHERE owner_id = ?", (owner,))]
         epoch = parse_dt("1970-01-01T00:00:00Z")
         inbox.sort(key=lambda d: parse_dt(d.get("createdAt")) or epoch, reverse=True)
-        return {"projects": self.list_projects(owner), "inbox": inbox, "pensadero": self.list_pensadero(owner)}
+        return {"projects": self.list_projects(owner), "inbox": inbox, "pensadero": self.list_pensadero(owner),
+                "notas": self.list_notas(owner, include_deleted=True)}
 
     def push(self, owner, incoming):
         if not isinstance(incoming, dict):
             return self.pull(owner)
         if incoming.get("wipe") is True:
             with self.db.transaction() as conn:
-                for table in ("projects", "inbox", "pensadero"):
+                for table in ("projects", "inbox", "pensadero", "notas"):
                     conn.execute(f"DELETE FROM {table} WHERE owner_id = ?", (owner,))
             return self.pull(owner)
         for project in incoming.get("projects") or []:
@@ -352,6 +520,9 @@ class Store:
         for item in incoming.get("pensadero") or []:
             if isinstance(item, dict):
                 self._merge_pensadero(owner, item)
+        for nota in incoming.get("notas") or []:
+            if isinstance(nota, dict) and not _blank(nota.get("id")):
+                self.save_nota(owner, nota)
         return self.pull(owner)
 
     def _merge_project(self, owner, incoming):

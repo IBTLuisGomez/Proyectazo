@@ -54,7 +54,20 @@ Una vez instalada la PWA, puedes colocar botones de acceso rápido como widgets 
    - 🔮 **Vaciado al Orbe (Gadget)**: Abre la esfera de cristal aislada para desahogar pensamientos en 1 segundo.
 3. **Arrastra el acceso directo a tu pantalla de inicio**: Mantén presionado cualquiera de los accesos y arrástralo a tu pantalla para crear un **Widget / Botón de 1 toque**.
 
-### 3.2 Dock Flotante Dual en Pantalla `[ 🔮 Orbe | 🎙️ Nexus IA ]`
+### 3.2 Widgets de listas de pendientes (app Android)
+Estos son widgets de verdad (no accesos directos) y necesitan la **app Android** del proyecto (`android/`), no la PWA: Android no permite widgets a las apps instaladas desde el navegador, y en iPhone no hay app nativa.
+
+1. Abre la app al menos una vez e inicia sesión (así el widget recibe tus listas).
+2. Mantén pulsado un hueco de la pantalla de inicio → **Widgets** → **Nexus Orb**.
+3. Elige:
+   - **Lista de pendientes** (redimensionable): muestra una lista con sus casillas. Toca una casilla para marcarla, **＋** para añadir, el **título** para cambiar de lista y **↗** para abrirla en la app.
+   - **Añadir pendiente** (barra de una fila): abre un cuadro para apuntar; escribe, pulsa Enter y sigue con el siguiente. Va a tu primera lista (si no hay ninguna, crea «Pendientes»).
+
+Funcionan con la app cerrada y sin cobertura: lo que marques se guarda en el teléfono y se envía cuando haya red o al abrir la app. Los cambios hechos en otros dispositivos llegan al widget cada 30 minutos aproximadamente (límite de Android) o al abrir la app.
+
+Las listas se gestionan en la app en **Repasar → 📝 Listas**. En la PWA tienes el acceso directo **📝 Listas de pendientes** (mantén pulsado el icono).
+
+### 3.3 Dock Flotante Dual en Pantalla `[ 🔮 Orbe | 🎙️ Nexus IA ]`
 Dentro de la aplicación dispones de una cápsula flotante dual:
 - **Botón `[ 🔮 Orbe ]`**: Lanza al instante el Gadget del Orbe Aislado para vaciar tu mente sin cambiar de vista.
 - **Botón `[ 🎙️ Nexus IA ]`**: Inicia la escucha por voz de la inteligencia artificial.

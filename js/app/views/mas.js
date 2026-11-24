@@ -1,6 +1,6 @@
 'use strict';
 // Ficha "Ajustes" de Repasar (antes "Más"): ajustes, instalación y Nexus.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 

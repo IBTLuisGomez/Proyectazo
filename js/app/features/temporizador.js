@@ -1,6 +1,6 @@
 'use strict';
 // Temporizador de sprint, minutos de foco y recompensas (sonido, vibración).
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 

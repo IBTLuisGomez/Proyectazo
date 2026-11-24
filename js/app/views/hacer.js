@@ -1,6 +1,6 @@
 'use strict';
 // Vista "Hacer": lista de tareas y tablero Kanban.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 

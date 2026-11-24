@@ -1,6 +1,6 @@
 'use strict';
 // Funciones con IA: desglose de metas, huecos en el calendario, reactivación, trabajo profundo y asistente Nexus.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 
@@ -327,7 +327,7 @@ defineAppMethods({
     const startTime = new Date(baseTime.getTime() + bufferPrepMs);
     const endTime = new Date(startTime.getTime() + sessionMs);
 
-    const title = `⚡ [${p ? p.name : 'Proyectazo'}] ${task ? task.title : 'Micro-paso'}`;
+    const title = `⚡ [${p ? p.name : 'NexusHiveBrain'}] ${task ? task.title : 'Micro-paso'}`;
     const details = `Bloque de Hiperfoco TDAH.\n• Buffer de entrada: 15 min antes (${baseTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})})\n• Sesión activa (+30% anti-optimismo): ${sessionMinutes} min\n• Buffer de descompresión: 15 min después (${endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})})\n\nObjetivo: ${p ? p.objective : ''}`;
 
     const formatGCal = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
@@ -624,7 +624,7 @@ defineAppMethods({
     const startStr = formatGCalDate(targetDate);
     const endStr = formatGCalDate(endDate);
 
-    const eventTitle = `⚡ FocusFlow [${p ? p.name : 'Proyectazo'}]: ${taskTitle}`;
+    const eventTitle = `⚡ FocusFlow [${p ? p.name : 'NexusHiveBrain'}]: ${taskTitle}`;
     const eventDetails = `Bloque de Trabajo Profundo protegido para TDAH.\n\n🎯 Tarea: ${taskTitle}\n🧵 Hilo de Ariadna: Micro-paso inmediato.\n☕ Buffer de 15 min al terminar para descansar la mente.\n\nGenerado por el algoritmo Gap-Filling de FocusFlow OS.`;
 
     const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(eventDetails)}`;
@@ -633,7 +633,7 @@ defineAppMethods({
     window.open(gcalUrl, '_blank');
 
     // Descargar .ics
-    const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FocusFlow OS//Proyectazo//ES\nBEGIN:VEVENT\nSUMMARY:${eventTitle}\nDESCRIPTION:${eventDetails.replace(/\n/g, '\\n')}\nDTSTART:${startStr}\nDTEND:${endStr}\nEND:VEVENT\nEND:VCALENDAR`;
+    const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FocusFlow OS//NexusHiveBrain//ES\nBEGIN:VEVENT\nSUMMARY:${eventTitle}\nDESCRIPTION:${eventDetails.replace(/\n/g, '\\n')}\nDTSTART:${startStr}\nDTEND:${endStr}\nEND:VEVENT\nEND:VCALENDAR`;
     const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);

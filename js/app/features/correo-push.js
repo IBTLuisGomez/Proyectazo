@@ -1,6 +1,6 @@
 'use strict';
 // Recordatorios: Gmail (microservicio Nexus) y Web Push con la app cerrada.
-// Métodos de ProyectazoApp (la clase base está en js/app.js).
+// Métodos de NexusHiveBrainApp (la clase base está en js/app.js).
 
 defineAppMethods({
 

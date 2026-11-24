@@ -33,6 +33,17 @@ Las asigna el clasificador (local) o Jarvis; el usuario solo corrige.
 
 Los datos se siguen guardando con las claves antiguas (`humo_*`); la agrupación se hace al mostrar (`categoriaVisible()` en `js/smoke-palette.js`). Así no hay migración ni cambios en el backend.
 
+## Listas y notas (tipo Keep)
+Ficha **Listas** de Repasar. Para lo que no es de ningún proyecto: compras, recados, pendientes sueltos.
+
+- **Lista** (casillas) o **nota** (texto); se puede pasar de una a otra. Color, fijar arriba, archivar, buscar.
+- Marcar un pendiente lo baja a «completados»; nada se pierde y todo borrado ofrece **Deshacer**.
+- Funciona sin red y se sincroniza entre dispositivos. Si dos dispositivos cambian la misma lista, se mezclan los cambios pendiente a pendiente (marcar uno en el móvil no pisa otro que se editó en el ordenador).
+- **Widgets de Android** (app nativa): *Lista de pendientes* (casillas que se marcan desde la pantalla de inicio) y *Añadir pendiente* (barra de captura). Funcionan con la app cerrada; ver [GUIA_USUARIO_MOVIL.md](GUIA_USUARIO_MOVIL.md).
+- No sustituye a las tareas de proyecto (ficha Tareas) ni al Pensadero: aquí no hay clasificación ni límite de foco.
+
+Detalle técnico: el modelo y la regla de mezcla están en `js/notas-core.js`; la misma regla está en `server/store.py` (`merge_nota`) y en `android/.../notas/NotasStore.kt`. Lo borrado se guarda como marca (`deleted`) para que otro dispositivo no lo resucite.
+
 ## Funciones TDAH que se mantienen
 Límite de tareas en curso, modo Zen con temporizador y ruido marrón, Checkout/cierre de sesión, reactivar o hibernar proyectos sin culpa, deconstruir metas en micro-pasos, avisos push, Baúl con PIN.
 
