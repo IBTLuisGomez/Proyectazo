@@ -10,7 +10,7 @@ En la carpeta raíz del proyecto encontrarás el archivo:
 
 Solo haz **doble clic** sobre `iniciar_escritorio.bat`. 
 Este script:
-1. Verifica e inicia el microservicio local de IA (`nexus_service.py`) en el puerto 8002 en segundo plano.
+1. Verifica e inicia el backend local (`python -m server`: API + IA) en el puerto 8081 en segundo plano. La primera vez crea `data/nexus.db` y el usuario inicial (la contraseña temporal sale en la consola si no defines `NEXUS_ADMIN_PASSWORD`).
 2. Abre FocusFlow OS en una ventana de escritorio nativa independiente (usando el motor Chromium de Edge o Chrome en modo `--app`), sin barras de URL ni distracciones del navegador.
 
 ---

@@ -21,3 +21,6 @@ node_modules/
 # Volcados de la JVM
 hs_err_pid*.log
 replay_pid*.log
+
+# Exportaciones de Postgres para migrar (contienen hashes y claves)
+export-postgres-*/

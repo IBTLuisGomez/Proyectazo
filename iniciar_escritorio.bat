@@ -6,10 +6,10 @@ echo ========================================================
 echo        🔮 FocusFlow OS — Ecosistema Cognitivo TDAH
 echo ========================================================
 echo.
-echo Iniciando microservicio local de IA y correo (puerto 8002)...
+echo Iniciando el backend local (API + IA, puerto 8081)...
 
-:: Iniciar microservicio backend nexus_service.py si no est corriendo
-powershell -Command "if (-not (Get-NetTCPConnection -LocalPort 8002 -ErrorAction SilentlyContinue)) { Start-Process python -ArgumentList 'nexus_service.py' -WindowStyle Hidden }"
+:: Iniciar el backend unico (python -m server) si no esta corriendo
+powershell -Command "if (-not (Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue)) { Start-Process python -ArgumentList '-m','server' -WorkingDirectory '%~dp0' -WindowStyle Hidden }"
 
 timeout /t 1 /nobreak >nul
 

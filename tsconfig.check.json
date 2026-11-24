@@ -1,0 +1,24 @@
+{
+  "//": "Comprobación de tipos (sin compilar) de los módulos autónomos del frontend. Ejecutar: npm run typecheck",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "types": [],
+    "skipLibCheck": true
+  },
+  "files": [
+    "js/app/ui/html.js",
+    "js/app/ui/acciones.js",
+    "js/smoke-palette.js",
+    "js/clasificador-reglas.js",
+    "js/captura-parser.js",
+    "js/idb-store.js",
+    "js/tipos-globales.d.ts"
+  ]
+}

@@ -88,7 +88,7 @@ defineAppMethods({
           <p class="text-xs theme-text-muted pt-1">Quedó de antes (sin culpa: elige hacerlo o pasarlo a mañana)</p>
           ${before.slice(0, Math.max(0, shown - today.length) || 2).map(row).join('')}
         ` : ''}
-        ${items.length > shown ? `<p class="text-xs theme-text-muted">y ${items.length - shown} más en Hacer</p>` : ''}
+        ${items.length > shown ? `<p class="text-xs theme-text-muted">y ${items.length - shown} más en Repasar → Tareas</p>` : ''}
       </div>`;
   },
 

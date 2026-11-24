@@ -13,7 +13,7 @@ defineAppMethods({
     const host = window.location.hostname || 'localhost';
     const isSecure = window.location.protocol === 'https:';
     // En HTTPS no intentar fallback HTTP inseguro ya que el navegador bloquea Mixed Content
-    const fallbackUrl = isSecure ? primaryUrl : `http://${host}:8002/api/nexus${cleanEndpoint}`;
+    const fallbackUrl = isSecure ? primaryUrl : `http://${host}:8081/api/nexus${cleanEndpoint}`;
 
     try {
       const res = await fetch(primaryUrl, options);

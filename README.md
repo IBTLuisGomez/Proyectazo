@@ -1,7 +1,7 @@
 # 🔮 Nexus Orb — FocusFlow OS (Fullstack & Multiplataforma)
 
 > **Sistema operativo cognitivo unificado para trabajo multiproyecto y mentes neurodivergentes (TDAH).**  
-> *Esfera volumétrica 3D WebGL · Reconocimiento por voz Nexus IA · Backend en Spring Boot 3 + PostgreSQL/H2 · Microservicio Nexus AI en Python · PWA móvil y de escritorio · Docker Compose.*
+> *Esfera volumétrica 3D WebGL · Reconocimiento por voz Nexus IA · Backend único en Python + SQLite (API, IA y asistente Jarvis) · PWA móvil y de escritorio · Docker Compose.*
 
 ---
 
@@ -9,22 +9,13 @@
 
 ### 1. Esfera de Cristal Nexus Orb 3D (WebGL Volumétrico)
 - **Humo animado fluido real**: Simulación volumétrica en GLSL mediante *domain warping* con ruido Simplex 3D y FBM, produciendo corrientes de convección térmica, turbulencia y filamentos luminosos en tiempo real.
-- **Respuesta cromática pura de 9 colores nucleares**:
-  - ✨ **General (Cian)**: Pensamiento libre sin clasificar.
-  - ⚪ **Humo Blanco**: Descarga catártica para soltar pensamientos intrusivos y liberar memoria de trabajo.
-  - 🔴 **Humo Rojo**: Urgencia crítica y fuegos de alta prioridad.
-  - 🟡 **Humo Dorado**: Chispas de valor e ideas transformables en micro-pasos de 15 min.
-  - 🔵 **Humo Azul**: Deep Work, foco mono-tarea y arquitectura.
-  - 🟢 **Humo Verde**: Hábitos diarios, salud y energía física.
-  - 🟣 **Humo Púrpura**: CRM personal, vínculos y personas clave.
-  - 🟠 **Humo Naranja**: Fricción financiera y compras conscientes.
-  - 🔘 **Humo Ceniza**: Hibernación *Someday / Maybe* para evitar saturación cognitiva.
+- **5 categorías que pone Nexus** (ver [docs/PRODUCTO.md](docs/PRODUCTO.md)): 🔴 Urgente · 🔵 Proyecto · 🟢 Vida (salud, personas, dinero, recados) · 🟡 Idea · ⚪ Luego. ✨ Sin clasificar mientras no se repasa.
 - **Rendimiento ultra-optimizado a 60 FPS**: Clamping de resolución interna a 320x320 con escalado CSS suave y 15 pasos de raymarching, reduciendo la carga de GPU en más del 88% y eliminando sobrecalentamientos o congelamientos en móviles.
 - **Recuperación automática de contexto**: Protección contra pérdida de contexto WebGL (`webglcontextlost`) para evitar que la esfera se torne blanca al salir de modales o alternar vistas.
 
 ### 2. Control Gestual e Interacción Sensorial
 - **Walkie-Talkie Nexus IA (Mantener presionado para hablar)**: Al mantener presionado el orbe con el dedo o ratón durante más de 300 ms, se activa la captura de voz en tiempo real con un resplandor pulsante. Al soltar, el pensamiento se deposita instantáneamente en el Pensadero o se canaliza al proyecto indicado por voz (ej. *"Mandar a CytoHelix"*).
-- **Deslizamiento táctil (Swipe)**: Desliza hacia la derecha o izquierda sobre el orbe en pantallas táctiles para ciclar fluidamente entre los 9 colores del reactor con micro-vibración háptica.
+- **Deslizamiento táctil (Swipe)**: Desliza hacia la derecha o izquierda sobre el orbe en pantallas táctiles para ciclar entre las 5 categorías con micro-vibración háptica.
 - **Pulso resonante (Clic / Tap rápido)**: Dispara una onda expansiva de partículas y dopamina auditiva.
 
 ### 3. Logotipo Dinámico según Modo de Color
@@ -51,17 +42,18 @@ Proyectazo/
 ├── index.html                 # PWA y SPA Frontend unificada (HTML5, Tailwind, WebGL GLSL, Web Speech API)
 ├── manifest.json              # Manifiesto PWA para instalación móvil y de escritorio
 ├── sw.js                      # Service Worker para funcionamiento 100% offline
-├── docker-compose.yml         # Orquestación de Frontend, Backend, Nexus AI y PostgreSQL
+├── docker-compose.yml         # 2 contenedores: app (Python) y frontend (nginx)
 ├── assets/
 │   ├── logo_dark.png          # Logo de alta resolución para Modo Oscuro
 │   ├── logo_icon_sin_bk.png   # Logo transparente para Modo Claro
 │   └── NexusOrb_Neon.mp4      # Video intro cinemático
-├── backend/                   # Backend REST en Spring Boot 3.3.4 (Java 17)
-│   ├── src/main/java/com/proyectazo/
-│   │   ├── controller/        # Projects, Tasks, Pensadero, Logs, Sync
-│   │   ├── model/             # Entidades JPA (Project, Task, PensaderoItem, InboxItem)
-│   │   └── service/           # Lógica de sincronización offline-first y límites WIP
-└── nexus_ai_service/          # Microservicio de IA en Python (FastAPI / Gemini 1.5 Flash)
+├── server/                    # Backend único en Python: API (/api) + IA y Jarvis (/api/nexus), SQLite
+│   ├── app.py                 # Rutas HTTP, autenticación y CORS
+│   ├── store.py               # Proyectos, tareas, pensadero y sincronización (límite WIP)
+│   ├── auth.py / push.py      # Sesiones (BCrypt) y avisos Web Push
+│   └── importar_postgres.py   # Migración desde la versión anterior (ver docs/MIGRACION.md)
+├── nexus_service.py, jarvis.py # IA: clasificación, desglose y asistente Jarvis
+└── backend/                   # Versión anterior en Spring Boot (se retirará tras migrar)
 ```
 
 ---
@@ -70,18 +62,18 @@ Proyectazo/
 
 ### Ejecución Completa con Docker Compose
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
-Puertos disponibles:
-- **Frontend Web & PWA**: [http://localhost:8080](http://localhost:8080) (o el `PORT` de tu `.env`); en la red local `http://192.168.x.x:8080`
-- **Backend Spring Boot**: [http://localhost:8081/api](http://localhost:8081/api)
-- **Microservicio Nexus AI**: [http://localhost:8002/docs](http://localhost:8002/docs)
-- **Base de Datos PostgreSQL**: Puerto 5432
+- **App web y PWA**: [http://localhost:8080](http://localhost:8080) (o el `PORT` de tu `.env`); en la red local `http://192.168.x.x:8080`
+- La API y la IA quedan detrás de nginx (`/api` y `/nexus`). Datos en el volumen `nexus_data` (SQLite).
+- ¿Vienes de la versión con Postgres? Sigue [docs/MIGRACION.md](docs/MIGRACION.md).
+
+Sin Docker: `pip install -r server/requirements.txt` y `python -m server` (API + IA en el puerto 8081).
 
 ### Seguridad y primer acceso
-- Copia `.env.example` a `.env`. `POSTGRES_PASSWORD` es obligatoria.
-- El usuario inicial se crea con `NEXUS_ADMIN_USER` y `NEXUS_ADMIN_PASSWORD` (mínimo 8 caracteres). Si no defines la contraseña, se genera una temporal y aparece en `docker logs nexus-backend`.
-- Toda la API (`/api/**`) y el microservicio Nexus (`/nexus/**`, mediante `auth_request` de nginx) requieren `Authorization: Bearer <token>`, obtenido en `POST /api/auth/login`.
+- Copia `.env.example` a `.env`.
+- El usuario inicial se crea con `NEXUS_ADMIN_USER` y `NEXUS_ADMIN_PASSWORD` (mínimo 8 caracteres). Si no defines la contraseña, se genera una temporal y aparece en `docker logs nexus-app`.
+- Toda la API (`/api/**`) y la IA (`/api/nexus/**`, salvo `health`) requieren `Authorization: Bearer <token>`, obtenido en `POST /api/auth/login`. El servidor lo comprueba también sin nginx.
 - El borrado total por `/api/sync` exige la cabecera `X-Confirm-Wipe: BORRAR-TODO`.
 - El PIN del Baúl se elige la primera vez que se abre y se guarda solo como hash.
 
@@ -100,8 +92,8 @@ La imagen de nginx lo recompila sola en `docker compose build`.
 
 ### Tests
 ```bash
-cd backend && ./mvnw test          # seguridad, CORS, wipe y límite WIP
-python -m pytest -q tests          # microservicio Nexus sin Gemini
+python -m pytest -q tests          # backend único (API, sync, push, migración), IA y Jarvis
+node --test tests/js/*.test.mjs    # captura, categorías y herramientas de Jarvis
 ```
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) ejecuta ambos, compila el CSS, valida la sintaxis de todo `js/` y construye las imágenes Docker.
 
@@ -121,4 +113,5 @@ docker exec nexus-frontend nginx -s reload
 
 - 🖥️ **[Guía de Usuario para Aplicación Web](docs/GUIA_USUARIO_WEB.md)**
 - 📱 **[Guía de Usuario para Aplicación Móvil](docs/GUIA_USUARIO_MOVIL.md)**
-- 📖 **[Descripción Completa y Detallada del Sistema](docs/DESCRIPCION_DETALLADA.md)**
+- 📖 **[Especificación vigente del producto](docs/PRODUCTO.md)**
+- 🗺️ **[Propuesta de mejora y hoja de ruta](docs/PROPUESTA_MEJORA.md)**

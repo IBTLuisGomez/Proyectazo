@@ -149,3 +149,62 @@ const SMOKE_PALETTE = {
     shader: { turbulence: 0.2, pulse: 0.1, density: 1.0, dissipation: 0.05, satellites: 0.0, sink: 0.0, expansion: 0.0, flash: 0.1 }
   }
 };
+
+/**
+ * Categorías visibles (4 + Luego + Sin clasificar). Ver docs/PRODUCTO.md.
+ * Los datos guardados conservan su clave antigua; aquí solo se decide cómo se MUESTRAN.
+ * Cada clave antigua apunta a una clave canónica (la que se ve y se elige en los selectores)
+ * y puede llevar una etiqueta automática (salud, personas, dinero…).
+ */
+const SMOKE_GROUPS = {
+  humo_general: 'humo_general',
+  humo_rojo: 'humo_rojo',
+  humo_azul: 'humo_azul',
+  humo_verde: 'humo_verde',
+  humo_purpura: 'humo_verde',
+  humo_naranja: 'humo_verde',
+  humo_tarea: 'humo_verde',
+  humo_dorado: 'humo_dorado',
+  humo_blanco: 'humo_ceniza',
+  humo_ceniza: 'humo_ceniza'
+};
+const SMOKE_TAGS = {
+  humo_verde: '💪 salud',
+  humo_purpura: '👥 personas',
+  humo_naranja: '💸 dinero',
+  humo_tarea: '📋 recado',
+  humo_blanco: '🫧 desahogo',
+  humo_ceniza: '💤 algún día'
+};
+// Orden de selectores, swipe del orbe y teclas 1–5 del repaso
+const SMOKE_VISIBLE_KEYS = ['humo_general', 'humo_rojo', 'humo_azul', 'humo_verde', 'humo_dorado', 'humo_ceniza'];
+
+function categoriaVisible(cat) {
+  return SMOKE_GROUPS[cat] || 'humo_general';
+}
+
+function etiquetaDe(cat) {
+  return SMOKE_TAGS[cat] || '';
+}
+
+(function aplicarCategoriasVisibles() {
+  const nuevas = {
+    humo_rojo: { name: 'Urgente', title: 'Urgente', desc: 'Tiene fecha o consecuencia si no se hace.', icon: '🔴' },
+    humo_azul: { name: 'Proyecto', title: 'Proyecto', desc: 'Trabajo de un proyecto o foco profundo.', icon: '🔵' },
+    humo_verde: { name: 'Vida', title: 'Vida', desc: 'Rutina, salud, personas, dinero y recados.', icon: '🟢' },
+    humo_dorado: { name: 'Idea', title: 'Idea', desc: 'Una chispa que aún no es una acción.', icon: '🟡' },
+    humo_ceniza: { name: 'Luego', title: 'Luego', desc: 'Algún día, desahogo o hibernado. Sin culpa.', icon: '⚪' }
+  };
+  Object.entries(nuevas).forEach(([k, v]) => Object.assign(SMOKE_PALETTE[k], v));
+  // Las claves antiguas se ven como su grupo (conservan category, module y desc propios)
+  const VISUAL = ['name', 'title', 'icon', 'hex', 'vec3', 'coreVec3', 'badgeClass'];
+  Object.keys(SMOKE_PALETTE).forEach(k => {
+    const g = categoriaVisible(k);
+    if (g === k) return;
+    VISUAL.forEach(f => { SMOKE_PALETTE[k][f] = SMOKE_PALETTE[g][f]; });
+  });
+})();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { SMOKE_PALETTE, SMOKE_GROUPS, SMOKE_VISIBLE_KEYS, categoriaVisible, etiquetaDe };
+}

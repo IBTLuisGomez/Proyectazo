@@ -8,8 +8,6 @@ defineAppMethods({
   // VISTA NUEVA: 🎨 LIENZO LIBRE / FREEFORM TDAH
   // ==========================================
   renderViewFreeform(container) {
-    const projects = this.state.projects || [];
-    const activeProject = projects.find(p => p.id === this.selectedKanbanProjectId) || projects[0];
 
     container.innerHTML = `
       <!-- Header del Lienzo Freeform -->

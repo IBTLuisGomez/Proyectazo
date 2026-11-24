@@ -1,36 +1,14 @@
+# Nexus Orb: 2 contenedores (app Python + nginx). Datos en el volumen nexus_data (SQLite).
+# El backend anterior (Postgres + Spring) queda en el perfil "legacy" solo para migrar los datos:
+#   docker compose --profile legacy up -d postgres   (ver docs/MIGRACION.md)
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: nexus-postgres
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-nexus_db}
-      POSTGRES_USER: ${POSTGRES_USER:-nexus_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nexus_user} -d ${POSTGRES_DB:-nexus_db}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - nexus_net
-
-  backend:
+  app:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: nexus-backend
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: nexus-app
     restart: always
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nexus_db}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nexus_user}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
-      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
       PORT: 8081
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8080}
       NEXUS_ADMIN_USER: ${NEXUS_ADMIN_USER:-admin}
@@ -38,26 +16,16 @@ services:
       NEXUS_VAPID_PUBLIC_KEY: ${NEXUS_VAPID_PUBLIC_KEY:-}
       NEXUS_VAPID_PRIVATE_KEY: ${NEXUS_VAPID_PRIVATE_KEY:-}
       NEXUS_PUSH_SUBJECT: ${NEXUS_PUSH_SUBJECT:-mailto:admin@localhost}
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8081/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 90s
-    networks:
-      - nexus_net
-
-  nexus-ai:
-    build:
-      context: .
-      dockerfile: Dockerfile.nexus
-    container_name: nexus-ai-microservice
-    restart: always
-    environment:
-      PORT: 8002
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      NEXUS_AI_MODELS: ${NEXUS_AI_MODELS:-}
+      NEXUS_AI_PROVIDER: ${NEXUS_AI_PROVIDER:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      JARVIS_MODEL: ${JARVIS_MODEL:-}
+      JARVIS_EFFORT: ${JARVIS_EFFORT:-}
+    volumes:
+      - nexus_data:/app/data
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health')\" || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/api/health')\" || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -72,16 +40,31 @@ services:
     container_name: nexus-frontend
     restart: always
     depends_on:
-      backend:
-        condition: service_healthy
-      nexus-ai:
+      app:
         condition: service_healthy
     ports:
       - "${PORT:-8080}:80"
     networks:
       - nexus_net
 
+  # ---- Solo para migrar desde la versión anterior (perfil "legacy") ----
+  postgres:
+    profiles: ["legacy"]
+    image: postgres:16-alpine
+    container_name: nexus-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nexus_db}
+      POSTGRES_USER: ${POSTGRES_USER:-nexus_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nexus_net
+
 volumes:
+  nexus_data:
+    driver: local
+  # Volumen del backend anterior: se conserva intacto hasta que confirmes la migración
   postgres_data:
     driver: local
 

@@ -1,3 +1,4 @@
+/* exported NexusIDB */
 // Almacén duradero en IndexedDB (sin el límite de ~5 MB de localStorage ni bloquear el navegador).
 // Guarda cadenas por clave. Si IndexedDB no existe (modo privado de algunos navegadores), available() es false.
 const NexusIDB = (() => {

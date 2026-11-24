@@ -1,3 +1,4 @@
+/* exported PensaderoShaderEngine */
 // Motor WebGL del orbe (raymarching volumétrico). Depende de SMOKE_PALETTE.
 
 /**
@@ -305,7 +306,7 @@ class PensaderoShaderEngine {
   }
 
   randomizeSmoke() {
-    const keys = Object.keys(SMOKE_PALETTE);
+    const keys = SMOKE_VISIBLE_KEYS;
     const chosen = keys[Math.floor(Math.random() * keys.length)];
     this.setSmokeState(chosen);
   }

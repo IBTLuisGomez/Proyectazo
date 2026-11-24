@@ -27,6 +27,34 @@ def test_every_button_calls_an_existing_method():
     assert not missing, f"Botones que llaman a métodos inexistentes: {missing}"
 
 
+def test_acciones_data_on_validas():
+    # Cada data-on-* de index.html es JSON válido y llama a métodos que existen
+    import json
+    import html as htmllib
+    defined = defined_methods()
+    problems = []
+    for m in re.finditer(r"data-on-([a-z]+)='([^']*)'", HTML):
+        line = HTML.count("\n", 0, m.start()) + 1
+        try:
+            calls = json.loads(htmllib.unescape(m.group(2)))
+        except json.JSONDecodeError:
+            problems.append(f"index.html:{line} JSON no válido")
+            continue
+        if calls and not isinstance(calls[0], list):
+            calls = [calls]
+        for call in calls:
+            if not call or call[0] not in defined:
+                problems.append(f"index.html:{line} método inexistente {call[:1]}")
+    assert not problems, problems
+    assert len(re.findall(r"data-on-[a-z]+=", HTML)) > 100
+
+
+def test_index_sin_manejadores_inline():
+    # index.html ya no lleva onclick/onsubmit…: todo pasa por js/app/ui/acciones.js
+    inline = re.findall(r'\son(?:click|submit|change|input|keydown|pointer\w+)="', HTML)
+    assert not inline, f"Manejadores inline nuevos en index.html: {len(inline)}"
+
+
 class _ModalNesting(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -98,3 +126,11 @@ def test_deletes_go_through_the_offline_queue():
             if "method: 'DELETE'" in line:
                 offenders.append(f"{path.relative_to(ROOT)}:{n}")
     assert not offenders, "DELETE directo (usar this.deleteOnServer): " + ", ".join(offenders)
+
+
+def test_acciones_en_plantillas_js_existen():
+    # accion('metodo', ...) en las plantillas html`` debe apuntar a un método de ProyectazoApp
+    defined = defined_methods()
+    used = set(re.findall(r"\baccion\(\s*'([A-Za-z_]\w*)'", APP_JS))
+    assert used, "se esperaba al menos un uso de accion()"
+    assert not (used - defined), f"Acciones sin método: {used - defined}"

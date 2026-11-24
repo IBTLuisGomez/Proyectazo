@@ -1,4 +1,5 @@
-// Aplicación principal. Expone `app` como global para los onclick="app.…" del HTML.
+/* exported defineAppMethods, app */
+// Aplicación principal. Expone `app` como global: lo usan las acciones data-on-* (js/app/ui/acciones.js).
 
 /**
  * Proyectazo — FocusFlow OS
@@ -22,7 +23,7 @@ class ProyectazoApp {
 
     this.NEXUS_API_BASE = (isHttp && !isDevDirect)
       ? '/nexus/api/nexus'
-      : `http://${host}:8002/api/nexus`;
+      : `http://${host}:8081/api/nexus`; // backend único: API e IA en el mismo puerto
     this.installAuthFetch();
     this.currentView = 'soltar';
     this.hacerMode = 'lista'; // 'lista' | 'tablero'
@@ -866,17 +867,11 @@ class ProyectazoApp {
       window.history.replaceState({ view: this.currentView }, '', `#${this.currentView}`);
     } else {
       const hashView = window.location.hash.replace('#', '');
-      if (hashView === 'zen' || hashView === 'ahora') {
-        this.currentView = 'ahora';
-      } else if (hashView === 'pensadero' || hashView === 'soltar' || hashView === 'gadget' || hashView === 'orbe') {
-        this.currentView = 'soltar';
-      } else if (hashView === 'kanban' || hashView === 'tareas' || hashView === 'pendientes' || hashView === 'hacer') {
-        this.currentView = 'hacer';
-      } else if (hashView === 'mas') {
-        this.currentView = 'mas';
-      } else if (hashView) {
-        this.currentView = hashView;
-      }
+      // Atajos del manifest que no son vistas: abren su herramienta sobre el Orbe
+      if (hashView === 'nexus-ai') setTimeout(() => this.openJarvis(), 300);
+      if (hashView === 'dual-widget') setTimeout(() => this.openDualWidgetModal(), 300);
+      this.currentView = this.normalizeView(hashView);
+      window.history.replaceState({ view: this.currentView }, '', `#${this.currentView}`);
     }
 
     // Initialize Splash Intro on mobile if not seen yet
@@ -1013,7 +1008,6 @@ class ProyectazoApp {
     } catch (e) {}
     const coarse = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 1;
     const shortSide = Math.min(window.innerWidth, window.innerHeight);
-    const longSide = Math.max(window.innerWidth, window.innerHeight);
     if (coarse && shortSide >= 600) return 'tablet';
     if (coarse) return 'phone';
     if (window.innerWidth < 720) return 'phone';
@@ -1468,7 +1462,7 @@ class ProyectazoApp {
   }
 
   getOnboardingSteps() {
-    const legend = Object.values(SMOKE_PALETTE).map(c => `
+    const legend = SMOKE_VISIBLE_KEYS.map(k => SMOKE_PALETTE[k]).map(c => `
       <li class="flex items-start gap-2">
         <span class="w-3 h-3 mt-0.5 rounded-full shrink-0 border border-white/20" style="background:${c.hex}"></span>
         <span><strong>${c.icon} ${c.name}</strong> <span class="theme-text-muted">— ${c.desc}</span></span>
@@ -1481,14 +1475,14 @@ class ProyectazoApp {
                ${window.electronAPI?.quickCaptureShortcut ? `<p class="text-xs">⌨️ Desde cualquier aplicación: <kbd class="px-1.5 py-0.5 rounded bg-slate-800 font-mono">${window.electronAPI.quickCaptureShortcut}</kbd> abre la captura rápida.</p>` : ''}`
       },
       {
-        title: '🎨 Cada color dice qué es',
-        html: `<p>Desliza sobre el orbe o toca un color para clasificar el pensamiento.</p>
+        title: '🎨 Cinco colores, los pone Nexus',
+        html: `<p>Nexus colorea cada pensamiento solo. Si se equivoca, toca otro color y lo recordará.</p>
                <ul class="space-y-1.5 text-xs max-h-64 overflow-y-auto pr-1">${legend}</ul>`
       },
       {
         title: '🎯 Un paso, no una lista',
-        html: `<p>En <strong>Hacer</strong> ves solo el siguiente micro-paso de 15 minutos. Como máximo hay <strong>3 tareas en foco</strong> a la vez.</p>
-               <p class="theme-text-muted">Al terminar, haz <strong>Checkout</strong>: anota qué avanzaste y dónde retomar mañana.</p>`
+        html: `<p>En <strong>Ahora</strong> ves solo la siguiente acción. Pulsa <strong>Empezar</strong> y listo. Como máximo hay <strong>3 tareas en foco</strong> a la vez.</p>
+               <p class="theme-text-muted">Tus tareas, proyectos, ideas e historial están en <strong>Repasar</strong>. Al terminar, haz <strong>Checkout</strong>: anota qué avanzaste y dónde retomar mañana.</p>`
       }
     ];
   }
@@ -1530,6 +1524,8 @@ class ProyectazoApp {
     const userBadge = document.getElementById('header-username-badge');
     if (userBadge) userBadge.textContent = userName;
     this.maybeStartOnboarding();
+    // Resumen del día (una vez al día); se espera a que carguen los datos
+    setTimeout(() => { try { this.maybeShowBriefing(); } catch (e) {} }, 2500);
   }
 
   logout() {
@@ -1758,7 +1754,7 @@ class ProyectazoApp {
 
   setBaulTab(tab) {
     this.baulTab = tab;
-    const container = document.getElementById('app-view');
+    const container = this.viewTarget();
     if (container) this.renderViewBaul(container);
   }
 
@@ -1782,7 +1778,7 @@ class ProyectazoApp {
     this.state.pensadero.unshift(newItem);
     this.saveState();
     this.showToast('🔒 Pensamiento guardado en el Baúl.');
-    const container = document.getElementById('app-view');
+    const container = this.viewTarget();
     if (container) this.renderViewBaul(container);
   }
 
@@ -1791,7 +1787,7 @@ class ProyectazoApp {
     this.state.pensadero = (this.state.pensadero || []).filter(x => x.id !== id);
     this.saveState();
     this.showToast('Nota eliminada del Baúl.');
-    const container = document.getElementById('app-view');
+    const container = this.viewTarget();
     if (container) this.renderViewBaul(container);
   }
 
@@ -1801,7 +1797,7 @@ class ProyectazoApp {
       item.inBaul = false;
       this.saveState();
       this.showToast('📤 Pensamiento desclasificado al Pensadero público.');
-      const container = document.getElementById('app-view');
+      const container = this.viewTarget();
       if (container) this.renderViewBaul(container);
     }
   }
@@ -1839,7 +1835,7 @@ class ProyectazoApp {
     this.state.projects.push(newP);
     this.saveState();
     this.showToast(`🔒 Proyecto "${name.trim()}" creado en el Baúl.`);
-    const container = document.getElementById('app-view');
+    const container = this.viewTarget();
     if (container) this.renderViewBaul(container);
   }
 
@@ -1849,7 +1845,7 @@ class ProyectazoApp {
       p.inBaul = false;
       this.saveState();
       this.showToast('📤 Proyecto desclasificado a proyectos públicos.');
-      const container = document.getElementById('app-view');
+      const container = this.viewTarget();
       if (container) this.renderViewBaul(container);
     }
   }
@@ -1878,7 +1874,7 @@ class ProyectazoApp {
       createdAt: new Date().toISOString()
     });
     this.saveState();
-    const container = document.getElementById('app-view');
+    const container = this.viewTarget();
     if (container) this.renderViewBaul(container);
   }
 
@@ -1891,7 +1887,7 @@ class ProyectazoApp {
       t.updatedAt = new Date().toISOString();
       this.saveState();
       if (isDone) this.triggerDopamineReward();
-      const container = document.getElementById('app-view');
+      const container = this.viewTarget();
       if (container) this.renderViewBaul(container);
     }
   }
@@ -2382,23 +2378,12 @@ class ProyectazoApp {
   }
 
   updateBadges() {
-    const thoughts = (this.state.pensadero || []).filter(x => !x.inBaul).length;
-    let pending = 0;
-    (this.state.projects || []).filter(p => !p.inBaul).forEach(p => {
-      pending += (p.tasks || []).filter(t => t.column !== 'victorias').length;
-    });
-    const paint = (id, count) => {
+    // Modo calma: sin números acumulados. Solo un punto discreto si hay pensamientos sin clasificar.
+    const unsorted = (this.state.pensadero || []).filter(x => !x.inBaul && (!x.category || x.category === 'humo_general')).length;
+    ['pensadero-count-badge', 'pensadero-count-mobile'].forEach(id => {
       const el = document.getElementById(id);
-      if (!el) return;
-      el.textContent = count;
-      el.classList.toggle('hidden', count <= 0);
-    };
-    const deskThoughts = document.getElementById('pensadero-count-badge');
-    const deskTasks = document.getElementById('tareas-count-badge');
-    if (deskThoughts) deskThoughts.textContent = thoughts;
-    if (deskTasks) deskTasks.textContent = pending;
-    paint('pensadero-count-mobile', thoughts);
-    paint('tareas-count-mobile', pending);
+      if (el) el.classList.toggle('hidden', unsorted <= 0);
+    });
     this.renderStickyRedAlert();
   }
 
@@ -2451,11 +2436,24 @@ class ProyectazoApp {
   }
 
   // --- NAVIGATION (4 DESTINOS TDAH) ---
+  // Alias y lista blanca de vistas. Secciones: soltar / ahora / repasar (repasar agrupa varias vistas en fichas).
+  normalizeView(viewName) {
+    const alias = { zen: 'ahora', pensadero: 'soltar', orbe: 'soltar', gadget: 'soltar', kanban: 'hacer', tareas: 'hacer', pendientes: 'hacer' };
+    let v = alias[viewName] || viewName;
+    if (v === 'repasar') v = this.lastRepasarTab();
+    // El Baúl bloqueado nunca se pinta vacío: se pide el PIN y se queda en la última ficha
+    if (v === 'baul' && !this.baulUnlocked) {
+      setTimeout(() => this.openBaul(), 0);
+      v = this.lastRepasarTab();
+    }
+    const known = ['soltar', 'ahora', ...ProyectazoApp.REPASAR_VIEWS];
+    return known.includes(v) ? v : 'soltar';
+  }
+
   navigate(viewName, pushHistory = true) {
-    // Normalizar alias a las 4 vistas principales
-    if (viewName === 'zen') viewName = 'ahora';
-    if (viewName === 'pensadero' || viewName === 'orbe') viewName = 'soltar';
-    if (viewName === 'kanban' || viewName === 'tareas' || viewName === 'pendientes') viewName = 'hacer';
+    viewName = this.normalizeView(viewName);
+    if (ProyectazoApp.REPASAR_VIEWS.includes(viewName) && viewName !== 'baul') this.rememberRepasarTab(viewName);
+    const navKey = ProyectazoApp.REPASAR_VIEWS.includes(viewName) ? 'repasar' : viewName;
 
     // Auto-bloqueo del Baúl al salir a cualquier otra pantalla
     if (viewName !== 'baul') {
@@ -2476,10 +2474,10 @@ class ProyectazoApp {
     const sub = document.getElementById('header-view-subtitle');
     if (sub) {
       const titles = {
-        soltar: '🔮 Orbe',
+        soltar: '🔮 Soltar',
         ahora: '🎯 Ahora',
-        hacer: '⚡ Hacer',
-        mas: '⋯ Más',
+        hacer: '🗂️ Repasar · Tareas',
+        mas: '🗂️ Repasar · Ajustes',
         baul: '🔒 Baúl Confidencial',
         hoy: '💼 Proyectos',
         freeform: '🎨 Lienzo Freeform',
@@ -2492,7 +2490,7 @@ class ProyectazoApp {
     // Destacar botones en Desktop Nav
     document.querySelectorAll('.nav-btn').forEach(btn => {
       const v = btn.getAttribute('data-view');
-      if (v === viewName) {
+      if (v === navKey) {
         btn.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
         btn.classList.remove('theme-text-muted');
       } else {
@@ -2504,7 +2502,7 @@ class ProyectazoApp {
     // Destacar botones en Barra Inferior Móvil (4 destinos TDAH)
     document.querySelectorAll('.bnav-btn').forEach(btn => {
       const v = btn.getAttribute('data-view');
-      if (v === viewName) {
+      if (v === navKey) {
         btn.classList.add('text-cyan-400', 'font-bold');
         btn.classList.remove('text-slate-400', 'opacity-70');
       } else {
@@ -2542,42 +2540,69 @@ class ProyectazoApp {
 
     this.updateBadges();
 
+    let target = container;
+    if (ProyectazoApp.REPASAR_VIEWS.includes(this.currentView)) {
+      target = this.renderRepasarShell(container, this.currentView);
+    }
+
     switch (this.currentView) {
       case 'ahora':
       case 'zen':
-        this.renderViewAhora(container);
+        this.renderViewAhora(target);
         break;
       case 'soltar':
       case 'pensadero':
-        this.renderViewSoltar(container);
+        this.renderViewSoltar(target);
         break;
       case 'hacer':
       case 'kanban':
       case 'tareas':
       case 'pendientes':
-        this.renderViewHacer(container);
+        this.renderViewHacer(target);
         break;
       case 'mas':
-        this.renderViewMas(container);
+        this.renderViewMas(target);
         break;
       case 'hoy':
-        this.renderViewHoy(container);
+        this.renderViewHoy(target);
         break;
       case 'freeform':
-        this.renderViewFreeform(container);
+        this.renderViewFreeform(target);
         break;
       case 'bitacora':
-        this.renderViewBitacora(container);
+        this.renderViewBitacora(target);
         break;
       case 'radar':
-        this.renderViewRadar(container);
+        this.renderViewRadar(target);
         break;
       case 'baul':
-        this.renderViewBaul(container);
+        this.renderViewBaul(target);
         break;
       default:
-        this.renderViewAhora(container);
+        this.renderViewAhora(target);
     }
+  }
+
+  // Vistas que viven como fichas dentro de "Repasar"
+  static get REPASAR_VIEWS() {
+    return ['hacer', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas'];
+  }
+
+  // Contenedor donde pinta la vista actual (dentro de Repasar es el panel bajo las fichas)
+  viewTarget() {
+    return document.getElementById('repasar-panel') || document.getElementById('app-view');
+  }
+
+  lastRepasarTab() {
+    try {
+      const v = localStorage.getItem('nexus_repasar_tab');
+      if (v && v !== 'baul' && ProyectazoApp.REPASAR_VIEWS.includes(v)) return v;
+    } catch (e) {}
+    return 'hacer';
+  }
+
+  rememberRepasarTab(view) {
+    try { localStorage.setItem('nexus_repasar_tab', view); } catch (e) {}
   }
 
   // --- AUTO-CLASIFICACIÓN NEXUS ---

@@ -121,17 +121,41 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 
 | Tema | Qué implica |
 |---|---|
-| **Migraciones Flyway** | Necesito el esquema real de tu Postgres: `docker exec nexus-postgres pg_dump -s -U <POSTGRES_USER> <POSTGRES_DB>` (solo estructura, sin datos) |
 | **Voz en iOS/Firefox** | No tienen reconocimiento de voz en el navegador. Requiere transcribir en el servidor (Whisper), que pide ~1–2 GB de RAM más |
 | **Google Calendar / Gmail con OAuth** | Sustituye la contraseña de aplicación de Gmail. Necesito que crees en [Google Cloud Console](https://console.cloud.google.com/) un proyecto, la pantalla de consentimiento OAuth y unas credenciales "Aplicación web" con tu dominio como URI de redirección, y me pases el *Client ID* |
 
 ---
 
-## 5. Limpieza opcional
+## 5. Limpieza (hecha)
 
-- `nexus_deploy_v1.tar.gz` (52 MB, en la raíz): ya no está en git; bórralo si no lo necesitas.
-- `data/` y `backend/data/` (bases H2 antiguas): siguen en disco pero fuera de git. El backend en Docker usa Postgres.
-- `archive/` guarda la versión v1.1 e `Index.Gemini.html` por si quieres consultarlas; se pueden borrar.
+- Borrados `nexus_deploy_v1.tar.gz`, `__pycache__/`, `.pytest_cache/` y `android/build/`.
+- `archive/` y las especificaciones antiguas están en `docs/archivo/`. La especificación vigente es [PRODUCTO.md](PRODUCTO.md).
+- Quedan en disco (fuera de git) `data/` y `backend/data/` (bases H2 antiguas): bórralas si no las necesitas.
+- Los modelos de IA se eligen con `NEXUS_AI_MODELS` en `.env` (ver `.env.example`).
+
+## 5b. Activar Jarvis con IA (opcional)
+
+1. Crea una clave en https://console.anthropic.com y ponla en `.env`: `ANTHROPIC_API_KEY=...`
+2. `docker compose up -d --build app` (en la versión anterior a la Fase 3: `nexus-ai`)
+3. Comprueba: `http://localhost:8080/nexus/health` debe mostrar `"jarvis": {"provider": "claude", ...}`.
+4. Prueba: abre Jarvis y di "mañana a las 10 recuérdame llamar al banco".
+
+Modelo por defecto `claude-opus-5-5` con esfuerzo `low` (respuestas rápidas). Para gastar menos: `JARVIS_MODEL=claude-sonnet-5-5` o `claude-haiku-5-5`. Sin clave, Jarvis funciona en modo local.
+
+## 5c. Backend único (Fase 3, rama `feat/backend-unico`)
+
+Sustituye Postgres + Spring + Nexus por un solo servicio Python con SQLite. Pasos para migrar tus datos sin perderlos en [MIGRACION.md](MIGRACION.md). El volumen de Postgres no se borra hasta que tú lo decidas.
+
+## 5d. Frontend (Fase 4, rama `feat/frontend-modular`, encima de la Fase 3)
+
+Hecho:
+- `index.html` sin manejadores inline: atributos `data-on-*` y un único despachador (`js/app/ui/acciones.js`).
+- Plantillas `` html`…` `` que escapan por defecto (`js/app/ui/html.js`), ya usadas en Repasar y Jarvis.
+- `npm run lint` (ESLint) y `npm run typecheck` (tsc) en CI.
+
+Pendiente, a propósito: módulos ES con un bundle único, componentes y un store central. Unir los scripts cambia el modo estricto y el ámbito de los globales, y eso solo se puede validar en un navegador. Se hará vista a vista, con pruebas E2E en CI (Playwright), cuando el CI vuelva a funcionar (ahora lo bloquea la facturación de GitHub).
+
+**Prueba manual que necesito de ti:** pulsa los botones de cada pantalla y de los modales (login, Ajustes, Baúl, Checkout, crear tarea, compartir…). Ahora todos pasan por el despachador nuevo; si alguno no responde, dime cuál.
 
 ## 6. A tener en cuenta
 

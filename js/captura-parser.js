@@ -112,6 +112,8 @@ const CapturaParser = (() => {
       .filter(p => p.length >= 2);
   }
 
+  /** @type {Array<[RegExp, string]>} */
+
   const COMMANDS = [
     [/^(urgente|fuego)\s*[:,\-–]\s*/i, 'humo_rojo'],
     [/^(idea)\s*[:,\-–]\s*/i, 'humo_dorado'],

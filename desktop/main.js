@@ -57,10 +57,11 @@ function saveBounds() {
 }
 
 function startBackendService() {
-  const pythonScript = path.join(__dirname, '..', 'nexus_service.py');
-  if (!fs.existsSync(pythonScript)) return;
+  // Backend único (API + IA) en el puerto 8081: python -m server
+  const serverDir = path.join(__dirname, '..', 'server');
+  if (!fs.existsSync(serverDir)) return;
   try {
-    pythonProcess = spawn('python', [pythonScript], {
+    pythonProcess = spawn('python', ['-m', 'server'], {
       cwd: path.join(__dirname, '..'),
       detached: true,
       stdio: 'ignore',
@@ -68,7 +69,7 @@ function startBackendService() {
     });
     pythonProcess.unref();
   } catch (err) {
-    console.warn('No se pudo arrancar nexus_service.py desde Electron:', err);
+    console.warn('No se pudo arrancar el backend (python -m server) desde Electron:', err);
   }
 }
 

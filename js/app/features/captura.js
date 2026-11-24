@@ -21,6 +21,7 @@ defineAppMethods({
     for (const idea of ideas) {
       const parsed = CapturaParser.parseIdea(idea);
       if (!parsed.text) continue;
+      if (opts.dueAt) parsed.dueAt = opts.dueAt; // fecha ya resuelta (p. ej. por Jarvis)
       const explicitCategory = (opts.category && opts.category !== 'humo_general') ? opts.category : parsed.category;
 
       // "para <proyecto>: …" o, por voz, nombrar el proyecto → tarea directa en su Buzón
@@ -28,12 +29,19 @@ defineAppMethods({
         ? this.findProjectMatch(parsed.projectName)
         : (opts.voiceRoute ? this.findProjectMatch(parsed.text, { byNameOnly: true }) : null);
       if (target) {
-        this.addTaskFromCapture(target.project, parsed, { silent: opts.silent || multiple });
+        const task = this.addTaskFromCapture(target.project, parsed, { silent: opts.silent || multiple });
+        results.push({ id: task.id, kind: 'task', projectName: target.project.name, dueAt: task.dueAt });
         continue;
       }
 
       const repeated = this.registerRepeatedThought(parsed.text);
       if (repeated) {
+        // Repetir algo ya apuntado con una hora nueva programa el aviso igualmente
+        if (parsed.dueAt) {
+          repeated.dueAt = new Date(parsed.dueAt).toISOString();
+          repeated.updatedAt = new Date().toISOString();
+          this.scheduleCaptureReminder(repeated, Promise.resolve());
+        }
         results.push(repeated);
         continue;
       }
@@ -62,7 +70,7 @@ defineAppMethods({
     }
 
     if (multiple && !opts.silent) {
-      const ids = results.map(r => r.id);
+      const ids = results.filter(r => r.kind !== 'task').map(r => r.id);
       this.showToast(`✂️ Separé ${ideas.length} ideas para que cada una vaya a su sitio`, () => {
         // Unir: deshacer la separación y guardar el texto como un solo pensamiento
         this.state.pensadero = (this.state.pensadero || []).filter(p => !ids.includes(p.id));
@@ -81,7 +89,7 @@ defineAppMethods({
   // Un pensamiento que ya estaba (sin resolver) no se duplica: cuenta las veces que vuelve.
   registerRepeatedThought(text) {
     const key = CapturaParser.normalize(text);
-    const existing = (this.state.pensadero || []).find(p => !p.isResolved && CapturaParser.normalize(p.content) === key);
+    const existing = (this.state.pensadero || []).find(p => !p.isResolved && !p.inBaul && CapturaParser.normalize(p.content) === key);
     if (!existing) return null;
     const ageMs = Date.now() - new Date(existing.lastSeenAt || existing.createdAt).getTime();
     if (ageMs < 10 * 60 * 1000) return existing; // doble envío accidental: se ignora
@@ -95,7 +103,7 @@ defineAppMethods({
   addTaskFromCapture(project, parsed, { silent = false } = {}) {
     if (!project.tasks) project.tasks = [];
     const task = {
-      id: this.uid(), title: parsed.text, column: 'buzon', effort: 'S',
+      id: this.uid(), title: parsed.text, column: 'buzon', effort: parsed.effort || 'S',
       dueAt: parsed.dueAt ? new Date(parsed.dueAt).toISOString() : null,
       createdAt: new Date().toISOString()
     };
@@ -242,7 +250,7 @@ defineAppMethods({
   },
 
   reviewCategories() {
-    return Object.keys(SMOKE_PALETTE).filter(k => k !== 'humo_general');
+    return SMOKE_VISIBLE_KEYS.filter(k => k !== 'humo_general');
   },
 
   renderReviewCard() {
@@ -260,7 +268,7 @@ defineAppMethods({
       <div class="grid grid-cols-3 gap-2">
         ${this.reviewCategories().map((k, i) => {
           const m = SMOKE_PALETTE[k];
-          const hint = suggestion.matched && suggestion.category === k ? ' ring-2 ring-cyan-400' : '';
+          const hint = suggestion.matched && categoriaVisible(suggestion.category) === k ? ' ring-2 ring-cyan-400' : '';
           return `<button type="button" onclick="app.reviewChoose('${k}')" class="p-2 rounded-xl border ${m.badgeClass}${hint} text-xs font-semibold text-left transition active:scale-95">
             <span class="theme-text-muted font-mono">${i + 1}</span> ${m.icon} ${m.name}</button>`;
         }).join('')}
@@ -282,6 +290,12 @@ defineAppMethods({
   reviewChoose(category) {
     const id = this._review && this._review.queue[this._review.index];
     if (!id) return;
+    // Si la sugerencia local cae en el mismo grupo, conservar su subtipo (p. ej. personas dentro de Vida)
+    const item = (this.state.pensadero || []).find(p => p.id === id);
+    if (item) {
+      const sug = CapturaParser.classifyLocal(item.content, { memory: this.state.settings?.classifierMemory });
+      if (sug.matched && categoriaVisible(sug.category) === category) category = sug.category;
+    }
     this.changeThoughtCategory(id, category); // corrección del usuario: se aprende
     this.advanceReview(true);
   },

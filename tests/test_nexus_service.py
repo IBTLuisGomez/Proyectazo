@@ -111,3 +111,12 @@ def test_head_health_returns_200(server):
     with urllib.request.urlopen(req) as res:
         assert res.status == 200
 
+
+
+def test_ai_models_configurables(nexus, monkeypatch):
+    monkeypatch.delenv("NEXUS_AI_MODELS", raising=False)
+    assert nexus.ai_models() == ["gemini-2.5-flash", "gemini-flash-latest"]
+    monkeypatch.setenv("NEXUS_AI_MODELS", " modelo-a , ,modelo-b ")
+    assert nexus.ai_models() == ["modelo-a", "modelo-b"]
+    monkeypatch.setenv("NEXUS_AI_MODELS", " , ")
+    assert nexus.ai_models() == ["gemini-2.5-flash", "gemini-flash-latest"]
