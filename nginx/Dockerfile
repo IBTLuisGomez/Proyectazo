@@ -22,6 +22,6 @@ COPY assets/ /usr/share/nginx/html/assets/
 COPY js/ /usr/share/nginx/html/js/
 COPY --from=css /build/assets/tailwind.css /usr/share/nginx/html/assets/tailwind.css
 
-EXPOSE 80
+EXPOSE 80 81
 
 CMD ["nginx", "-g", "daemon off;"]

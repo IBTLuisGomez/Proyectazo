@@ -1,0 +1,14 @@
+# HTTPS delante de nginx (perfil "https" de docker-compose.yml). Ver docs/GUIA_PENDIENTES.md, punto 2.2.
+#
+# NEXUS_DOMAIN (en .env) decide el certificado:
+#   - un dominio público (nexus.midominio.com): Let's Encrypt, automático y renovado solo.
+#     El dominio debe apuntar a este servidor y los puertos 80 y 443 estar abiertos.
+#   - localhost, una IP o un nombre de la red local (192.168.1.50, nexus.local): certificado de la
+#     autoridad interna de Caddy; cada dispositivo debe instalar su certificado raíz una vez.
+#   Varios a la vez, separados por comas: "localhost, 192.168.1.50"
+#
+# El puerto 81 de nginx solo existe dentro de la red de Docker: ahí nginx se fía de la IP del
+# cliente que le pasa Caddy (la usa el límite de intentos de login).
+{$NEXUS_DOMAIN:localhost} {
+	reverse_proxy frontend:81
+}

@@ -1,4 +1,6 @@
 # Nexus Orb: 2 contenedores (app Python + nginx). Datos en el volumen nexus_data (SQLite).
+# HTTPS (necesario para push y micrófono en el móvil): perfil "https", que añade Caddy delante.
+#   En .env: COMPOSE_PROFILES=https y NEXUS_DOMAIN=tu-dominio   (ver docs/GUIA_PENDIENTES.md, 2.2)
 # El backend anterior (Postgres + Spring) queda en el perfil "legacy" solo para migrar los datos:
 #   docker compose --profile legacy up -d postgres   (ver docs/MIGRACION.md)
 services:
@@ -43,7 +45,29 @@ services:
       app:
         condition: service_healthy
     ports:
-      - "${PORT:-8080}:80"
+      # Con HTTPS, HTTP_BIND=127.0.0.1 deja el acceso sin cifrar solo para este equipo
+      - "${HTTP_BIND:-0.0.0.0}:${PORT:-8080}:80"
+    networks:
+      - nexus_net
+
+  # ---- HTTPS con certificado automático (perfil "https") ----
+  caddy:
+    profiles: ["https"]
+    image: caddy:2-alpine
+    container_name: nexus-caddy
+    restart: always
+    depends_on:
+      - frontend
+    environment:
+      NEXUS_DOMAIN: ${NEXUS_DOMAIN:-localhost}
+    ports:
+      - "80:80"        # validación del certificado y redirección a https
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # certificados: no borrar (Let's Encrypt limita las emisiones)
+      - caddy_config:/config
     networks:
       - nexus_net
 
@@ -63,6 +87,10 @@ services:
 
 volumes:
   nexus_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
     driver: local
   # Volumen del backend anterior: se conserva intacto hasta que confirmes la migración
   postgres_data:

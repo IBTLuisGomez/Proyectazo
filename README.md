@@ -47,7 +47,7 @@ Proyectazo/
 ├── index.html                 # PWA y SPA Frontend unificada (HTML5, Tailwind, WebGL GLSL, Web Speech API)
 ├── manifest.json              # Manifiesto PWA para instalación móvil y de escritorio
 ├── sw.js                      # Service Worker para funcionamiento 100% offline
-├── docker-compose.yml         # 2 contenedores: app (Python) y frontend (nginx)
+├── docker-compose.yml         # 2 contenedores: app (Python) y frontend (nginx); Caddy opcional para HTTPS (caddy/Caddyfile)
 ├── assets/
 │   ├── logo_dark.png          # Logo de alta resolución para Modo Oscuro
 │   ├── logo_icon_sin_bk.png   # Logo transparente para Modo Claro
@@ -73,6 +73,7 @@ docker compose up -d --build
 ```
 - **App web y PWA**: [http://localhost:8080](http://localhost:8080) (o el `PORT` de tu `.env`); en la red local `http://192.168.x.x:8080`
 - La API y la IA quedan detrás de nginx (`/api` y `/nexus`). Datos en el volumen `nexus_data` (SQLite).
+- **HTTPS** (necesario para push y micrófono en el móvil): `COMPOSE_PROFILES=https` y `NEXUS_DOMAIN=...` en `.env` añaden Caddy con certificado automático. Pasos en [docs/GUIA_PENDIENTES.md](docs/GUIA_PENDIENTES.md), punto 2.2.
 - ¿Vienes de la versión con Postgres? Sigue [docs/MIGRACION.md](docs/MIGRACION.md).
 
 Sin Docker: `pip install -r server/requirements.txt` y `python -m server` (API + IA en el puerto 8081).

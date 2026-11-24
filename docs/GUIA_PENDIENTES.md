@@ -90,11 +90,30 @@ Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegado
 
 ### 2.2 Avisos con la app cerrada (Web Push) y voz
 Requieren **HTTPS** (o `localhost`). En la red local por IP (`http://192.168.x.x`) el móvil **no** permitirá push ni micrófono.
-Opciones: un dominio con certificado (Caddy o certbot delante de nginx) o un túnel tipo Cloudflare Tunnel / Tailscale Funnel.
 Con HTTPS: Ajustes → Notificaciones → **Activar avisos con la app cerrada** en cada dispositivo → **Probar**.
 
-### 2.3 Si pones un proxy HTTPS delante (Cloudflare, Caddy…)
-Si el HTTPS termina **antes** de nginx, nginx ve `http` y el navegador `https`. Añade tu dirección pública a `.env`:
+#### Activar HTTPS (Caddy, incluido en el compose)
+Añade a `.env` y arranca de nuevo con `docker compose up -d --build`:
+```
+COMPOSE_PROFILES=https
+NEXUS_DOMAIN=nexus.tu-dominio.com
+HTTP_BIND=127.0.0.1
+```
+- `PORT` no puede ser 80: Caddy usa los puertos 80 y 443.
+- `HTTP_BIND=127.0.0.1` cierra el acceso sin cifrar desde otros equipos (opcional, recomendado).
+- Para volver a HTTP, quita `COMPOSE_PROFILES` y ejecuta `docker compose --profile https down` seguido de `docker compose up -d`.
+
+**Con un dominio público** (servidor en internet): el dominio debe apuntar al servidor y los puertos 80 y 443 estar abiertos. El certificado de Let's Encrypt se pide y se renueva solo. No borres el volumen `caddy_data`: Let's Encrypt limita cuántos certificados emite por semana.
+
+**En la red local** (sin dominio): pon los nombres por los que entras, por ejemplo `NEXUS_DOMAIN=localhost, 192.168.100.13`. Caddy crea su propia autoridad de certificados, y cada dispositivo debe instalarla una vez o el navegador avisará de sitio no seguro (y push seguirá sin funcionar):
+```powershell
+docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt caddy-raiz.crt
+```
+Pasa ese archivo al dispositivo e instálalo: en Android, Ajustes → Seguridad → Cifrado y credenciales → Instalar un certificado → Certificado de CA; en Windows, doble clic → Instalar → «Entidades de certificación raíz de confianza». La IP del equipo debe ser fija.
+La **app Android** (`android/`) todavía no confía en certificados instalados por el usuario: en red local, usa Chrome o la PWA, o dime y lo añado. Alternativa sin instalar nada: un túnel (Cloudflare Tunnel, Tailscale Funnel), que da un dominio público.
+
+### 2.3 Si pones otro proxy HTTPS delante (Cloudflare…)
+No hace falta con el Caddy del compose. Si el HTTPS lo termina **otro** proxy antes de nginx, nginx ve `http` y el navegador `https`. Añade tu dirección pública a `.env`:
 ```
 CORS_ALLOWED_ORIGINS=https://tu-dominio.com,null
 ```
