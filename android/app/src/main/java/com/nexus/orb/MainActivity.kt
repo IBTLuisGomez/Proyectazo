@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         val form = if (resources.configuration.smallestScreenWidthDp >= 600) "tablet" else "phone"
         val js = "document.documentElement.dataset.native='android';" +
             "document.documentElement.dataset.form='$form';" +
-            "if(window.app&&app.applyFormFactor)app.applyFormFactor();"
+            "if(typeof app!=='undefined'&&app&&app.applyFormFactor)app.applyFormFactor();"
         webView.evaluateJavascript(js, null)
     }
 
