@@ -63,6 +63,8 @@ Estos son widgets de verdad (no accesos directos) y necesitan la **app Android**
    - **Lista de pendientes** (redimensionable): muestra una lista con sus casillas. Toca una casilla para marcarla, **＋** para añadir, el **título** para cambiar de lista y **↗** para abrirla en la app.
    - **Añadir pendiente** (barra de una fila): abre un cuadro para apuntar; escribe, pulsa Enter y sigue con el siguiente. Va a tu primera lista (si no hay ninguna, crea «Pendientes»).
 
+   - **Soltar un pensamiento** (barra de una fila): para sacar algo de la cabeza al momento. Llega a Soltar; si la app estaba cerrada, queda sin clasificar para el repaso.
+
 Funcionan con la app cerrada y sin cobertura: lo que marques se guarda en el teléfono y se envía cuando haya red o al abrir la app. Los cambios hechos en otros dispositivos llegan al widget cada 30 minutos aproximadamente (límite de Android) o al abrir la app.
 
 Las listas se gestionan en la app en **Repasar → 📝 Listas**. En la PWA tienes el acceso directo **📝 Listas de pendientes** (mantén pulsado el icono).

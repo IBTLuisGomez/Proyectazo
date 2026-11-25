@@ -44,13 +44,23 @@ Ficha **Listas** de Repasar. Para lo que no es de ningún proyecto: compras, rec
 
 Detalle técnico: el modelo y la regla de mezcla están en `js/notas-core.js`; la misma regla está en `server/store.py` (`merge_nota`) y en `android/.../notas/NotasStore.kt`. Lo borrado se guarda como marca (`deleted`) para que otro dispositivo no lo resucite.
 
+## Foco acompañado y rutinas
+Al pie de **Ahora**. Todo esto se guarda en el dispositivo y no se sincroniza.
+
+- **Acompañamiento** («Preguntarme si sigo»: No, 10, 15 o 25 min; apagado por defecto). Con el temporizador en marcha pregunta si sigues con la tarea; «Me distraje» lo anota sin culpa. A los 90 minutos seguidos sugiere agua, estirar y comer. Con la app en segundo plano llega como notificación.
+- **Estimaciones aprendidas.** Al registrar un avance se guarda el foco real frente a lo estimado por el tamaño de la tarea. Con tres tareas de un tamaño, Ahora añade «sueles tardar ~N».
+- **Cerrar el día** (un minuto): qué hiciste, qué queda abierto y qué es lo primero mañana. Lo último abre el resumen de la mañana siguiente. A partir de las 18:00 se ofrece una vez si hubo foco ese día.
+- **Revisión semanal** (diez minutos, cuatro pasos): lo hecho, pensamientos sin ordenar, proyectos quietos y el foco de la semana, que aparece en el resumen de cada mañana. Se ofrece una vez de viernes a domingo.
+
+Principio: los resúmenes cuentan lo hecho, nunca lo que falta; los avisos se ofrecen una vez y no insisten.
+
 ## Funciones TDAH que se mantienen
 Límite de tareas en curso, modo Zen con temporizador y ruido marrón, Checkout/cierre de sesión, reactivar o hibernar proyectos sin culpa, deconstruir metas en micro-pasos, avisos push, Baúl con PIN.
 
 ## Jarvis (asistente)
 Se abre con el botón 🤖/🎙️ flotante, desde Ajustes o desde el aviso del resumen diario. Se habla o se escribe en lenguaje normal.
 
-- **Qué puede hacer** (herramientas, se ejecutan en el navegador sobre tus datos): soltar un pensamiento, crear una tarea en un proyecto, programar un aviso, ver tareas, recordar un dato sobre ti, arrancar un foco, abrir una sección. No puede borrar nada.
+- **Qué puede hacer** (herramientas, se ejecutan en el navegador sobre tus datos): soltar un pensamiento, crear una tarea en un proyecto, programar un aviso, ver tareas, añadir a una lista (la crea si no existe), ver las listas y marcar pendientes, recordar un dato sobre ti, arrancar un foco, abrir una sección. No puede borrar nada.
 - **Memoria**: los datos que le pides recordar y la conversación se guardan en este dispositivo (no en el servidor). 🧹 empieza una conversación nueva; la memoria se conserva.
 - **Proveedor de IA**: `NEXUS_AI_PROVIDER` en `.env` (`claude` o `local`). Sin clave de IA funciona en modo local: lo que digas se guarda en Soltar con el intérprete de siempre (entiende "para <proyecto>: …" y fechas).
 - **Resumen del día**: una vez al día, a partir de las 6:00, al abrir la app: lo que vence hoy, lo urgente, la primera tarea propuesta y un proyecto quieto. Se calcula en el dispositivo, sin IA.

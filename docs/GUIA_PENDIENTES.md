@@ -81,6 +81,14 @@ Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegado
 - [ ] En otro dispositivo: la lista aparece; marca un pendiente en cada uno y sincroniza: se conservan los dos.
 - [ ] Tema claro: los colores de las tarjetas se leen bien.
 
+**Foco y rutinas (al pie de Ahora)**
+- [ ] «Preguntarme si sigo» en 10 min, iniciar el temporizador y esperar: llega la pregunta; «Me distraje» responde sin regañar.
+- [ ] Con la app en otra pestaña, la pregunta llega como notificación del sistema.
+- [ ] **🌙 Cerrar el día**: rellenar «lo primero mañana»; al día siguiente aparece en el resumen de la mañana.
+- [ ] **📅 Revisión semanal**: los cuatro pasos se leen bien en el móvil; pausar un proyecto quieto no borra lo escrito en el paso 4.
+- [ ] Tras cerrar tres tareas del mismo tamaño con el temporizador, Ahora muestra «sueles tardar».
+- [ ] Jarvis (con IA activada): «añade pan y leche a la compra» crea o usa la lista.
+
 **Sin red**
 - [ ] Modo avión, borrar un pensamiento, volver a conectar: no debe reaparecer.
 
@@ -110,7 +118,7 @@ HTTP_BIND=127.0.0.1
 docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt caddy-raiz.crt
 ```
 Pasa ese archivo al dispositivo e instálalo: en Android, Ajustes → Seguridad → Cifrado y credenciales → Instalar un certificado → Certificado de CA; en Windows, doble clic → Instalar → «Entidades de certificación raíz de confianza». La IP del equipo debe ser fija.
-La **app Android** (`android/`) todavía no confía en certificados instalados por el usuario: en red local, usa Chrome o la PWA, o dime y lo añado. Alternativa sin instalar nada: un túnel (Cloudflare Tunnel, Tailscale Funnel), que da un dominio público.
+La **app Android** (`android/`) también acepta ese certificado (hay que recompilarla). Alternativa sin instalar nada: un túnel (Cloudflare Tunnel, Tailscale Funnel), que da un dominio público.
 
 ### 2.3 Si pones otro proxy HTTPS delante (Cloudflare…)
 No hace falta con el Caddy del compose. Si el HTTPS lo termina **otro** proxy antes de nginx, nginx ve `http` y el navegador `https`. Añade tu dirección pública a `.env`:
@@ -137,6 +145,8 @@ La app carga la URL del servidor (configurable dentro de la app). Apúntala a tu
 - [ ] **＋** en el widget con el modo avión: se añade; al volver la red llega al servidor.
 - [ ] Marcar algo en el ordenador: el widget lo refleja al abrir la app o en ~30 min.
 - [ ] Tocar el título cambia de lista; **↗** abre la app en esa lista.
+- [ ] Widget **Soltar un pensamiento**: lo escrito aparece en Soltar (sin clasificar si la app estaba cerrada).
+- [ ] Con HTTPS de red local y el certificado raíz de Caddy instalado en el teléfono, la app carga sin aviso.
 
 ---
 
@@ -196,7 +206,16 @@ Pendiente, a propósito: módulos ES con un bundle único, componentes y un stor
 - **Clasificador**: las reglas están en `js/clasificador-reglas.js` (las usan el navegador y Nexus). Para añadir palabras, edítalas ahí y ejecuta los tests (`node --test tests/js/*.test.mjs` y `pytest tests`).
 - **Contraste**: `assets/contraste.css` se genera con `python scripts/gen-contraste.py`; no lo edites a mano.
 
+### Copias de seguridad
+- El servidor guarda **una copia diaria** de la base de datos en `backups/` dentro del volumen de datos, y conserva las últimas 14 (`NEXUS_BACKUP_KEEP`; 0 las desactiva). `docker logs nexus-app` lo confirma al arrancar.
+- Están en el mismo disco que la base: protegen de un borrado o una base dañada, **no** de perder el servidor. Para eso, copia la carpeta fuera de vez en cuando: `docker compose cp app:/app/data/backups ./copias`.
+- Restaurar: `scripts/restaurar-copia.sh` lista las copias y `scripts/restaurar-copia.sh 2026-11-24` restaura la de ese día (para la app, guarda la base actual y arranca de nuevo). **No se ha probado todavía contra un servidor real**: la primera vez, hazlo con calma.
+
+### Errores del navegador
+Los fallos de JavaScript de cualquier dispositivo con sesión llegan al servidor: `docker logs nexus-app | grep cliente`. Si un botón no responde en el móvil, ahí queda el archivo y la línea. No se envía contenido tuyo.
+
 ### Seguridad
+- **Cifrar los secretos en disco**: pon `NEXUS_SECRET_KEY=<texto largo y aleatorio>` en `.env` y reinicia. La clave VAPID y la contraseña de Gmail quedan cifradas. Guarda esa clave también fuera del servidor: si se pierde, push y correo se desactivan hasta restaurarla (el resto sigue funcionando).
 
 - La **contraseña de aplicación de Gmail** se guarda en texto plano en el disco del servicio Nexus (`data/google_mail_config.json` dentro del contenedor). Está protegida por el login, pero OAuth (punto 4) es lo correcto.
 - La **clave privada VAPID** se guarda en la base de datos si no la fijas en `.env`. Haz copias de seguridad de la BD.

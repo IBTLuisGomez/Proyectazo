@@ -38,6 +38,14 @@
 - Sin red y sincronizadas entre dispositivos (mezcla pendiente a pendiente, sin pisar cambios).
 - **Widgets en Android**: *Lista de pendientes* (marcar sin abrir la app) y *Añadir pendiente*. Ver [guía móvil](docs/GUIA_USUARIO_MOVIL.md).
 
+### 8. Foco acompañado y rutinas
+- Al pie de **Ahora**: check-ins durante el foco, aviso a los 90 minutos, cierre del día en un minuto y revisión semanal guiada.
+- La app aprende cuánto tardas de verdad y lo muestra junto a la estimación.
+
+### 9. Operación
+- Copia de seguridad diaria de la base de datos, secretos cifrados en reposo (`NEXUS_SECRET_KEY`) y registro de errores del navegador. Detalle en [docs/GUIA_PENDIENTES.md](docs/GUIA_PENDIENTES.md), punto 6.
+- Estado del plan y lo que falta: [docs/PROPUESTA_MEJORA.md](docs/PROPUESTA_MEJORA.md), sección 7.
+
 ---
 
 ## 🏗️ Arquitectura Técnica

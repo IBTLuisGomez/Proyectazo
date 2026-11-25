@@ -30,9 +30,9 @@ fi
 if [ ! -f .env ]; then
     echo "⚙️ Creando archivo .env a partir de .env.example..."
     cp .env.example .env
-    # Generar password aleatoria si es default
-    RAND_PASS=$(openssl rand -hex 16)
-    sed -i "s/tu_password_segura_aqui_2026/$RAND_PASS/g" .env
+    # Clave para cifrar los secretos en reposo (clave VAPID y contraseña de Gmail). Guárdala también fuera del servidor.
+    sed -i "s/^NEXUS_SECRET_KEY=$/NEXUS_SECRET_KEY=$(openssl rand -hex 32)/" .env
+    echo "   Revisa .env antes de seguir: NEXUS_ADMIN_USER, NEXUS_ADMIN_PASSWORD y, para HTTPS, NEXUS_DOMAIN."
 fi
 
 # 5. Configurar Firewall (UFW)
@@ -50,6 +50,15 @@ docker compose up -d --build
 echo ""
 echo "=============================================================================="
 echo "✅ ¡Despliegue completado con éxito!"
-echo "🌐 Accede a tu servidor en: http://$(curl -s ifconfig.me)"
+# Con el perfil https (COMPOSE_PROFILES=https y NEXUS_DOMAIN en .env) la entrada es Caddy, con certificado automático
+DOMINIO=$(grep -E '^NEXUS_DOMAIN=' .env | head -n 1 | cut -d= -f2- | cut -d, -f1 | tr -d ' "')
+PUERTO=$(grep -E '^PORT=' .env | head -n 1 | cut -d= -f2- | tr -d ' "')
+if grep -qE '^COMPOSE_PROFILES=.*https' .env && [ -n "$DOMINIO" ]; then
+    echo "🌐 Accede a tu servidor en: https://$DOMINIO"
+else
+    echo "🌐 Accede a tu servidor en: http://$(curl -s ifconfig.me):${PUERTO:-8080}"
+    echo "   Sin HTTPS, el móvil no permite avisos push ni micrófono: ver docs/GUIA_PENDIENTES.md, punto 2.2."
+fi
+echo "💾 Copias de seguridad diarias en el volumen de datos; restaurar con scripts/restaurar-copia.sh"
 echo "📊 Para ver logs: docker compose logs -f"
 echo "=============================================================================="

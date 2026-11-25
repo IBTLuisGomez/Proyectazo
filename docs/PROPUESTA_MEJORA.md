@@ -176,19 +176,54 @@ Limpieza inmediata: borrar `nexus_deploy_v1.tar.gz`, `__pycache__/`, `android/bu
 
 ---
 
-## 7. Hoja de ruta propuesta
+## 7. Hoja de ruta y estado
 
-| Fase | Duración aprox. | Contenido | Resultado visible |
+**Actualizado: 2026-11-25.** Se desarrolla en la rama `development` y, cuando está probado, se fusiona a `main`.
+
+Leyenda: ✅ hecho y probado con tests · 🟡 hecho, falta una comprobación que no se puede hacer en el equipo de desarrollo · ⏳ pendiente · 🔒 bloqueado por algo externo.
+
+### 7.1 Fases de la propuesta original
+
+| Fase | Estado | Qué hay | Qué falta |
 |---|---|---|---|
-| **0. Limpieza** | 1–2 días | Repo ordenado, especificación única, quitar binarios, modelo IA configurable | Nada roto, base clara |
-| **1. Simplificar UX** | 1–2 semanas | 3 verbos, 4 colores, pantalla "Ahora" de una tarjeta, cierre del día | App más ligera de usar |
-| **2. Jarvis v1** | 2–3 semanas | Endpoint con tool calling, memoria básica, briefing de mañana, arranque asistido | Se siente como asistente |
-| **3. Backend único** | 2–3 semanas | FastAPI + SQLite, mismos contratos, HTTPS con Caddy | Arranca con poca RAM |
-| **4. Frontend modular** | continuo | Vite, módulos, componentes vista a vista, E2E en CI | Cambios seguros y rápidos |
-| **5. Integraciones** | 2 semanas | Google Calendar/Gmail OAuth, avisos de transición, Whisper | Jarvis conoce tu agenda |
-| **6. Móvil nativo** | 1–2 semanas | Capacitor, widget, recordatorios por lugar | Captura y "Ahora" desde la pantalla de bloqueo |
+| **0. Limpieza** | ✅ | Repo ordenado, especificación única ([PRODUCTO.md](PRODUCTO.md)), modelo de IA configurable | Borrar del disco `data/` y `backend/data/` (bases H2 antiguas, fuera de git) |
+| **1. Simplificar UX** | ✅ | 3 secciones, 4 colores + Luego, tarjeta «Ahora», energía, «No sé por dónde empezar» | Recordatorios por lugar (necesita app nativa con geolocalización) |
+| **2. Jarvis v1** | ✅ | Herramientas, memoria, resumen del día, voz de entrada y salida | Activarlo con `ANTHROPIC_API_KEY`; avisos de transición antes de un evento (depende del calendario, Fase 5) |
+| **3. Backend único** | ✅ | Python + SQLite, mismos contratos; HTTPS con Caddy (perfil `https`) | Retirar la carpeta `backend/` (Spring) cuando confirmes que la migración está cerrada |
+| **4. Frontend modular** | 🟡 | Acciones `data-on-*`, plantillas que escapan, ESLint y comprobación de tipos | Módulos ES con un bundle, componentes, store central y E2E con Playwright. A propósito: solo se puede validar en un navegador, con CI |
+| **5. Integraciones** | 🔒 | Nada todavía | Google Calendar y Gmail con OAuth (hace falta tu *Client ID* de Google Cloud); Whisper en servidor para voz en iOS/Firefox |
+| **6. Móvil nativo** | 🟡 | Tres widgets Android (lista de pendientes, añadir pendiente, soltar) | Compilar y probar en un teléfono; Capacitor; widget de «Ahora» |
 
-Cada fase se entrega por separado y deja la app funcionando.
+### 7.2 Fases añadidas (7 a 16)
+
+| Fase | Estado | Qué hace | Dónde |
+|---|---|---|---|
+| **Listas tipo Keep** | ✅ | Listas con casillas y notas, color, fijar, archivar; mezcla entre dispositivos pendiente a pendiente | `js/notas-core.js`, `js/app/views/notas.js`, `server/store.py` |
+| **7. Copias de seguridad** | ✅ | Copia diaria de la base en caliente, con comprobación de integridad y rotación | `server/backup.py` |
+| **8. Secretos cifrados** | ✅ | Con `NEXUS_SECRET_KEY`, la clave VAPID y la contraseña de Gmail se guardan cifradas | `server/secretbox.py` |
+| **9. Errores del navegador** | ✅ | Los fallos de JavaScript llegan al servidor (mensaje, archivo, línea y vista; nunca contenido) | `js/errores.js`, `server/clientlog.py` |
+| **10. Jarvis y las listas** | ✅ | Jarvis añade, consulta y marca en las listas | `js/app/features/jarvis.js`, `jarvis.py` |
+| **11. Acompañamiento** | 🟡 | Pregunta cada 10, 15 o 25 min si sigues con ello; aviso a los 90 min seguidos | `js/foco-core.js`, `js/app/features/acompanamiento.js` |
+| **12. Estimaciones aprendidas** | 🟡 | Compara lo estimado con el foco real y muestra «sueles tardar» | los mismos |
+| **13. Cierre del día** | 🟡 | Tres preguntas en un minuto; «lo primero mañana» abre el resumen de la mañana | los mismos |
+| **14. Revisión semanal** | 🟡 | Lo hecho, pensamientos sin ordenar, proyectos quietos y foco de la semana | los mismos |
+| **15. Android: Soltar y HTTPS local** | 🟡 | Widget «Soltar»; la app acepta certificados instalados por el usuario | `android/app/src/main/java/com/nexus/orb/notas/` |
+| **16. Despliegue** | 🟡 | `deploy.sh` genera la clave de cifrado y conoce el perfil HTTPS; script para restaurar una copia | `deploy.sh`, `scripts/restaurar-copia.sh` |
+
+Qué significa 🟡 en cada caso:
+- **11 a 14**: la lógica y la interfaz pasan sus tests sin navegador; falta verlas en uno real.
+- **15**: sin compilar, porque el equipo de desarrollo no tiene Android SDK.
+- **16**: el script de restauración tiene la sintaxis comprobada, pero no se ha ejecutado contra un servidor en marcha.
+
+### 7.3 Lo que falta, por orden recomendado
+
+1. **Probar en un navegador y en un teléfono** lo marcado 🟡. Es lo único que separa buena parte de lo hecho de estar terminado. La lista está en [GUIA_PENDIENTES.md](GUIA_PENDIENTES.md).
+2. **Compilar la app Android** en Android Studio e instalar los widgets.
+3. **Activar HTTPS** en el servidor (`COMPOSE_PROFILES=https`): sin él, el móvil no permite push ni micrófono.
+4. **Recuperar el CI**: el workflow de GitHub Actions está retirado por el límite de facturación de la cuenta. Sin CI no hay E2E, y sin E2E no conviene terminar la Fase 4.
+5. **Fase 5** cuando tengas el *Client ID* de Google: OAuth sustituye a la contraseña de aplicación de Gmail y trae el calendario.
+6. **Retirar `backend/`** (Spring) y el perfil `legacy` del compose cuando des la migración por cerrada.
+7. Más adelante: Whisper, Capacitor, recordatorios por lugar y terminar la Fase 4.
 
 ---
 
