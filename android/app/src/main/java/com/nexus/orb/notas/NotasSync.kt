@@ -49,6 +49,9 @@ object NotasSync {
                 "add" -> request("POST", "$base/notas/$notaId/items", token,
                     JSONObject().put("id", op.optString("itemId")).put("text", op.optString("text")).put("updatedAt", at))
                 "nota" -> request("POST", "$base/notas", token, op.optJSONObject("nota") ?: JSONObject())
+                // El servidor ignora un segundo envío con el mismo id: reintentar no duplica
+                "pensamiento" -> request("POST", "$base/pensadero", token,
+                    JSONObject().put("id", op.optString("id")).put("content", op.optString("text")))
                 else -> 400 to null
             }.first
             when {

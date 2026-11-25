@@ -24,19 +24,34 @@ class QuickAddActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quick_add)
         setFinishOnTouchOutside(true)
 
+        // El mismo cuadro sirve al widget «Soltar»: entonces va al Pensadero, no a una lista
+        val soltar = intent.getStringExtra(NotasWidgets.EXTRA_MODE) == NotasWidgets.MODE_SOLTAR
         val notaId = intent.getStringExtra(NotasWidgets.EXTRA_NOTA_ID)
         val destino = NotasStore.notas(this).let { all ->
             all.firstOrNull { it.id == notaId && it.kind == "lista" } ?: all.firstOrNull { it.kind == "lista" }
         }
-        findViewById<TextView>(R.id.quick_add_title).text =
-            getString(R.string.quick_add_titulo, destino?.titulo ?: NotasStore.TITULO_POR_DEFECTO)
-
         val field = findViewById<EditText>(R.id.quick_add_text)
         val status = findViewById<TextView>(R.id.quick_add_status)
+        val button = findViewById<Button>(R.id.quick_add_button)
+        findViewById<TextView>(R.id.quick_add_title).text =
+            if (soltar) getString(R.string.soltar_titulo)
+            else getString(R.string.quick_add_titulo, destino?.titulo ?: NotasStore.TITULO_POR_DEFECTO)
+        if (soltar) {
+            field.setHint(R.string.soltar_hint)
+            button.setText(R.string.soltar_boton)
+        }
 
         fun add() {
             val text = field.text.toString().trim()
             if (text.isEmpty()) return
+            if (soltar) {
+                NotasStore.addPensamiento(this, text)
+                field.setText("")
+                status.text = getString(R.string.soltar_hecho, text)
+                status.visibility = View.VISIBLE
+                NotasSync.enqueue(this)
+                return
+            }
             // Siempre a la misma lista, aunque entre medias cambie cuál es la primera
             val titulo = NotasStore.addItem(this, destino?.id ?: notaId, text)
             field.setText("")
@@ -54,7 +69,7 @@ class QuickAddActivity : AppCompatActivity() {
                 false
             }
         }
-        findViewById<Button>(R.id.quick_add_button).setOnClickListener { add() }
+        button.setOnClickListener { add() }
         findViewById<Button>(R.id.quick_add_close).setOnClickListener { finish() }
         field.requestFocus()
     }

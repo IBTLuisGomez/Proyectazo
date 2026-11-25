@@ -21,6 +21,8 @@ object NotasWidgets {
     const val EXTRA_NOTA_ID = "nota_id"
     const val EXTRA_ITEM_ID = "item_id"
     const val EXTRA_DONE = "done"
+    const val EXTRA_MODE = "mode"
+    const val MODE_SOLTAR = "soltar"
 
     private val immutable = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
@@ -35,6 +37,20 @@ object NotasWidgets {
         if (ids.isNotEmpty()) manager.notifyAppWidgetViewDataChanged(ids, R.id.widget_list)
         manager.getAppWidgetIds(ComponentName(context, QuickAddWidgetProvider::class.java))
             .forEach { renderQuickAdd(context, manager, it) }
+    }
+
+    fun renderSoltar(context: Context, manager: AppWidgetManager, widgetId: Int) {
+        val views = RemoteViews(context.packageName, R.layout.widget_soltar)
+        val soltar = Intent(context, QuickAddActivity::class.java)
+            .putExtra(EXTRA_MODE, MODE_SOLTAR)
+            .setData(Uri.parse("nexus://soltar/$widgetId"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        views.setOnClickPendingIntent(R.id.soltar_field, PendingIntent.getActivity(context, widgetId, soltar, immutable))
+        val abrir = Intent(context, MainActivity::class.java)
+            .setData(Uri.parse("nexus://app/$widgetId"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        views.setOnClickPendingIntent(R.id.soltar_open, PendingIntent.getActivity(context, widgetId, abrir, immutable))
+        manager.updateAppWidget(widgetId, views)
     }
 
     fun renderLista(context: Context, manager: AppWidgetManager, widgetId: Int) {
@@ -126,6 +142,15 @@ class NotasWidgetProvider : AppWidgetProvider() {
 class QuickAddWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         ids.forEach { NotasWidgets.renderQuickAdd(context, manager, it) }
+    }
+}
+
+/** Widget «Soltar»: una barra para sacar un pensamiento de la cabeza; llega al Pensadero sin clasificar. */
+class SoltarWidgetProvider : AppWidgetProvider() {
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        ids.forEach { NotasWidgets.renderSoltar(context, manager, it) }
+        // De paso, reintentar lo que quedó pendiente de enviar
+        NotasSync.enqueue(context, goAsync())
     }
 }
 

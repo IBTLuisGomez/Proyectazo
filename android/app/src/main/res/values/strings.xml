@@ -26,6 +26,16 @@
     <string name="quick_add_cerrar">Cerrar</string>
     <string name="quick_add_hecho">✓ «%1$s» añadido a %2$s</string>
 
+    <!-- Widget «Soltar» -->
+    <string name="widget_soltar_nombre">Soltar un pensamiento</string>
+    <string name="widget_soltar_descripcion">Saca algo de la cabeza en un toque; llega al Pensadero para ordenarlo después.</string>
+    <string name="widget_soltar_hint">💭 Soltar un pensamiento…</string>
+    <string name="widget_abrir_nexus">Abrir Nexus Orb</string>
+    <string name="soltar_titulo">Soltar un pensamiento</string>
+    <string name="soltar_hint">¿Qué tienes en la cabeza?</string>
+    <string name="soltar_boton">Soltar</string>
+    <string name="soltar_hecho">✓ Soltado: «%1$s»</string>
+
     <string name="config_titulo">¿Qué lista quieres ver?</string>
     <string name="config_vacio">Aún no hay listas. Coloca el widget y toca + para crear «Pendientes», o créalas en la app (Repasar → Listas).</string>
     <string name="config_aceptar">Colocar</string>

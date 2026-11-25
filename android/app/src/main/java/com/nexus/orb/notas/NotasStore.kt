@@ -142,6 +142,17 @@ object NotasStore {
         return target.titulo
     }
 
+    /**
+     * Pensamiento capturado en el widget «Soltar». No toca las listas: viaja como operación hasta el
+     * Pensadero (POST /api/pensadero, o la app web al abrirse, que además lo clasifica).
+     */
+    fun addPensamiento(context: Context, text: String): Boolean {
+        val clean = text.trim().take(2000)
+        if (clean.isEmpty()) return false
+        addOp(context, JSONObject().put("type", "pensamiento").put("id", newId("pen")).put("text", clean))
+        return true
+    }
+
     private fun addOp(context: Context, op: JSONObject) = synchronized(lock) {
         op.put("opId", newId("op"))
         if (!op.has("at")) op.put("at", now())

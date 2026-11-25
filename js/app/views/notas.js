@@ -506,7 +506,14 @@ defineAppMethods({
     try { ops = JSON.parse(nativo.getWidgetOps() || '[]'); } catch (e) {}
     if (Array.isArray(ops) && ops.length) {
       let cambios = false;
-      for (const op of ops) cambios = NotasCore.aplicarOperacion(this.listaNotas(), op) || cambios;
+      for (const op of ops) {
+        if (op && op.type === 'pensamiento') {
+          // Widget «Soltar»: entra por el mismo embudo que cualquier captura (clasificación, repetidos)
+          if (String(op.text || '').trim()) this.captureThought(String(op.text), { source: 'widget', silent: true });
+          continue;
+        }
+        cambios = NotasCore.aplicarOperacion(this.listaNotas(), op) || cambios;
+      }
       this.saveState();
       try { nativo.ackWidgetOps(JSON.stringify(ops.map(op => op.opId))); } catch (e) {}
       if (cambios) {

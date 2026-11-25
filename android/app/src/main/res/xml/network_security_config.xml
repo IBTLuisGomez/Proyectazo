@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Confía también en los certificados que el usuario instala en el teléfono. Hace falta para el HTTPS
+  de la red local (docs/GUIA_PENDIENTES.md, 2.2): el certificado lo emite la autoridad interna de Caddy
+  y Android, por defecto, solo acepta en las apps los de las autoridades públicas.
+  El tráfico sin cifrar sigue permitido porque el servidor puede estar en http://192.168.x.x.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
