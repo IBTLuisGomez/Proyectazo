@@ -40,6 +40,7 @@ defineAppMethods({
       this.timer.intervalId = setInterval(() => {
         this.timer.secondsLeft = Math.max(0, Math.ceil((this.timer.endAt - Date.now()) / 1000));
         this.updateTimerDisplay();
+        this.focoTick(); // acompañamiento, aviso de hiperfoco y tiempo real por tarea
         if (this.timer.secondsLeft <= 0) {
           clearInterval(this.timer.intervalId);
           this.timer.isRunning = false;

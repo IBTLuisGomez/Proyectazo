@@ -6,7 +6,7 @@ const proyecto = {
   app: 'writable', NexusHiveBrainApp: 'readonly', ProyectazoApp: 'readonly', defineAppMethods: 'readonly',
   SMOKE_PALETTE: 'readonly', SMOKE_GROUPS: 'readonly', SMOKE_TAGS: 'readonly', SMOKE_VISIBLE_KEYS: 'readonly',
   categoriaVisible: 'readonly', etiquetaDe: 'readonly',
-  CLASIFICADOR_REGLAS: 'readonly', CapturaParser: 'readonly', NotasCore: 'readonly', NexusIDB: 'readonly', PensaderoShaderEngine: 'readonly',
+  CLASIFICADOR_REGLAS: 'readonly', CapturaParser: 'readonly', NotasCore: 'readonly', FocoCore: 'readonly', NexusAhora: 'readonly', NexusIDB: 'readonly', PensaderoShaderEngine: 'readonly',
   html: 'readonly', raw: 'readonly', accion: 'readonly',
   module: 'readonly', require: 'readonly'
 };

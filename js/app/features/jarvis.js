@@ -400,6 +400,11 @@ defineAppMethods({
     const urgent = (this.state.pensadero || []).filter(x => !x.inBaul && x.category === 'humo_rojo' && !x.isResolved);
     const hour = new Date().getHours();
     parts.push(html`<strong>${hour < 13 ? '☀️ Buenos días' : hour < 20 ? '🌤️ Buenas tardes' : '🌙 Buenas noches'}.</strong>`);
+    // Lo que la persona dejó dicho al cerrar el día y en la revisión semanal (acompanamiento.js)
+    const primero = this.primeroDeHoy ? this.primeroDeHoy() : '';
+    if (primero) parts.push(html`🌅 Ayer dejaste dicho que lo primero es: <em>${primero}</em>.`);
+    const semana = this.semanaActual ? this.semanaActual() : null;
+    if (semana && semana.focos) parts.push(html`🧭 Tu foco de la semana: ${semana.focos}.`);
     if (due.length) parts.push(html`📅 Para hoy: ${due.slice(0, 3).map(d => d.title).join(' · ')}${due.length > 3 ? ` y ${due.length - 3} más` : ''}.`);
     if (urgent.length) parts.push(html`🔴 ${urgent.length === 1 ? 'Hay 1 cosa urgente' : `Hay ${urgent.length} cosas urgentes`} en Soltar.`);
     const active = projects.find(p => p.status === 'en_ejecucion') || projects[0];

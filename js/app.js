@@ -1533,6 +1533,8 @@ class NexusHiveBrainApp {
     this.maybeStartOnboarding();
     // Resumen del día (una vez al día); se espera a que carguen los datos
     setTimeout(() => { try { this.maybeShowBriefing(); } catch (e) {} }, 2500);
+    // Más tarde y de uno en uno: ofrecer cerrar el día o la revisión semanal (acompanamiento.js)
+    setTimeout(() => { try { this.ofrecerRutinas(); } catch (e) {} }, 20000);
   }
 
   logout() {

@@ -90,7 +90,6 @@ defineAppMethods({
       title: activeProject.nextAction || 'Avanzar en el micro-paso de 15 minutos',
       notes: ''
     };
-    const estimate = NexusAhora.EFFORT_MINUTES[activeTask.effort];
     const energyBtn = (key, label) => `<button type="button" onclick="app.setEnergyToday('${key}')" aria-pressed="${energy === key}"
       class="min-h-[44px] px-3 rounded-full text-xs font-semibold border transition ${energy === key ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-200' : 'border-slate-800 text-slate-400 hover:text-slate-200'}">${label}</button>`;
 
@@ -121,7 +120,7 @@ defineAppMethods({
             <h1 class="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight leading-snug mt-1">
               ${this.escapeHtml(activeTask.title)}
             </h1>
-            ${estimate ? `<span class="mt-1.5 text-xs font-mono text-slate-400">⏱ ~${estimate} min</span>` : ''}
+            ${this.renderEstimacion(activeTask)}
             ${activeTask.notes ? `<p class="text-xs text-slate-400 mt-1 max-w-md italic truncate">"${this.escapeHtml(activeTask.notes)}"</p>` : ''}
           </div>
 
@@ -245,6 +244,9 @@ defineAppMethods({
             </div>
           </div>
         </section>
+
+        <!-- 5. ACOMPAÑAMIENTO Y RUTINAS (js/app/features/acompanamiento.js) -->
+        ${this.renderRutinasBar()}
 
       </div>
     `;
@@ -373,6 +375,7 @@ defineAppMethods({
       if (t) {
         t.column = 'victorias';
         t.updatedAt = new Date().toISOString();
+        this.registrarEstimacion(t); // lo estimado frente al foco real (js/app/features/acompanamiento.js)
         this.saveState();
         if (this.backendAvailable) {
           fetch(`${this.API_BASE}/tasks/${taskId}/move`, {
