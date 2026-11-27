@@ -4,6 +4,7 @@
 const NexusIDB = (() => {
   const DB_NAME = 'nexus-orb';
   const STORE = 'kv';
+  /** @type {Promise<IDBDatabase> | null} */
   let dbPromise = null;
 
   function available() {

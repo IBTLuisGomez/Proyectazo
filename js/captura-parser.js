@@ -172,6 +172,7 @@ const CapturaParser = (() => {
    */
   function parseIdea(text, now = new Date()) {
     let t = cleanDictation(text);
+    /** @type {string | null} */
     let category = null;
     for (const [re, cat] of COMMANDS) {
       if (re.test(t)) {
@@ -180,15 +181,18 @@ const CapturaParser = (() => {
         break;
       }
     }
+    /** @type {string | null} */
     let projectName = null;
     const pm = t.match(/^(?:para|en|proyecto)\s+([^:]{2,40}?)\s*:\s*/i);
     if (pm) {
       projectName = pm[1].trim();
       t = t.slice(pm[0].length);
     }
+    /** @type {number | null} */
     let amount = null;
     const am = t.match(/\$\s?(\d[\d.,]*)|(\d[\d.,]*)\s?(pesos|mxn|usd|dolares|dólares|euros|€)/i);
     if (am) amount = parseFloat((am[1] || am[2]).replace(/[.,](?=\d{3}\b)/g, '').replace(',', '.'));
+    /** @type {string | null} */
     let contactName = null;
     const cm = t.match(/@([\p{L}][\p{L}\d_.-]{1,30})/u) || t.match(/\b(?:[Ll]lamar|[Ee]scribirle|[Ee]scribir|[Hh]ablar con|[Mm]ensaje a|[Cc]umplea[nñ]os de)\s+(?:a\s+)?([A-ZÁÉÍÓÚÑ][\p{L}]+)/u);
     if (cm) contactName = cm[1];
