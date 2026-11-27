@@ -28,7 +28,6 @@ class NexusHiveBrainApp {
     this.currentView = 'soltar';
     this.hacerMode = 'lista'; // 'lista' | 'tablero'
     this.activeFilterEnergy = 'all'; // 'all' | 'baja' | 'media' | 'alta'
-    this.batteryLevel = 100; // 100 | 50 | 20
     this.selectedKanbanProjectId = null;
     this.backendAvailable = false;
     this.tareasFilter = 'all'; // 'all' | 'enfoco' | 'proximo' | 'buzon' | 'cooling' | 'victorias'
@@ -46,7 +45,8 @@ class NexusHiveBrainApp {
       isRunning: false,
       intervalId: null
     };
-    this.colors = ['#10b981', '#3b82f6', '#06b6d4', '#f59e0b', '#8b5cf6', '#ec4899', '#f43f5e', '#64748b'];
+    // Paleta rápida de proyectos (además hay selector libre en el formulario)
+    this.colors = ['#10b981', '#22c55e', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#f43f5e', '#f97316', '#f59e0b', '#64748b'];
 
     // Freeform canvas state
     this.freeform = {
@@ -157,6 +157,23 @@ class NexusHiveBrainApp {
     }
     if (!Array.isArray(this.state.notas)) {
       this.state.notas = [];
+    }
+    this.migrateSubstepsToSteps();
+  }
+
+  // Trabajo Profundo guardaba micro-pasos en task.substeps; ahora todo vive en task.steps (js/pasos-core.js).
+  // Se mezclan sin repetir textos y substeps queda como [] (no null: el servidor ignora null y lo conservaría).
+  migrateSubstepsToSteps() {
+    if (typeof PasosCore === 'undefined') return;
+    for (const p of this.state.projects || []) {
+      for (const t of p.tasks || []) {
+        if (!Array.isArray(t.substeps) || !t.substeps.length) continue;
+        const vistos = new Set((t.steps || []).map(s => String(s.text || '').toLowerCase()));
+        const nuevos = t.substeps.filter(s => s && s.text && !vistos.has(String(s.text).toLowerCase()));
+        t.steps = PasosCore.normalizar([...(t.steps || []), ...nuevos]);
+        t.substeps = [];
+        t.updatedAt = new Date().toISOString();
+      }
     }
   }
 
@@ -775,6 +792,8 @@ class NexusHiveBrainApp {
       this.state.settings.theme = themeName;
       this.saveState();
     }
+    // Con movimiento reducido el orbe no tiene bucle: repintarlo para que adopte el tema
+    if (this.shaderEngine && !this.shaderEngine.animId) this.shaderEngine.renderFrame();
   }
 
   cycleTheme() {
@@ -2178,30 +2197,6 @@ class NexusHiveBrainApp {
     if (projectId) this.openCheckout(projectId);
   }
 
-  // --- DESCOMPONEDOR DE TAREAS (MASTICADOR) ---
-  promptMasticarTask(taskTitle) {
-    const text = prompt("¿Qué tarea sientes abrumadora?", taskTitle || "");
-    if (!text || !text.trim()) return;
-
-    const p = this.state.projects.find(x => x.id === this.selectedKanbanProjectId) || this.state.projects[0];
-    if (!p) return;
-
-    const step1 = `1. Preparar recursos para: ${text.slice(0, 30)}`;
-    const step2 = `2. Primer borrador / estructura de: ${text.slice(0, 30)}`;
-    const step3 = `3. Revisión rápida y conclusión de: ${text.slice(0, 30)}`;
-
-    if (!p.tasks) p.tasks = [];
-    p.tasks.push(
-      { id: this.uid(), title: step1, column: 'proximo', effort: 'S', createdAt: new Date().toISOString() },
-      { id: this.uid(), title: step2, column: 'proximo', effort: 'S', createdAt: new Date().toISOString() },
-      { id: this.uid(), title: step3, column: 'proximo', effort: 'S', createdAt: new Date().toISOString() }
-    );
-
-    this.saveState();
-    this.render();
-    alert(`✓ ¡Tarea masticada! Se crearon 3 micro-pasos ligeros en 'Próximo Paso' de ${p.name}.`);
-  }
-
   // --- BACKEND SPRING BOOT SYNC ---
   async checkBackendConnection() {
     if (!navigator.onLine) {
@@ -2308,6 +2303,7 @@ class NexusHiveBrainApp {
       this.state.notas = NotasCore.mezclarListas(this.state.notas, data.notas);
       this.publicarNotasEnWidget();
     }
+    this.mezclarModulosRemotos(data);
     if (typeof this.cleanDuplicateThoughts === 'function') this.cleanDuplicateThoughts();
   }
 
@@ -2346,7 +2342,8 @@ class NexusHiveBrainApp {
         projects: this.changedSince(this.state.projects, since),
         inbox: this.changedSince(this.state.inbox, since),
         pensadero: this.changedSince(this.state.pensadero, since),
-        notas: this.changedSince(this.state.notas, since)
+        notas: this.changedSince(this.state.notas, since),
+        modulos: this.cambiosDeModulos(since)
       };
       const res = await fetch(`${this.API_BASE}/sync`, {
         method: 'POST',
@@ -2375,21 +2372,41 @@ class NexusHiveBrainApp {
     const container = document.getElementById('project-color-picker');
     if (!container) return;
     container.innerHTML = this.colors.map(c => `
-      <button type="button" onclick="app.selectProjectColor('${c}')" class="color-chip w-6 h-6 rounded-full border-2 transition-all ${c === '#10b981' ? 'scale-110 border-white' : 'border-transparent'}" style="background-color: ${c};" data-color="${c}"></button>
+      <button type="button" onclick="app.selectProjectColor('${c}')" class="color-chip w-7 h-7 rounded-full transition-all" style="background-color: ${c};" data-color="${c}" aria-label="Color ${c}" title="${c}"></button>
     `).join('');
   }
 
   selectProjectColor(color) {
+    // Acepta solo #rrggbb: el valor acaba en estilos en línea
+    if (!/^#[0-9a-f]{6}$/i.test(String(color || ''))) return;
+    color = color.toLowerCase();
     document.getElementById('project-form-color').value = color;
+    const custom = document.getElementById('project-form-color-custom');
+    if (custom && custom.value.toLowerCase() !== color) custom.value = color;
+    const hex = document.getElementById('project-form-color-hex');
+    if (hex) hex.textContent = color;
     document.querySelectorAll('.color-chip').forEach(btn => {
-      if (btn.getAttribute('data-color') === color) {
-        btn.classList.add('scale-110', 'border-white');
-        btn.classList.remove('border-transparent');
-      } else {
-        btn.classList.remove('scale-110', 'border-white');
-        btn.classList.add('border-transparent');
-      }
+      const on = btn.getAttribute('data-color') === color;
+      // Anillo con separación: se ve igual en tema claro y oscuro
+      btn.style.boxShadow = on ? `0 0 0 2px var(--bg-card), 0 0 0 4px ${color}` : 'none';
+      btn.style.transform = on ? 'scale(1.1)' : '';
+      btn.setAttribute('aria-pressed', String(on));
     });
+    this.updateProjectFormPreview();
+  }
+
+  // Vista previa del formulario de proyecto: refleja emoji, nombre, descripción y color al escribir
+  updateProjectFormPreview() {
+    const val = id => (document.getElementById(id)?.value || '').trim();
+    const box = document.getElementById('project-form-preview');
+    if (!box) return;
+    const color = val('project-form-color') || '#10b981';
+    box.style.borderLeft = `6px solid ${color}`;
+    box.style.background = `color-mix(in srgb, ${color} 10%, var(--bg-card-subtle))`;
+    const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    set('project-form-preview-emoji', val('project-form-emoji') || '⚡');
+    set('project-form-preview-name', val('project-form-name') || 'Nuevo proyecto');
+    set('project-form-preview-desc', val('project-form-description') || val('project-form-objective') || 'Sin descripción');
   }
 
   updateBadges() {
@@ -2416,21 +2433,25 @@ class NexusHiveBrainApp {
     }
 
     const topRed = redItems[0];
-    bar.className = 'sticky top-16 z-40 bg-gradient-to-r from-rose-950 via-rose-900 to-slate-950 border-b border-rose-500/50 px-4 py-2.5 shadow-xl shadow-rose-950/40 text-xs flex flex-wrap items-center justify-between gap-3 text-rose-100 animate-pulse';
+    // Aviso tranquilo: sin rojo parpadeante ni contador de "fuegos" (principio Sin culpa).
+    // Informa de lo que tiene fecha y ofrece hacerlo o verlo; nada más.
+    const otros = redItems.length - 1;
+    bar.className = 'aviso-urgente sticky top-16 z-40 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2';
     bar.innerHTML = `
-      <div class="flex items-center gap-2.5">
-        <span class="px-2.5 py-0.5 rounded-full bg-rose-700 text-white font-black text-[10px] uppercase tracking-wider shadow">🚨 FUEGO ACTIVO (${redItems.length})</span>
-        <span class="font-bold text-white text-xs sm:text-sm line-clamp-1">${this.escapeHtml(topRed.content)}</span>
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-base" aria-hidden="true">📌</span>
+        <span class="font-semibold text-xs sm:text-sm line-clamp-1">${this.escapeHtml(topRed.content)}</span>
+        ${otros > 0 ? `<span class="text-[11px] theme-text-muted shrink-0">y ${otros} más con fecha</span>` : ''}
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="app.syncRedSmokeToGoogle('${topRed.id}', '${this.uriArg(topRed.content)}')" class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow transition flex items-center gap-1" title="Sincronizar con Google Calendar">
-          <span>📅</span> Google Sync
+      <div class="flex items-center gap-1.5">
+        <button onclick="app.resolveRedSmoke('${topRed.id}')" class="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1" title="Ya está">
+          <span>✓</span> Hecho
         </button>
-        <button onclick="app.resolveRedSmoke('${topRed.id}')" class="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition flex items-center gap-1" title="Marcar como atendido">
-          <span>✓</span> Apagar Fuego
+        <button onclick="app.syncRedSmokeToGoogle('${topRed.id}', '${this.uriArg(topRed.content)}')" class="px-2.5 py-1 rounded-xl theme-card-subtle border theme-border text-xs font-semibold transition" title="Ponerlo en Google Calendar">
+          📅
         </button>
-        <button onclick="app.navigate('pensadero'); app.filterPensaderoSmoke('humo_rojo');" class="px-2.5 py-1 rounded-xl bg-slate-800 text-rose-300 hover:text-white text-xs font-semibold">
-          Ver todos (${redItems.length}) →
+        <button onclick="app.navigate('pensadero'); app.filterPensaderoSmoke('humo_rojo');" class="px-2.5 py-1 rounded-xl theme-card-subtle border theme-border text-xs font-semibold transition">
+          Ver
         </button>
       </div>
     `;
@@ -2500,7 +2521,7 @@ class NexusHiveBrainApp {
         bitacora: '📜 Bitácora',
         radar: '📡 Radar de Enfoque'
       };
-      sub.textContent = titles[viewName] || 'NexusHiveBrain';
+      sub.textContent = titles[viewName] || this.tituloModulo(viewName) || 'NexusHiveBrain';
     }
 
     // Destacar botones en Desktop Nav
@@ -2598,13 +2619,14 @@ class NexusHiveBrainApp {
         this.renderViewBaul(target);
         break;
       default:
-        this.renderViewAhora(target);
+        // Fichas de los módulos opcionales (js/app/features/modulos.js)
+        if (!this.renderVistaModulo(target)) this.renderViewAhora(target);
     }
   }
 
   // Vistas que viven como fichas dentro de "Repasar"
   static get REPASAR_VIEWS() {
-    return ['hacer', 'notas', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas'];
+    return ['hacer', 'notas', 'hoy', 'freeform', 'bitacora', 'radar', 'baul', 'mas', ...ModulosCore.vistas()];
   }
 
   // Contenedor donde pinta la vista actual (dentro de Repasar es el panel bajo las fichas)

@@ -186,7 +186,8 @@ def test_sync_gana_lo_mas_nuevo_y_conserva_campos(api):
     assert api.call("POST", "/api/sync", {"wipe": True})[0] == 428  # sin confirmación no se borra nada
     assert api.call("GET", "/api/sync")[1]["projects"]
     status, data, _ = api.call("POST", "/api/sync", {"wipe": True}, headers={"X-Confirm-Wipe": "BORRAR-TODO"})
-    assert data == {"projects": [], "inbox": [], "pensadero": [], "notas": []}
+    vacio = {"habits": [], "people": [], "expenses": [], "energy": []}
+    assert data == {"projects": [], "inbox": [], "pensadero": [], "notas": [], "modulos": vacio}
 
 
 def test_push_un_aviso_por_tarea_y_envio(api):
@@ -379,3 +380,55 @@ def test_errores_del_cliente(api):
     assert api.call("POST", "/api/client-errors", {"stack": "sin mensaje"})[1] == {"stored": False}
     rows = api.call("GET", "/api/client-errors")[1]
     assert len(rows) == 1 and rows[0]["message"].startswith("Cannot read") and rows[0]["view"] == "notas"
+
+
+# ---------------- Módulos opcionales (hábitos, personas, gastos, energía) ----------------
+def test_modulos_sync_gana_el_mas_reciente_y_lo_borrado_no_resucita(api):
+    api.login()
+    habito = {"id": "h1", "name": "Agua", "updatedAt": T1, "createdAt": T1, "marks": {}}
+    data = api.call("POST", "/api/sync", {"modulos": {"habits": [habito], "energy": [{"id": "2026-01-01", "level": "alta", "updatedAt": T1}]}})[1]
+    assert [h["name"] for h in data["modulos"]["habits"]] == ["Agua"]
+    assert data["modulos"]["energy"][0]["level"] == "alta"
+    # Una versión más nueva sustituye; una más vieja no
+    api.call("POST", "/api/sync", {"modulos": {"habits": [dict(habito, name="Agua con limón", updatedAt=T3)]}})
+    data = api.call("POST", "/api/sync", {"modulos": {"habits": [dict(habito, name="Viejo", updatedAt=T2)]}})[1]
+    assert data["modulos"]["habits"][0]["name"] == "Agua con limón"
+    # Borrar deja solo la marca, y una copia vieja no lo devuelve
+    borrado = {"id": "h1", "deleted": True, "updatedAt": "2026-01-01T13:00:00.000Z", "name": "sobra"}
+    data = api.call("POST", "/api/sync", {"modulos": {"habits": [borrado]}})[1]
+    assert data["modulos"]["habits"] == [{"id": "h1", "deleted": True, "createdAt": None, "updatedAt": "2026-01-01T13:00:00.000Z"}]
+    data = api.call("POST", "/api/sync", {"modulos": {"habits": [habito]}})[1]
+    assert data["modulos"]["habits"][0].get("deleted") is True
+
+
+def test_modulos_mezcla_las_marcas_dia_a_dia(api):
+    api.login()
+    movil = {"id": "h1", "name": "Agua", "updatedAt": T3, "marks": {"2026-01-02": {"done": True, "at": T3}}}
+    pc = {"id": "h1", "name": "Agua", "updatedAt": T2,
+          "marks": {"2026-01-01": {"done": True, "at": T2}, "2026-01-02": {"done": False, "at": T1}}}
+    for primero, segundo in ((movil, pc), (pc, movil)):
+        api.call("POST", "/api/sync", {"wipe": True}, headers={"X-Confirm-Wipe": "BORRAR-TODO"})
+        api.call("POST", "/api/sync", {"modulos": {"habits": [primero]}})
+        marks = api.call("POST", "/api/sync", {"modulos": {"habits": [segundo]}})[1]["modulos"]["habits"][0]["marks"]
+        assert marks == {"2026-01-01": {"done": True, "at": T2}, "2026-01-02": {"done": True, "at": T3}}
+
+
+def test_modulos_ignora_lo_no_valido_y_separa_cuentas(api):
+    api.login()
+    basura = {"secretos": [{"id": "x", "updatedAt": T1}], "people": ["texto", {"sin": "id"}, {"id": "p1", "name": "Ana", "ownerId": 99, "_interno": 1}],
+              "expenses": [{"id": "g1", "amount": 65, "note": "x" * 50000}]}
+    data = api.call("POST", "/api/sync", {"modulos": basura})[1]["modulos"]
+    assert set(data) == {"habits", "people", "expenses", "energy"}
+    assert data["expenses"] == [], "un documento enorme no se guarda"
+    assert len(data["people"]) == 1 and "ownerId" not in data["people"][0] and "_interno" not in data["people"][0]
+    assert data["people"][0]["updatedAt"], "sin fecha se le pone la del servidor"
+    assert api.call("POST", "/api/sync", {"modulos": "no es un objeto"})[0] == 200
+    # Otra cuenta no ve nada y puede usar el mismo id
+    db = api.db
+    otra =db.execute("INSERT INTO users(username, password_hash) VALUES ('beto', 'x')").lastrowid
+    from server.store import Store
+    store = Store(db)
+    assert store.list_modulos(otra)["people"] == []
+    store.save_modulos(otra, {"people": [{"id": "p1", "name": "Otra Ana", "updatedAt": T3}]})
+    assert api.call("GET", "/api/sync")[1]["modulos"]["people"][0]["name"] == "Ana"
+    assert store.list_modulos(otra)["people"][0]["name"] == "Otra Ana"

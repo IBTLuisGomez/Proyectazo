@@ -1,0 +1,98 @@
+/* ==========================================================================
+   TEMA CLARO — capa de superficies
+   La interfaz se escribió con superficies oscuras fijas (bg-slate-900, bg-slate-950/80…).
+   En el tema claro esas superficies se quedaban negras sobre fondo blanco: islas oscuras,
+   mucho contraste y ruido visual (justo lo que el TDAH no necesita).
+   Aquí se traducen a las variables del tema. El texto lo corrige js/app/ui/contraste.js
+   midiendo el fondo real, así que basta con aclarar fondos y bordes.
+
+   Excepción: lo que deba seguir oscuro a propósito (vídeo de inicio, Modo 1 Cosa,
+   bloques de código) lleva la clase .keep-dark y se respeta junto con todo su interior.
+   ========================================================================== */
+
+/* --- Superficies neutras --- */
+html.theme-light :is(.bg-slate-950, .bg-slate-900, .bg-slate-950\/95, .bg-slate-950\/90, .bg-slate-900\/95, .bg-slate-900\/90):not(.keep-dark):not(.keep-dark *) {
+  background-color: var(--bg-card) !important;
+}
+html.theme-light :is(.bg-slate-950\/80, .bg-slate-950\/70, .bg-slate-900\/80, .bg-slate-900\/70, .bg-slate-800, .bg-slate-800\/90, .bg-slate-800\/80):not(.keep-dark):not(.keep-dark *) {
+  background-color: var(--bg-card-subtle) !important;
+}
+html.theme-light :is(.bg-slate-950\/60, .bg-slate-950\/40, .bg-slate-900\/60, .bg-slate-900\/40, .bg-slate-900\/30, .bg-slate-800\/60, .bg-slate-800\/40, .bg-slate-700\/60):not(.keep-dark):not(.keep-dark *) {
+  background-color: rgba(148, 163, 184, 0.10) !important;
+}
+html.theme-light .bg-slate-700:not(.keep-dark):not(.keep-dark *) {
+  background-color: #cbd5e1 !important;
+}
+html.theme-light :is(.hover\:bg-slate-800, .hover\:bg-slate-700, .hover\:bg-slate-700\/50):not(.keep-dark):not(.keep-dark *):hover {
+  background-color: var(--bg-card-hover) !important;
+}
+
+/* --- Bordes --- */
+html.theme-light :is(.border-slate-800, .border-slate-800\/90, .border-slate-800\/80, .border-slate-800\/70, .border-slate-700, .border-slate-700\/80, .border-slate-700\/60, .border-slate-700\/50):not(.keep-dark):not(.keep-dark *) {
+  border-color: var(--border-color) !important;
+}
+html.theme-light :is(.border-slate-600, .border-slate-600\/50, .hover\:border-slate-700:hover, .hover\:border-slate-600:hover):not(.keep-dark):not(.keep-dark *) {
+  border-color: var(--border-highlight) !important;
+}
+
+/* --- Grises claros pensados para fondo oscuro: en claro son texto principal/secundario.
+   (El guardián de contraste solo mide texto con letras; esto cubre también símbolos como «+».) */
+html.theme-light :is(.text-slate-100, .text-slate-200):not(.keep-dark):not(.keep-dark *) { color: var(--text-main) !important; }
+html.theme-light .text-slate-300:not(.keep-dark):not(.keep-dark *) { color: var(--text-muted) !important; }
+html.theme-light select:not(.keep-dark *) { color: var(--text-main) !important; }
+html.theme-light option { background: #ffffff; color: #0f172a; }
+
+/* --- Texto que pasa a blanco al pasar el ratón: en claro, al color principal --- */
+html.theme-light .hover\:text-white:not(.keep-dark):not(.keep-dark *):hover {
+  color: var(--text-main) !important;
+}
+
+/* Sombras: en claro, suaves (las de los temas oscuros son casi negras) */
+html.theme-light :is(.shadow-2xl, .shadow-xl):not(.keep-dark):not(.keep-dark *) {
+  box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.18) !important;
+}
+
+/* --- Cuenca del orbe (Soltar) --- */
+html.theme-light .pensadero-basin {
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, #eef3f9 55%, #e3ebf5 100%) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 12px 40px -18px rgba(8, 145, 178, 0.35), inset 0 0 40px rgba(124, 58, 237, 0.05) !important;
+}
+html.theme-light .orb-ring-outer {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: #dbe4ef !important;
+  box-shadow: 0 18px 50px -20px rgba(15, 23, 42, 0.25) !important;
+}
+html.theme-light .orb-ring-inner {
+  background: #f8fafc !important;
+}
+html.theme-light #nexus-orb-glow { opacity: 0.35 !important; }
+
+/* Barras degradadas oscuras de la cabecera del orbe a pantalla completa */
+@media (max-width: 1279px) {
+  html.theme-light body.orb-fullview header {
+    background: linear-gradient(180deg, rgba(240, 244, 249, 0.92) 0%, transparent 100%) !important;
+  }
+  html.theme-light body.orb-fullview #mobile-nav-shell {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.96) 0%, transparent 100%) !important;
+    border-top-color: #e2e8f0 !important;
+  }
+}
+
+/* --- Aviso de urgentes: tranquilo en todos los temas (sin rojo parpadeante) --- */
+.aviso-urgente {
+  background: color-mix(in srgb, #f59e0b 12%, var(--bg-card));
+  border-bottom: 1px solid color-mix(in srgb, #f59e0b 35%, transparent);
+  color: var(--text-main);
+}
+
+/* --- Micro-pasos de tareas --- */
+.paso-barra { height: 4px; border-radius: 999px; background: rgba(148, 163, 184, 0.25); overflow: hidden; }
+.paso-barra > span { display: block; height: 100%; border-radius: 999px; transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.paso-hecho { text-decoration: line-through; opacity: 0.6; }
+@keyframes pasoPop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.paso-pop { animation: pasoPop 0.3s ease; }
+
+/* Herramientas secundarias de las tarjetas: plegadas tras «⋯» */
+details.task-tools > summary { list-style: none; cursor: pointer; }
+details.task-tools > summary::-webkit-details-marker { display: none; }

@@ -28,7 +28,8 @@ class PensaderoShaderEngine {
       sink: 0.0,
       expansion: 0.0,
       flash: 0.0,
-      multiColor: 1.0
+      multiColor: 1.0,
+      light: 0.0
     };
     this.target = { ...this.current };
     this.activeCategory = 'humo_general';
@@ -93,6 +94,7 @@ class PensaderoShaderEngine {
       uniform float u_expansion;
       uniform float u_flash;
       uniform float u_multiColor;
+      uniform float u_light; // 0 = temas oscuros, 1 = tema claro (cristal pastel)
 
       // Simplex 3D Noise (Ian McEwan, Stefan Gustavson)
       vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -152,6 +154,8 @@ class PensaderoShaderEngine {
         vec3 colBase = u_coreColor;
         vec3 colHighlight = mix(u_color, vec3(1.0), 0.72);
         vec3 colDark = mix(colBase * 0.12, vec3(0.015, 0.022, 0.038), 0.78);
+        // Tema claro: el interior del cristal es luz pastel en vez de casi negro
+        colDark = mix(colDark, mix(u_color, vec3(0.97, 0.98, 1.0), 0.80), u_light);
 
         // Deformación convectiva térmica del humo (Stitch Reactor Convective Model)
         float t = u_time * (0.35 + u_turbulence * 0.32);
@@ -178,7 +182,7 @@ class PensaderoShaderEngine {
         // Mezcla cromática del humo según el espectro seleccionado
         vec3 smokeColor = mix(colDark, colSmoke, clamp(smoke * 1.45, 0.0, 1.0));
         smokeColor = mix(smokeColor, colBase, clamp(n2 * 0.80, 0.0, 1.0));
-        smokeColor += colHighlight * (coreSpark * (1.25 + u_pulse * 1.6) * pulseMod);
+        smokeColor += colHighlight * (coreSpark * (1.25 + u_pulse * 1.6) * pulseMod) * (1.0 - 0.6 * u_light);
         smokeColor += colSmoke * (rim * (1.5 + u_pulse * 0.85));
 
         // Destello de impacto
@@ -207,7 +211,11 @@ class PensaderoShaderEngine {
         float spec2 = smoothstep(0.24, 0.0, length(uv - lightPos2)) * 0.28;
         finalColor += colHighlight * spec2 * sphereEdge;
 
-        gl_FragColor = vec4(finalColor, clamp(sphereEdge + halo * 0.7, 0.0, 1.0));
+        vec4 darkOut = vec4(finalColor, clamp(sphereEdge + halo * 0.7, 0.0, 1.0));
+        // En claro el halo exterior se compone como tinte (premultiplicado): sumado a blanco desaparecía
+        float haloA = halo * 0.55 * (1.0 - sphereEdge);
+        vec4 lightOut = vec4(finalColor * sphereEdge + colSmoke * haloA, clamp(sphereEdge + haloA, 0.0, 1.0));
+        gl_FragColor = mix(darkOut, lightOut, u_light);
       }
     `;
 
@@ -247,7 +255,8 @@ class PensaderoShaderEngine {
       sink: gl.getUniformLocation(prog, "u_sink"),
       expansion: gl.getUniformLocation(prog, "u_expansion"),
       flash: gl.getUniformLocation(prog, "u_flash"),
-      multiColor: gl.getUniformLocation(prog, "u_multiColor")
+      multiColor: gl.getUniformLocation(prog, "u_multiColor"),
+      light: gl.getUniformLocation(prog, "u_light")
     };
 
     this.startLoop();
@@ -295,7 +304,7 @@ class PensaderoShaderEngine {
       ind.style.boxShadow = `0 0 14px ${meta.hex}`;
     }
     if (lbl) {
-      lbl.textContent = `${meta.icon} ${meta.name}: ${meta.title}`;
+      lbl.textContent = `${meta.icon} ${meta.name}${meta.title && meta.title !== meta.name ? ': ' + meta.title : ''}`;
     }
   }
 
@@ -394,6 +403,11 @@ class PensaderoShaderEngine {
     gl.uniform1f(this.uniforms.expansion, this.current.expansion);
     gl.uniform1f(this.uniforms.flash, this.current.flash);
     gl.uniform1f(this.uniforms.multiColor, this.current.multiColor);
+    // Sigue al tema de <html> sin acoplar el motor al resto de la app
+    this.target.light = document.documentElement.classList.contains('theme-light') ? 1.0 : 0.0;
+    // Sin bucle (movimiento reducido) se aplica de golpe: solo se pinta un fotograma
+    this.current.light = this.animId ? lerp(this.current.light || 0, this.target.light, 0.12) : this.target.light;
+    gl.uniform1f(this.uniforms.light, this.current.light);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }

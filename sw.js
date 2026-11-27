@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexus-orb-v3.17';
+const CACHE_NAME = 'nexus-orb-v3.19';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
   './favicon.svg',
   './assets/tailwind.css',
   './assets/contraste.css',
+  './assets/tema-claro.css',
   './js/errores.js',
   './js/idb-store.js',
   './js/smoke-palette.js',
@@ -13,6 +14,9 @@ const ASSETS_TO_CACHE = [
   './js/captura-parser.js',
   './js/notas-core.js',
   './js/foco-core.js',
+  './js/pasos-core.js',
+  './js/energia-core.js',
+  './js/modulos-core.js',
   './js/orb-shader-engine.js',
   './js/app.js',
   './js/app/views/ahora-hoy.js',
@@ -36,6 +40,12 @@ const ASSETS_TO_CACHE = [
   './js/app/features/fechas.js',
   './js/app/features/jarvis.js',
   './js/app/features/acompanamiento.js',
+  './js/app/features/pasos.js',
+  './js/app/features/energia.js',
+  './js/app/features/modulos.js',
+  './js/app/modulos/habitos.js',
+  './js/app/modulos/personas.js',
+  './js/app/modulos/finanzas.js',
   './js/app/ui/acciones.js',
   './js/app/ui/html.js',
   './assets/nexus_n.jpg',

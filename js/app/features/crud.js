@@ -146,6 +146,7 @@ defineAppMethods({
       document.getElementById('project-form-emoji').value = p.emoji || '⚡';
       document.getElementById('project-form-name').value = p.name || '';
       document.getElementById('project-form-objective').value = p.objective || '';
+      document.getElementById('project-form-description').value = p.description || '';
       document.getElementById('project-form-next-action').value = p.nextAction || '';
       document.getElementById('project-form-keywords').value = p.keywords || '';
       document.getElementById('project-form-status').value = p.status || 'activo';
@@ -158,6 +159,7 @@ defineAppMethods({
       document.getElementById('project-form-emoji').value = '⚡';
       document.getElementById('project-form-name').value = '';
       document.getElementById('project-form-objective').value = '';
+      document.getElementById('project-form-description').value = '';
       document.getElementById('project-form-next-action').value = '';
       document.getElementById('project-form-keywords').value = '';
       document.getElementById('project-form-status').value = 'activo';
@@ -166,7 +168,10 @@ defineAppMethods({
       deleteBtn.classList.add('hidden');
     }
 
+    this.updateProjectFormPreview();
     this.openModal('modal-project');
+    // Editar: el cursor va al nombre, que es lo que más se cambia
+    if (projectId) setTimeout(() => document.getElementById('project-form-name')?.focus(), 80);
   },
 
   submitProjectForm(e) {
@@ -176,6 +181,7 @@ defineAppMethods({
     const name = document.getElementById('project-form-name').value.trim();
     const color = document.getElementById('project-form-color').value;
     const objective = document.getElementById('project-form-objective').value.trim();
+    const description = document.getElementById('project-form-description').value.trim();
     const nextAction = document.getElementById('project-form-next-action').value.trim() || 'Definir primera micro-acción';
     const status = document.getElementById('project-form-status').value;
     const energy = document.getElementById('project-form-energy').value;
@@ -198,7 +204,9 @@ defineAppMethods({
         p.name = name;
         p.color = color;
         p.objective = objective;
+        p.description = description;
         p.nextAction = nextAction;
+        p.updatedAt = new Date().toISOString();
         p.status = status;
         p.energy = energy;
         p.keywords = keywords;
@@ -218,6 +226,7 @@ defineAppMethods({
         emoji: emoji,
         color: color,
         objective: objective,
+        description: description,
         nextAction: nextAction,
         nextActionType: 'hacer',
         status: status,
@@ -243,6 +252,7 @@ defineAppMethods({
     this.saveState();
     this.closeModal('modal-project');
     this.render();
+    this.showToast(id ? `✓ ${emoji} ${name} actualizado` : `✓ ${emoji} ${name} creado`);
   },
 
   deleteCurrentProject() {
@@ -456,6 +466,9 @@ defineAppMethods({
     document.getElementById('edit-task-notes').value = task.notes || '';
     document.getElementById('edit-task-code').value = task.codeSnippet || '';
     document.getElementById('edit-task-due').value = this.dueToInput(task.dueAt);
+    const stepInput = document.getElementById('edit-task-step-input');
+    if (stepInput) stepInput.value = '';
+    this.cargarPasosEdicion(task);
 
     this.openModal('modal-edit-task');
   },
@@ -499,6 +512,9 @@ defineAppMethods({
     task.isBureaucratic = isBureaucratic;
     task.notes = notes || null;
     task.codeSnippet = codeSnippet || null;
+    // Un paso escrito y sin pulsar Enter también cuenta
+    const pendiente = (document.getElementById('edit-task-step-input')?.value || '').trim();
+    task.steps = PasosCore.normalizar([...(this._editSteps || []), ...(pendiente ? [{ text: pendiente }] : [])]);
     // Fecha nueva → mover el aviso push (el servidor reemplaza el pendiente de esta tarea)
     if (dueAt && dueAt !== task.dueAt && this.backendAvailable) this.scheduleBackgroundPush(task.id, title, dueAt).catch(() => {});
     task.dueAt = dueAt;
@@ -515,6 +531,16 @@ defineAppMethods({
     this.closeModal('modal-edit-task');
     this.showToast('✓ Tarea actualizada');
     this.render();
+
+    // Antes los cambios de la tarea solo llegaban al servidor con la sincronización completa
+    if (this.backendAvailable) {
+      const { id: _id, ...campos } = task;
+      fetch(`${this.API_BASE}/tasks/${task.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(campos) // el cambio de proyecto lo lleva la sincronización (projectId es reservado)
+      }).catch(() => {});
+    }
   },
 
   deleteTaskFromEditModal() {

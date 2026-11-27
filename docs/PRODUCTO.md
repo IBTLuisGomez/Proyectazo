@@ -17,7 +17,7 @@ Una persona con TDAH que lleva varios proyectos a la vez. La app debe **quitar d
 |---|---|---|
 | **Soltar** | "Tengo algo en la cabeza" | Orbe, captura por voz/texto, pensamientos recientes y repaso rápido |
 | **Ahora** | "¿Qué hago ya?" | Una tarjeta con la siguiente acción, tiempo estimado, *Empezar*; "No sé por dónde empezar"; energía del día; "Para hoy" plegado |
-| **Repasar** | "¿Cómo voy?" | Fichas: Proyectos · Ideas · Historial · Baúl · Ajustes |
+| **Repasar** | "¿Cómo voy?" | Fichas: Tareas · Listas · Proyectos · Ideas · Historial · Radar · Baúl · Ajustes, más una por cada módulo encendido |
 
 ## Las categorías (4 + Luego)
 Las asigna el clasificador (local) o Jarvis; el usuario solo corrige.
@@ -33,6 +33,10 @@ Las asigna el clasificador (local) o Jarvis; el usuario solo corrige.
 
 Los datos se siguen guardando con las claves antiguas (`humo_*`); la agrupación se hace al mostrar (`categoriaVisible()` en `js/smoke-palette.js`). Así no hay migración ni cambios en el backend.
 
+## Proyectos y micro-pasos
+- **Proyecto**: emoji, nombre, descripción (contexto para tu yo del futuro), objetivo en una frase, color (paleta o cualquiera), estado y energía. Se edita con «✏️ Editar» en el Kanban o en la tarjeta del proyecto.
+- **Micro-pasos** (`task.steps`): una tarea grande se parte en pasos de 5–15 min **dentro de la misma tarjeta**. La tarjeta muestra el progreso y el siguiente paso; Ahora muestra «Solo esto ahora» con un botón grande. 🪄 sugiere pasos con Nexus (o una plantilla de 3 pasos sin IA). Máximo 12 pasos. Modelo en `js/pasos-core.js`.
+
 ## Listas y notas (tipo Keep)
 Ficha **Listas** de Repasar. Para lo que no es de ningún proyecto: compras, recados, pendientes sueltos.
 
@@ -44,13 +48,35 @@ Ficha **Listas** de Repasar. Para lo que no es de ningún proyecto: compras, rec
 
 Detalle técnico: el modelo y la regla de mezcla están en `js/notas-core.js`; la misma regla está en `server/store.py` (`merge_nota`) y en `android/.../notas/NotasStore.kt`. Lo borrado se guarda como marca (`deleted`) para que otro dispositivo no lo resucite.
 
+## Energía del día
+Una sola energía en toda la app (🪫 baja · 🔋 media · ⚡ alta), elegida en Ahora o en Proyectos. Se guarda una vez al día y se sincroniza.
+
+- **Medidor.** La energía da una capacidad en puntos (baja 3 · media 6 · alta 9). Gasta lo que está En foco o tiene fecha hasta hoy: XS 0,5 · S 1 · M 2 · L 3, más 0,25 por micro-paso pendiente. Si se pasa, la barra se pone ámbar y ofrece mover algo a mañana. Nunca rojo, nunca bloquea.
+- **¿Qué cabe ahora?** Ahora propone primero las tareas que caben en la energía que queda; si la propuesta es grande, lo dice.
+- **Incubadora.** Una tarea del Buzón o de Próximo sin fecha que nadie toca en 14 días pasa sola a «Más tarde» (Congelador), con aviso y Deshacer. En la revisión semanal se decide: retomarla o dejarla fuera de la vista.
+
+Detalle técnico: `js/energia-core.js` y `FocoCore.incubables` en `js/foco-core.js`; interfaz en `js/app/features/energia.js`.
+
+## Módulos opcionales
+Se encienden en **Repasar → Ajustes → 🧩 Módulos** y nacen apagados. Regla: un módulo nunca añade una pestaña principal. Aporta una ficha a Repasar, como mucho **una** sugerencia en Ahora («También hoy: …»), una línea al resumen de la mañana y herramientas a Jarvis. Apagarlo conserva sus datos.
+
+| Módulo | Qué hace |
+|---|---|
+| 🌱 **Hábitos** | Rutinas por días de la semana. Racha flexible: un día sin hacerlo no la rompe, dos seguidos sí. Se muestra lo hecho (racha y «esta semana: N veces») |
+| 🫂 **Personas** | Cada cuánto quieres hablar con alguien (semana, dos semanas, mes, tres meses) y su cumpleaños. Avisa de cumpleaños a 7 días y de «hace N días que no hablas con…» |
+| 💸 **Finanzas rápidas** | Gasto en dos toques («café 65», «gasté 200 en super»), también desde Soltar si empieza por gasté/pagué/compré. Totales de la semana y del mes por categoría. En gastos de 500 o más pregunta «¿dopamina rápida o necesidad?». Sin presupuestos ni números rojos |
+
+Los datos se sincronizan entre dispositivos (gana la versión más reciente de cada ficha; las marcas de un hábito se mezclan día a día). Jarvis solo recibe los nombres de hábitos y personas, nunca importes ni notas.
+
+Detalle técnico: registro y mezcla en `js/modulos-core.js` (la misma regla en `server/store.py`, tabla `modulos`); cada módulo en `js/app/modulos/` con `ModulosCore.registrar({...})`; datos en `state.modulos`.
+
 ## Foco acompañado y rutinas
 Al pie de **Ahora**. Todo esto se guarda en el dispositivo y no se sincroniza.
 
 - **Acompañamiento** («Preguntarme si sigo»: No, 10, 15 o 25 min; apagado por defecto). Con el temporizador en marcha pregunta si sigues con la tarea; «Me distraje» lo anota sin culpa. A los 90 minutos seguidos sugiere agua, estirar y comer. Con la app en segundo plano llega como notificación.
 - **Estimaciones aprendidas.** Al registrar un avance se guarda el foco real frente a lo estimado por el tamaño de la tarea. Con tres tareas de un tamaño, Ahora añade «sueles tardar ~N».
 - **Cerrar el día** (un minuto): qué hiciste, qué queda abierto y qué es lo primero mañana. Lo último abre el resumen de la mañana siguiente. A partir de las 18:00 se ofrece una vez si hubo foco ese día.
-- **Revisión semanal** (diez minutos, cuatro pasos): lo hecho, pensamientos sin ordenar, proyectos quietos y el foco de la semana, que aparece en el resumen de cada mañana. Se ofrece una vez de viernes a domingo.
+- **Revisión semanal** (diez minutos, cinco pasos): lo hecho, pensamientos sin ordenar, proyectos quietos, lo que la incubadora mandó a «Más tarde» y el foco de la semana, que aparece en el resumen de cada mañana. Se ofrece una vez de viernes a domingo.
 
 Principio: los resúmenes cuentan lo hecho, nunca lo que falta; los avisos se ofrecen una vez y no insisten.
 
@@ -60,7 +86,7 @@ Límite de tareas en curso, modo Zen con temporizador y ruido marrón, Checkout/
 ## Jarvis (asistente)
 Se abre con el botón 🤖/🎙️ flotante, desde Ajustes o desde el aviso del resumen diario. Se habla o se escribe en lenguaje normal.
 
-- **Qué puede hacer** (herramientas, se ejecutan en el navegador sobre tus datos): soltar un pensamiento, crear una tarea en un proyecto, programar un aviso, ver tareas, añadir a una lista (la crea si no existe), ver las listas y marcar pendientes, recordar un dato sobre ti, arrancar un foco, abrir una sección. No puede borrar nada.
+- **Qué puede hacer** (herramientas, se ejecutan en el navegador sobre tus datos): soltar un pensamiento, crear una tarea en un proyecto, programar un aviso, ver tareas, añadir a una lista (la crea si no existe), ver las listas y marcar pendientes, partir una tarea en micro-pasos y marcarlos, marcar un hábito, apuntar un gasto y anotar que hablaste con alguien (estos tres solo con su módulo encendido), recordar un dato sobre ti, arrancar un foco, abrir una sección. No puede borrar nada.
 - **Memoria**: los datos que le pides recordar y la conversación se guardan en este dispositivo (no en el servidor). 🧹 empieza una conversación nueva; la memoria se conserva.
 - **Proveedor de IA**: `NEXUS_AI_PROVIDER` en `.env` (`claude` o `local`). Sin clave de IA funciona en modo local: lo que digas se guarda en Soltar con el intérprete de siempre (entiende "para <proyecto>: …" y fechas).
 - **Resumen del día**: una vez al día, a partir de las 6:00, al abrir la app: lo que vence hoy, lo urgente, la primera tarea propuesta y un proyecto quieto. Se calcula en el dispositivo, sin IA.

@@ -44,7 +44,10 @@ function fakeApp(state = {}) {
     render() {},
     startQuickReview() { this.calls.push('review'); },
     hibernateProjectWithoutGuilt(id) { this.calls.push(['pausar', id]); this.state.projects.find(p => p.id === id).status = 'hibernado'; },
-    dismissStalledProject(id) { this.calls.push(['seguir', id]); }
+    dismissStalledProject(id) { this.calls.push(['seguir', id]); },
+    // Incubadora (js/app/features/energia.js; sus tests están en energia.test.mjs)
+    incubarAutomatico() { this.calls.push('incubar'); return []; },
+    renderIncubadoraRevision: () => html`<p>Nada esperando en «Más tarde».</p>`
   });
   return app;
 }

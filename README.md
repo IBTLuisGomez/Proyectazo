@@ -42,7 +42,11 @@
 - Al pie de **Ahora**: check-ins durante el foco, aviso a los 90 minutos, cierre del día en un minuto y revisión semanal guiada.
 - La app aprende cuánto tardas de verdad y lo muestra junto a la estimación.
 
-### 9. Operación
+### 9. Energía del día y módulos opcionales
+- **Medidor de energía**: lo que tienes para hoy frente a tu energía (baja, media, alta); Ahora propone primero lo que cabe y lo que lleva 14 días sin tocarse pasa solo a «Más tarde».
+- **Módulos** que se encienden en Ajustes: 🌱 Hábitos (racha flexible), 🫂 Personas (cumpleaños y cada cuánto hablar) y 💸 Finanzas rápidas («café 65»). Ver [docs/PRODUCTO.md](docs/PRODUCTO.md).
+
+### 10. Operación
 - Copia de seguridad diaria de la base de datos, secretos cifrados en reposo (`NEXUS_SECRET_KEY`) y registro de errores del navegador. Detalle en [docs/GUIA_PENDIENTES.md](docs/GUIA_PENDIENTES.md), punto 6.
 - Estado del plan y lo que falta: [docs/PROPUESTA_MEJORA.md](docs/PROPUESTA_MEJORA.md), sección 7.
 
@@ -67,6 +71,7 @@ Proyectazo/
 │   └── importar_postgres.py   # Migración desde la versión anterior (ver docs/MIGRACION.md)
 ├── nexus_service.py, jarvis.py # IA: clasificación, desglose y asistente Jarvis
 ├── js/notas-core.js           # Listas y notas: modelo y mezcla entre dispositivos (vista en js/app/views/notas.js)
+├── js/modulos-core.js         # Registro de módulos opcionales; cada módulo en js/app/modulos/ (hábitos, personas, finanzas)
 ├── android/                   # App Android (WebView) y widgets de listas (app/src/main/java/com/nexus/orb/notas/)
 └── backend/                   # Versión anterior en Spring Boot (se retirará tras migrar)
 ```
@@ -109,7 +114,7 @@ La imagen de nginx lo recompila sola en `docker compose build`.
 ### Tests
 ```bash
 python -m pytest -q tests          # backend único (API, sync, push, migración), IA y Jarvis
-node --test tests/js/*.test.mjs    # captura, categorías, herramientas de Jarvis y listas
+node --test tests/js/*.test.mjs    # captura, categorías, Jarvis, listas, energía, módulos y carga de la app completa
 ```
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) ejecuta ambos, compila el CSS, valida la sintaxis de todo `js/` y construye las imágenes Docker.
 
@@ -131,3 +136,4 @@ docker exec nexus-frontend nginx -s reload
 - 📱 **[Guía de Usuario para Aplicación Móvil](docs/GUIA_USUARIO_MOVIL.md)**
 - 📖 **[Especificación vigente del producto](docs/PRODUCTO.md)**
 - 🗺️ **[Propuesta de mejora y hoja de ruta](docs/PROPUESTA_MEJORA.md)**
+- 🐝 **[Ecosistema Hive Brain: módulos, qué quitar y qué añadir](docs/ECOSISTEMA_HIVEBRAIN.md)**

@@ -217,6 +217,13 @@ defineAppMethods({
     if (listas.length) lines.push(`Listas: ${listas.slice(0, 20).map(n => `${n.title} (${NotasCore.pendientes(n).length} pendientes)`).join('; ')}`);
     const due = this.dueItems ? this.dueItems() : [];
     if (due.length) lines.push(`Para hoy: ${due.slice(0, 5).map(d => d.title).join('; ')}`);
+    // Módulos opcionales encendidos (js/app/features/modulos.js): solo nombres, nunca importes ni notas
+    if (this.moduloActivo) {
+      const nombres = col => this.modVivos(col).map(d => d.name).filter(Boolean).slice(0, 20).join(', ') || 'ninguno';
+      if (this.moduloActivo('habitos')) lines.push(`Hábitos: ${nombres('habits')}`);
+      if (this.moduloActivo('personas')) lines.push(`Personas: ${nombres('people')}`);
+      if (this.moduloActivo('finanzas')) lines.push('Finanzas rápidas: encendido');
+    }
     const memory = jarvisRead(JARVIS.MEMORY_KEY, []);
     if (memory.length) lines.push(`Sabes de la persona: ${memory.join('; ')}`);
     return `<contexto>\n${lines.join('\n')}\n</contexto>`;
@@ -229,6 +236,19 @@ defineAppMethods({
     const listas = NotasCore.visibles(this.listaNotas()).filter(x => x.kind === 'lista');
     const titulo = x => String(x.title || '').trim().toLowerCase();
     return listas.find(x => titulo(x) === n) || listas.find(x => titulo(x) && (titulo(x).includes(n) || n.includes(titulo(x)))) || null;
+  },
+
+  // Tarea pendiente por título: exacto primero, después por coincidencia parcial; opcionalmente dentro de un proyecto
+  jarvisFindTask(titulo, proyecto) {
+    const n = String(titulo || '').trim().toLowerCase();
+    if (!n) return null;
+    const p = String(proyecto || '').trim().toLowerCase();
+    const filas = [];
+    (this.state.projects || []).filter(x => !x.inBaul && (!p || x.name.toLowerCase() === p || x.name.toLowerCase().includes(p))).forEach(project => {
+      (project.tasks || []).filter(t => t.column !== 'victorias').forEach(task => filas.push({ project, task }));
+    });
+    const t = x => String(x.task.title || '').trim().toLowerCase();
+    return filas.find(x => t(x) === n) || filas.find(x => t(x).includes(n) || n.includes(t(x))) || null;
   },
 
   // ---------- Herramientas ----------
@@ -286,7 +306,8 @@ defineAppMethods({
           if (input.proyecto && !projects.length) return fail(`No existe el proyecto "${str(input.proyecto)}".`);
           const rows = [];
           projects.forEach(p => (p.tasks || []).filter(t => t.column !== 'victorias').forEach(t => {
-            rows.push(`${p.name} | ${t.title} | ${t.column} | ${t.effort || 'S'}${t.dueAt ? ' | ' + this.formatDue(t.dueAt) : ''}`);
+            const pasos = PasosCore.progreso(t.steps);
+            rows.push(`${p.name} | ${t.title} | ${t.column} | ${t.effort || 'S'}${t.dueAt ? ' | ' + this.formatDue(t.dueAt) : ''}${pasos.total ? ` | pasos ${pasos.hechos}/${pasos.total}` : ''}`);
           }));
           return ok(rows.length ? rows.slice(0, 40).join('\n') : 'No hay tareas pendientes.');
         }
@@ -352,6 +373,65 @@ defineAppMethods({
           this.refrescarNotas();
           return ok(`${hecho ? 'Hecho' : 'De vuelta a pendiente'} en ${lista.title}: ${item.text}`);
         }
+        // Micro-pasos dentro de una tarea (js/pasos-core.js)
+        case 'partir_en_pasos': {
+          const found = this.jarvisFindTask(input.tarea, input.proyecto);
+          if (!found) return fail(`No encuentro la tarea "${str(input.tarea)}". Usa ver_tareas para ver los títulos.`);
+          const nuevos = (Array.isArray(input.pasos) ? input.pasos : []).map(p => str(p, 140)).filter(Boolean);
+          if (!nuevos.length) return fail('Faltan los pasos.');
+          const actuales = PasosCore.normalizar(found.task.steps);
+          const ya = new Set(actuales.map(s => s.text.toLowerCase()));
+          const todos = PasosCore.normalizar([...actuales, ...nuevos.filter(p => !ya.has(p.toLowerCase())).map(text => ({ text }))]);
+          const anadidos = todos.length - actuales.length;
+          if (!anadidos) return ok(actuales.length >= PasosCore.MAX_PASOS ? `"${found.task.title}" ya tiene el máximo de ${PasosCore.MAX_PASOS} pasos.` : 'Esos pasos ya estaban.');
+          found.task.steps = todos;
+          this._guardarPasos(found.task);
+          const sig = PasosCore.siguiente(todos);
+          return ok(`${anadidos} ${anadidos === 1 ? 'paso añadido' : 'pasos añadidos'} a "${found.task.title}".${sig ? ` El siguiente: ${sig.text}` : ''}`);
+        }
+        case 'marcar_paso': {
+          const found = this.jarvisFindTask(input.tarea, null);
+          if (!found) return fail(`No encuentro la tarea "${str(input.tarea)}".`);
+          const hecho = input.hecho !== false;
+          const pasos = PasosCore.normalizar(found.task.steps);
+          const buscado = str(input.paso, 140).toLowerCase();
+          const candidatos = pasos.filter(s => s.done !== hecho);
+          // Sin texto: el siguiente paso pendiente
+          const paso = buscado
+            ? candidatos.find(s => s.text.toLowerCase() === buscado) || candidatos.find(s => s.text.toLowerCase().includes(buscado))
+            : (hecho ? PasosCore.siguiente(pasos) : null);
+          if (!paso) return fail(pasos.length ? `No encuentro ese paso ${hecho ? 'pendiente' : 'hecho'} en "${found.task.title}".` : `"${found.task.title}" no tiene pasos.`);
+          found.task.steps = PasosCore.alternar(pasos, paso.id);
+          this._guardarPasos(found.task);
+          const prog = PasosCore.progreso(found.task.steps);
+          const sig = PasosCore.siguiente(found.task.steps);
+          return ok(`${hecho ? 'Paso hecho' : 'Paso de vuelta a pendiente'}: ${paso.text} (${prog.hechos}/${prog.total}).${prog.completo ? ' Todos los pasos hechos.' : sig ? ` Siguiente: ${sig.text}` : ''}`);
+        }
+        // Módulos opcionales (js/app/modulos/): solo si la persona los tiene encendidos
+        case 'marcar_habito': {
+          if (!this.moduloActivo('habitos')) return fail('El módulo Hábitos está apagado. Se enciende en Repasar → Ajustes → Módulos.');
+          const habito = HabitosCore.buscar(this.modVivos('habits'), input.habito);
+          if (!habito) return fail(`No existe el hábito "${str(input.habito)}". Hábitos: ${this.modVivos('habits').map(h => h.name).join(', ') || 'ninguno'}`);
+          const hecho = input.hecho !== false;
+          const nuevo = HabitosCore.marcar(habito, HabitosCore.claveDia(Date.now()), hecho);
+          this.modGuardar('habits', nuevo);
+          const racha = HabitosCore.racha(nuevo, Date.now());
+          return ok(hecho ? `Hecho hoy: ${habito.name}${racha > 1 ? ` (racha de ${racha})` : ''}` : `Desmarcado hoy: ${habito.name}`);
+        }
+        case 'apuntar_gasto': {
+          if (!this.moduloActivo('finanzas')) return fail('El módulo Finanzas rápidas está apagado. Se enciende en Repasar → Ajustes → Módulos.');
+          const gasto = this.apuntarGasto({ amount: input.cantidad, note: str(input.concepto, 80) }, { silent: true });
+          if (!gasto) return fail('Importe no válido.');
+          const t = FinanzasCore.totales(this.modVivos('expenses'), Date.now());
+          return ok(`Gasto apuntado: ${FinanzasCore.dinero(gasto.amount)} en ${gasto.note}. Esta semana: ${FinanzasCore.dinero(t.semana)}.`);
+        }
+        case 'registrar_contacto': {
+          if (!this.moduloActivo('personas')) return fail('El módulo Personas está apagado. Se enciende en Repasar → Ajustes → Módulos.');
+          const persona = PersonasCore.buscar(this.modVivos('people'), input.persona);
+          if (!persona) return fail(`No tengo a "${str(input.persona)}" en Personas. Están: ${this.modVivos('people').map(p => p.name).join(', ') || 'nadie'}`);
+          this.modGuardar('people', PersonasCore.registrarContacto(persona));
+          return ok(`Apuntado: hoy hablaste con ${persona.name}.`);
+        }
         case 'ir_a': {
           if (!['soltar', 'ahora', 'repasar'].includes(input.seccion)) return fail('Sección no válida.');
           this.closeJarvis();
@@ -414,6 +494,8 @@ defineAppMethods({
     }
     const stalled = projects.filter(p => (p.status === 'en_ejecucion' || p.status === 'activo') && this.daysSince(p.lastActivity) >= 7)
       .sort((a, b) => this.daysSince(b.lastActivity) - this.daysSince(a.lastActivity))[0];
+    // Una línea por módulo encendido (hábitos de hoy, cumpleaños…)
+    if (this.resumenDeModulos) this.resumenDeModulos().forEach(linea => parts.push(html`${linea}`));
     if (stalled) parts.push(html`💤 ${stalled.name} lleva ${this.daysSince(stalled.lastActivity)} días quieto. ¿Un paso pequeño o lo hibernamos sin culpa?`);
     if (parts.length === 1) parts.push(html`Nada urgente. Elige una cosa y empieza por 2 minutos.`);
     return html`${parts.map((p, i) => i ? html`<br>${p}` : p)}`;

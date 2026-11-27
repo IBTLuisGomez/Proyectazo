@@ -135,9 +135,43 @@ const FocoCore = (() => {
     };
   }
 
+  // ---------------- Incubadora automática (Fase 19) ----------------
+  // Tareas del Buzón o de Próximo que nadie toca desde hace DIAS_INCUBAR días: pasan a «Más tarde»
+  // (columna congelador) para decidir sobre ellas en la revisión semanal. No se tocan las que están
+  // En foco, las que tienen fecha ni las de proyectos del Baúl.
+  const DIAS_INCUBAR = 14;
+
+  function incubables(projects, ahoraMs, dias = DIAS_INCUBAR) {
+    const limite = ahoraMs - dias * 24 * 60 * MIN;
+    const out = [];
+    for (const p of projects || []) {
+      if (!p || p.inBaul) continue;
+      for (const t of p.tasks || []) {
+        if (!t || !t.id || (t.column !== 'buzon' && t.column !== 'proximo') || t.dueAt) continue;
+        const tocada = tiempo(t.updatedAt) || tiempo(t.createdAt);
+        if (!tocada || tocada > limite) continue;
+        out.push({ projectId: p.id, project: p.name, taskId: t.id, title: t.title, column: t.column, dias: Math.floor((ahoraMs - tocada) / (24 * 60 * MIN)) });
+      }
+    }
+    return out.sort((a, b) => b.dias - a.dias);
+  }
+
+  // Lo que la incubadora movió y sigue en «Más tarde», lo más reciente primero
+  function incubadas(projects) {
+    const out = [];
+    for (const p of projects || []) {
+      if (!p || p.inBaul) continue;
+      for (const t of p.tasks || []) {
+        if (t && t.column === 'congelador' && t.incubatedAt) out.push({ projectId: p.id, project: p.name, taskId: t.id, title: t.title, incubatedAt: t.incubatedAt });
+      }
+    }
+    return out.sort((a, b) => tiempo(b.incubatedAt) - tiempo(a.incubatedAt));
+  }
+
   return {
-    HIPERFOCO_MIN, DESCANSO_MIN, MUESTRAS_MIN, DIAS_QUIETO,
-    nuevoEstado, tick, factor, ajustada, claveDia, inicioSemana, claveSemana, primeroDeHoy, resumenSemana
+    HIPERFOCO_MIN, DESCANSO_MIN, MUESTRAS_MIN, DIAS_QUIETO, DIAS_INCUBAR,
+    nuevoEstado, tick, factor, ajustada, claveDia, inicioSemana, claveSemana, primeroDeHoy, resumenSemana,
+    incubables, incubadas
   };
 })();
 

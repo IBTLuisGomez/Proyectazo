@@ -13,6 +13,7 @@ defineAppMethods({
       { view: 'freeform', icon: '🎨', label: 'Ideas' },
       { view: 'bitacora', icon: '📜', label: 'Historial' },
       { view: 'radar', icon: '📡', label: 'Radar' },
+      ...this.fichasDeModulos(),
       { view: 'baul', icon: '🔒', label: 'Baúl' },
       { view: 'mas', icon: '⚙️', label: 'Ajustes' }
     ];

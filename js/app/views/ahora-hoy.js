@@ -24,11 +24,13 @@ defineAppMethods({
       const raw = JSON.parse(localStorage.getItem('nexus_energy') || 'null');
       if (raw && raw.date === new Date().toDateString()) return raw.level;
     } catch (e) {}
-    return 'media';
+    // Lo dicho hoy en otro dispositivo (js/app/features/energia.js); si no, media
+    return this.energiaGuardadaHoy() || 'media';
   },
 
   setEnergyToday(level) {
     try { localStorage.setItem('nexus_energy', JSON.stringify({ date: new Date().toDateString(), level })); } catch (e) {}
+    this.guardarEnergiaDia(level);
     this.ahoraOffset = 0;
     this.render();
   },
@@ -83,7 +85,8 @@ defineAppMethods({
     }
 
     const energy = this.getEnergyToday();
-    const candidates = this.ahoraCandidates(activeProject, energy);
+    // Primero lo que cabe en la energía que queda hoy (js/app/features/energia.js)
+    const candidates = this.ordenarPorEnergia(this.ahoraCandidates(activeProject, energy));
     const offset = candidates.length ? (this.ahoraOffset || 0) % candidates.length : 0;
     const activeTask = candidates[offset] || {
       id: 'task-temp',
@@ -121,6 +124,9 @@ defineAppMethods({
               ${this.escapeHtml(activeTask.title)}
             </h1>
             ${this.renderEstimacion(activeTask)}
+            ${this.renderCabida(activeTask)}
+            ${activeTask.id !== 'task-temp' && (activeTask.steps || []).length ? this.renderPasosResumen(activeProject.id, activeTask, 'hero') : ''}
+            ${activeTask.id !== 'task-temp' && !(activeTask.steps || []).length ? `<button type="button" onclick="app.breakTaskIntoSteps('${activeProject.id}', '${activeTask.id}')" class="mt-2 text-[11px] text-slate-400 hover:text-cyan-300 underline">🪜 ¿Se ve grande? Pártela en pasos pequeños</button>` : ''}
             ${activeTask.notes ? `<p class="text-xs text-slate-400 mt-1 max-w-md italic truncate">"${this.escapeHtml(activeTask.notes)}"</p>` : ''}
           </div>
 
@@ -129,6 +135,8 @@ defineAppMethods({
             <span class="text-[11px] text-slate-500">Energía:</span>
             ${energyBtn('baja', '🪫 Baja')}${energyBtn('media', '🔋 Media')}${energyBtn('alta', '⚡ Alta')}
           </div>
+          ${this.renderMedidorEnergia()}
+          ${this.renderCandidatoModulos()}
 
           <div class="flex items-center justify-center gap-2 flex-wrap">
             <button type="button" onclick="app.startTinyStep()" class="min-h-[44px] px-4 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition active:scale-95">
@@ -402,8 +410,12 @@ defineAppMethods({
     const enEjecucionProjects = allProjects.filter(p => p.status === 'en_ejecucion');
     const activeProjects = allProjects.filter(p => p.status === 'activo');
 
+    // Una sola energía en toda la app: la que se elige en «Ahora» (getEnergyToday)
+    const energiaHoy = this.getEnergyToday();
+    const energiaBtn = (key, label) => `<button type="button" onclick="app.setEnergyToday('${key}')" aria-pressed="${energiaHoy === key}"
+      class="px-2.5 py-1 rounded-xl text-xs font-semibold transition ${energiaHoy === key ? 'bg-cyan-500/20 text-cyan-200 font-bold' : 'theme-text-muted hover:brightness-125'}">${label}</button>`;
     const filterFn = p => {
-      if (this.batteryLevel === 20) return p.energy === 'baja' || p.nextActionType === 'hacer';
+      if (energiaHoy === 'baja') return p.energy === 'baja' || p.nextActionType === 'hacer';
       if (this.activeFilterEnergy === 'all') return true;
       if (this.activeFilterEnergy === 'baja') return p.energy === 'baja';
       if (this.activeFilterEnergy === 'media') return p.energy === 'media';
@@ -417,10 +429,9 @@ defineAppMethods({
     const sortedByColdest = [...enEjecucionProjects, ...activeProjects].sort((a, b) => this.daysSince(b.lastActivity) - this.daysSince(a.lastActivity));
     const heroProject = sortedByColdest[0] || null;
 
-    // Streak y Heatmap de Consistencia TDAH (28 días)
-    const monthlyHeatmap = this.getMonthlyHeatmapHistory(28);
-    const currentStreak = this.calculateCurrentStreak();
-    const totalMonthlyAdvances = monthlyHeatmap.reduce((sum, d) => sum + d.count, 0);
+    // Lo hecho esta semana (últimos 7 días). Solo se cuenta lo hecho: nada de huecos ni rachas que romper.
+    const avancesSemana = this.getMonthlyHeatmapHistory(7).reduce((sum, d) => sum + d.count, 0);
+    const focoSemana = this.getFocusMinutes(7);
 
     container.innerHTML = `
       <!-- Header saludo y Medidor de Batería Mental -->
@@ -436,80 +447,35 @@ defineAppMethods({
           </h1>
         </div>
 
-        <!-- Medidor de Batería Mental TDAH -->
-        <div class="flex items-center gap-2 theme-card-subtle p-1.5 rounded-2xl border theme-border self-start lg:self-auto overflow-x-auto max-w-full">
-          <span class="text-[11px] font-bold theme-text-muted px-2">Batería Mental:</span>
-          <button onclick="app.setBattery(100)" class="px-2.5 py-1 rounded-xl text-xs font-semibold transition ${this.batteryLevel === 100 ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm' : 'theme-text-muted hover:text-white'}">
-            🔋 100% (Hiperfoco)
-          </button>
-          <button onclick="app.setBattery(50)" class="px-2.5 py-1 rounded-xl text-xs font-semibold transition ${this.batteryLevel === 50 ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'theme-text-muted hover:text-white'}">
-            ⚡ 50% (Normal)
-          </button>
-          <button onclick="app.setBattery(20)" class="px-2.5 py-1 rounded-xl text-xs font-semibold transition ${this.batteryLevel === 20 ? 'bg-rose-500 text-white font-bold shadow-sm' : 'theme-text-muted hover:text-white'}">
-            🪫 20% (Niebla mental)
-          </button>
+        <!-- Energía de hoy: la misma que en «Ahora» -->
+        <div class="flex items-center gap-1.5 theme-card-subtle p-1.5 rounded-2xl border theme-border self-start lg:self-auto overflow-x-auto max-w-full" role="group" aria-label="Tu energía hoy">
+          <span class="text-[11px] font-bold theme-text-muted px-2">Energía hoy:</span>
+          ${energiaBtn('baja', '🪫 Baja')}${energiaBtn('media', '🔋 Media')}${energiaBtn('alta', '⚡ Alta')}
         </div>
       </div>
 
-      <!-- Banner de aviso si batería baja (Modo Niebla Mental) -->
-      ${this.batteryLevel === 20 ? `
+      ${energiaHoy === 'baja' ? `
         <div class="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs text-amber-300">
           <div class="flex items-center gap-2.5">
-            <span class="text-xl">🪫</span>
-            <div>
-              <strong class="font-bold">Modo Niebla Mental Activado:</strong> Ocultamos tareas de alta energía. Haz solo una micro-acción de 5 min o vuelca ideas en El Pensadero.
-            </div>
+            <span class="text-xl" aria-hidden="true">🪫</span>
+            <div>Con energía baja solo ves proyectos ligeros. Una micro-acción de 5 minutos ya cuenta.</div>
           </div>
-          <button onclick="app.navigate('pensadero')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shrink-0">
-            Ir a El Pensadero →
+          <button onclick="app.navigate('soltar')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shrink-0">
+            Soltar ideas →
           </button>
         </div>
       ` : ''}
 
-      <!-- Gamificación, Rachas y Refuerzo Dopaminérgico (Heatmap 28 días estilo GitHub / Duolingo) -->
-      <div class="mb-6 p-4 sm:p-5 rounded-2xl theme-card border theme-border space-y-3">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl shrink-0">
-              🔥
-            </div>
-            <div>
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-mono font-bold uppercase tracking-wider text-amber-400">Racha de Momentum TDAH: ${currentStreak} días</span>
-                <span class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">${totalMonthlyAdvances} micro-avances este mes</span>
-                <span class="text-[10px] font-mono px-2 py-0.2 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold">⏱️ ${this.getFocusMinutes(7)} min de foco (7 días)</span>
-              </div>
-              <p class="text-[11px] theme-text-muted mt-0.5">
-                Evidencia tangible contra la ceguera temporal. Los huecos vacíos son pausas de recarga, no fracasos.
-              </p>
-            </div>
-          </div>
-
-          <!-- Badges de Refuerzo Dopaminérgico -->
-          <div class="flex items-center gap-2 self-start sm:self-auto">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/30">
-              ${currentStreak >= 7 ? '🌟 Maestro del Enfoque' : (currentStreak >= 3 ? '⚡ En Racha Activa' : '🌱 Sembrando Inercia')}
-            </span>
-          </div>
+      <!-- Lo hecho esta semana, en positivo -->
+      ${avancesSemana || focoSemana ? `
+        <div class="mb-6 p-4 rounded-2xl theme-card border theme-border flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0" aria-hidden="true">🌱</div>
+          <p class="text-sm"><strong>Esta semana:</strong> ${[
+            avancesSemana ? `${avancesSemana} ${avancesSemana === 1 ? 'avance' : 'avances'}` : '',
+            focoSemana ? `${focoSemana} min de foco` : ''
+          ].filter(Boolean).join(' · ')}</p>
         </div>
-
-        <!-- Grid de 4 semanas (28 días) -->
-        <div class="pt-2 border-t theme-border flex flex-col sm:flex-row sm:items-center justify-between gap-2 overflow-x-auto pb-1">
-          <span class="text-[10px] font-mono theme-text-muted uppercase tracking-wider shrink-0">Últimos 28 días:</span>
-          <div class="flex items-center gap-1.5 flex-wrap">
-            ${monthlyHeatmap.map(d => {
-              let cellClass = 'theme-card-subtle theme-text-muted opacity-60';
-              if (d.count === 1) cellClass = 'bg-emerald-500/30 text-emerald-300 border-emerald-500/40 font-bold';
-              else if (d.count >= 2) cellClass = 'bg-emerald-400 text-slate-950 font-extrabold shadow-sm shadow-emerald-400/40 border-emerald-300';
-              return `
-                <div class="w-6 h-6 rounded-md border flex items-center justify-center text-[10px] font-mono transition-transform hover:scale-125 cursor-pointer ${cellClass}" title="${d.dateStr} (${d.dayName}): ${d.count} avances">
-                  ${d.count > 0 ? (d.count > 1 ? d.count : '✓') : '·'}
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      </div>
+      ` : ''}
 
       ${this.renderDueTodayCard()}
       ${this.renderStalledProjectsCard()}
@@ -544,12 +510,9 @@ defineAppMethods({
           <div class="p-4 rounded-2xl theme-card-subtle border theme-border mb-5">
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <span class="text-[11px] font-mono uppercase tracking-wider font-bold text-emerald-400 flex items-center gap-1.5">
-                <span>🎯</span> Próxima Micro-Acción (Masticada)
+                <span>🎯</span> Próxima micro-acción
               </span>
               <div class="flex items-center gap-1.5">
-                <button onclick="app.promptMasticarTask('${this.jsStr(heroProject.nextAction)}')" class="text-[10px] theme-text-muted hover:text-white px-2 py-0.5 rounded border theme-border hover:brightness-110" title="Desglosar en 3 micro-pasos de 5 min">
-                  🍴 Masticar
-                </button>
                 <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full theme-card border theme-border">
                   ${heroProject.nextActionType || 'hacer'}
                 </span>
@@ -761,37 +724,6 @@ defineAppMethods({
     return days;
   },
 
-  calculateCurrentStreak() {
-    let allLogs = [];
-    (this.state.projects || []).forEach(p => {
-      (p.logs || []).forEach(l => {
-        if (l.date) allLogs.push(new Date(l.date).toISOString().slice(0, 10));
-      });
-    });
-    const uniqueDays = new Set(allLogs);
-    let streak = 0;
-    let checkDate = new Date();
-    const todayStr = checkDate.toISOString().slice(0, 10);
-    if (!uniqueDays.has(todayStr)) {
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
-    while (true) {
-      const dStr = checkDate.toISOString().slice(0, 10);
-      if (uniqueDays.has(dStr)) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-    return Math.max(streak, 1);
-  },
-
-  setBattery(level) {
-    this.batteryLevel = level;
-    this.render();
-  },
-
   renderProjectCard(project) {
     const fresh = this.getFreshness(project);
     const latestLog = (project.logs && project.logs.length > 0) ? project.logs[0] : null;
@@ -833,11 +765,12 @@ defineAppMethods({
                   ⚡ A Radar
                 </button>
               ` : '')}
-              <button onclick="app.openProjectModal('${project.id}')" class="text-slate-400 hover:text-white p-1 text-xs shrink-0" title="Editar Proyecto (CRUD)">
-                ⚙️
+              <button onclick="app.openProjectModal('${project.id}')" class="px-2 py-0.5 rounded-lg theme-card-subtle border theme-border text-[11px] font-semibold hover:brightness-110 transition shrink-0" title="Editar nombre, descripción, color y estado">
+                ✏️ Editar
               </button>
             </div>
           </div>
+          ${project.description ? `<p class="text-xs text-slate-400 mb-1 line-clamp-2 whitespace-pre-line">${this.escapeHtml(project.description)}</p>` : ''}
 
           <!-- Medidor de Frescura / Salud (Stitch Screen 4) -->
           <div class="my-2.5">
@@ -859,7 +792,7 @@ defineAppMethods({
                 <span class="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-slate-950 text-slate-400 border border-slate-800">${project.nextActionType || 'hacer'}</span>
               </div>
               <p class="text-xs font-bold text-white mt-0.5 leading-snug">
-                ${project.nextAction || '<span class="italic text-slate-500">No definido aún</span>'}
+                ${project.nextAction ? this.escapeHtml(project.nextAction) : '<span class="italic text-slate-500">No definido aún</span>'}
               </p>
             </div>
           </div>

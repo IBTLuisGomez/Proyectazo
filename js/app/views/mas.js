@@ -64,6 +64,8 @@ defineAppMethods({
 
         </div>
 
+        ${this.renderModulosAjustes()}
+
       </div>
     `;
   },

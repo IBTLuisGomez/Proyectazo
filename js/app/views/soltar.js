@@ -69,8 +69,8 @@ defineAppMethods({
             <div class="relative w-[68vw] h-[68vw] max-w-[340px] max-h-[340px] sm:w-[320px] sm:h-[320px] lg:w-[400px] lg:h-[400px] mx-auto flex items-center justify-center shrink-0">
               <div id="nexus-orb-glow" class="absolute inset-4 rounded-full blur-3xl opacity-60 transition-all duration-700 pointer-events-none" style="background: radial-gradient(circle, ${activeMeta.hex} 0%, transparent 70%);"></div>
 
-              <div class="relative w-full h-full rounded-full p-2 bg-slate-900/60 border border-slate-800 shadow-2xl flex items-center justify-center pointer-events-none">
-                <div class="relative w-full h-full rounded-full p-1 bg-slate-950/90 flex items-center justify-center overflow-hidden">
+              <div class="orb-ring-outer relative w-full h-full rounded-full p-2 bg-slate-900/60 border border-slate-800 shadow-2xl flex items-center justify-center pointer-events-none">
+                <div class="orb-ring-inner relative w-full h-full rounded-full p-1 bg-slate-950/90 flex items-center justify-center overflow-hidden">
                   <div id="nexus-core-wrapper" class="relative z-10 w-full h-full flex items-center justify-center select-none cursor-pointer rounded-full overflow-hidden pointer-events-auto" onclick="app.handleOrbClick(event)" title="Haz clic para generar un pulso o soltar tu pensamiento. Mantén presionado para hablar.">
                     <canvas id="pensadero-glsl-canvas" class="w-full h-full block rounded-full select-none"></canvas>
                   </div>
@@ -84,7 +84,7 @@ defineAppMethods({
                 <button type="button" onclick="app.cycleOrbColor(-1)" class="w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center text-xs transition active:scale-95 shadow" title="Color anterior (o desliza hacia la derecha)">‹</button>
                 <div id="orbe-status-label" class="text-xs font-mono font-bold tracking-wide text-white bg-slate-950/90 px-3.5 py-1.5 rounded-full border border-slate-700 shadow flex items-center gap-2">
                   <span id="orbe-color-indicator" class="w-2.5 h-2.5 rounded-full inline-block" style="background: ${activeMeta.hex}; box-shadow: 0 0 10px ${activeMeta.hex};"></span>
-                  <span>${activeMeta.icon} ${activeMeta.name}: ${activeMeta.title}</span>
+                  <span>${activeMeta.icon} ${activeMeta.name}${activeMeta.title && activeMeta.title !== activeMeta.name ? ': ' + activeMeta.title : ''}</span>
                 </div>
                 <button type="button" onclick="app.cycleOrbColor(1)" class="w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center text-xs transition active:scale-95 shadow" title="Siguiente color (o desliza hacia la izquierda)">›</button>
               </div>
@@ -97,7 +97,7 @@ defineAppMethods({
                     <button type="button" 
                             onclick="app.setOrbeColor('${key}')" 
                             data-smoke="${key}"
-                            class="smoke-reactor-btn px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all flex items-center gap-1 active:scale-95 border ${isSel ? 'ring-2 ring-white scale-105 font-bold shadow-lg' : 'opacity-75 hover:opacity-100'}"
+                            class="smoke-reactor-btn px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all flex items-center gap-1 active:scale-95 border ${isSel ? 'ring-2 ring-cyan-400 scale-105 font-bold shadow-lg' : 'opacity-75 hover:opacity-100'}"
                             style="background: ${meta.hex}22; border-color: ${meta.hex}66; color: ${meta.hex};"
                             title="${meta.title}: ${meta.desc}">
                       <span>${meta.icon}</span>
@@ -436,7 +436,7 @@ defineAppMethods({
     }
     const statusLabel = document.getElementById('orbe-status-label');
     if (statusLabel) {
-      statusLabel.innerHTML = `<span id="orbe-color-indicator" class="w-2.5 h-2.5 rounded-full inline-block" style="background: ${meta.hex}; box-shadow: 0 0 10px ${meta.hex};"></span> <span>${meta.icon} ${meta.name}: ${meta.title}</span>`;
+      statusLabel.innerHTML = `<span id="orbe-color-indicator" class="w-2.5 h-2.5 rounded-full inline-block" style="background: ${meta.hex}; box-shadow: 0 0 10px ${meta.hex};"></span> <span>${meta.icon} ${meta.name}${meta.title && meta.title !== meta.name ? ': ' + meta.title : ''}</span>`;
     }
 
     // Resplandor Neón de Fondo reactivo
@@ -454,10 +454,10 @@ defineAppMethods({
     // Resaltar botón de reactor seleccionado
     document.querySelectorAll('.smoke-reactor-btn').forEach(btn => {
       if (btn.getAttribute('data-smoke') === category) {
-        btn.classList.add('ring-2', 'ring-white', 'scale-105', 'font-bold', 'shadow-lg');
+        btn.classList.add('ring-2', 'ring-cyan-400', 'scale-105', 'font-bold', 'shadow-lg');
         btn.classList.remove('opacity-75');
       } else {
-        btn.classList.remove('ring-2', 'ring-white', 'scale-105', 'font-bold', 'shadow-lg');
+        btn.classList.remove('ring-2', 'ring-cyan-400', 'scale-105', 'font-bold', 'shadow-lg');
         btn.classList.add('opacity-75');
       }
     });

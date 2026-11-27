@@ -508,11 +508,18 @@ defineAppMethods({
     this.openModal('deepwork-modal');
   },
 
+  // Los micro-pasos de Trabajo Profundo son los mismos de la tarea (task.steps, ver js/app/features/pasos.js)
+  _deepworkTask() {
+    const { projectId, taskId } = this.currentDeepWork || {};
+    const found = this._tareaPorId(projectId, taskId);
+    return found ? found.task : null;
+  },
+
   renderDeepworkSubsteps(task) {
     const list = document.getElementById('deepwork-substeps-list');
     if (!list) return;
 
-    const steps = task.substeps || [];
+    const steps = PasosCore.normalizar(task.steps);
     if (steps.length === 0) {
       list.innerHTML = `<div class="p-3 text-center text-slate-500 italic rounded-xl border border-dashed theme-border">Sin micro-pasos. Añade pasos de ≤5 min para evitar la parálisis.</div>`;
       return;
@@ -521,7 +528,7 @@ defineAppMethods({
     list.innerHTML = steps.map((s, idx) => `
       <div class="flex items-center gap-2 p-2 rounded-xl theme-card-subtle border theme-border">
         <input type="checkbox" ${s.done ? 'checked' : ''} onchange="app.toggleDeepworkSubstep(${idx})" class="rounded text-sky-500 focus:ring-0 cursor-pointer" />
-        <span class="text-xs flex-1 ${s.done ? 'line-through text-slate-500' : 'font-medium'}">${s.text}</span>
+        <span class="text-xs flex-1 ${s.done ? 'line-through text-slate-500' : 'font-medium'}">${this.escapeHtml(s.text)}</span>
         <button onclick="app.removeDeepworkSubstep(${idx})" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-1">✕</button>
       </div>
     `).join('');
@@ -530,35 +537,30 @@ defineAppMethods({
   addDeepworkSubstep() {
     const text = prompt("Micro-paso concreto (≤5 min):");
     if (!text || !text.trim()) return;
-
-    const { projectId, taskId } = this.currentDeepWork;
-    const p = this.state.projects.find(x => x.id === projectId);
-    const t = p ? (p.tasks || []).find(x => x.id === taskId) : null;
+    const t = this._deepworkTask();
     if (!t) return;
-
-    if (!t.substeps) t.substeps = [];
-    t.substeps.push({ text: text.trim(), done: false });
+    t.steps = PasosCore.normalizar([...(t.steps || []), { text }]);
+    this._guardarPasos(t);
     this.renderDeepworkSubsteps(t);
   },
 
   toggleDeepworkSubstep(idx) {
-    const { projectId, taskId } = this.currentDeepWork;
-    const p = this.state.projects.find(x => x.id === projectId);
-    const t = p ? (p.tasks || []).find(x => x.id === taskId) : null;
-    if (!t || !t.substeps || !t.substeps[idx]) return;
-
-    t.substeps[idx].done = !t.substeps[idx].done;
-    if (t.substeps[idx].done) this.triggerDopamineReward();
+    const t = this._deepworkTask();
+    const s = t && PasosCore.normalizar(t.steps)[idx];
+    if (!s) return;
+    t.steps = PasosCore.alternar(PasosCore.normalizar(t.steps), s.id);
+    if (t.steps[idx].done) this.triggerDopamineReward();
+    this._guardarPasos(t);
     this.renderDeepworkSubsteps(t);
   },
 
   removeDeepworkSubstep(idx) {
-    const { projectId, taskId } = this.currentDeepWork;
-    const p = this.state.projects.find(x => x.id === projectId);
-    const t = p ? (p.tasks || []).find(x => x.id === taskId) : null;
-    if (!t || !t.substeps) return;
-
-    t.substeps.splice(idx, 1);
+    const t = this._deepworkTask();
+    if (!t) return;
+    const steps = PasosCore.normalizar(t.steps);
+    steps.splice(idx, 1);
+    t.steps = steps;
+    this._guardarPasos(t);
     this.renderDeepworkSubsteps(t);
   },
 
@@ -1059,9 +1061,11 @@ defineAppMethods({
   openPersonalCRM(target) {
     const item = this.getPensaderoItem(target);
     if (!item) return;
-    const name = item.contactName || "Carlos Méndez";
-    const context = item.contactContext || "Le encanta el café de especialidad. Su mamá estuvo en el hospital la semana pasada. No hablar de política.";
-    alert(`💜 AVATAR DE MEMORIA (CRM Personal)\n\nPersona: ${name}\nContexto: ${context}\n\n💡 Tip TDAH: Llama o envía un mensaje de voz breve ahora mismo. Ya tienes el contexto fresco para vencer la parálisis social.`);
+    // Antes, sin datos de contacto, mostraba una persona y un contexto inventados como si fueran reales.
+    // Ahora usa solo lo que escribiste; el módulo Personas (ver docs/ECOSISTEMA_HIVEBRAIN.md) traerá fichas completas.
+    const name = item.contactName || item.content;
+    const context = item.contactContext || 'Sin notas todavía. Añade detalles al pensamiento (temas, familia, ideas de regalo) para tenerlos a mano.';
+    alert(`💜 AVATAR DE MEMORIA (CRM Personal)\n\nPersona: ${name}\nContexto: ${context}\n\n💡 Tip TDAH: Llama o envía un mensaje de voz breve ahora mismo.`);
     if (this.shaderEngine) {
       this.shaderEngine.setSmokeState('humo_purpura');
     }

@@ -26,6 +26,8 @@ Cómo responder:
 - Cuando diga algo que hay que guardar, recordar o hacer, usa las herramientas en lugar de solo contestar. Después confirma en una frase qué hiciste.
 - Usa los nombres de proyecto exactamente como aparecen en el contexto. Si no está claro a qué proyecto va, guárdalo como pensamiento.
 - Compras, recados y cosas que se van tachando van a una lista (anadir_a_lista), un elemento por cosa; no al orbe ni a un proyecto.
+- Si una tarea se le hace grande o no sabe por dónde empezar, pártela con partir_en_pasos: de 3 a 6 pasos de 5 a 15 minutos, el primero de menos de 5. Cuando diga que terminó un paso, usa marcar_paso.
+- Hábitos, personas y gastos solo existen si aparecen en el contexto (módulos encendidos). Si dice que hizo un hábito, usa marcar_habito; si cuenta un gasto, apuntar_gasto; si habló con alguien de su lista, registrar_contacto. Nunca opines sobre en qué gasta.
 - Fechas: calcula a partir de la fecha y hora del contexto y envíalas en ISO 8601 con zona horaria.
 - Si te cuenta algo estable sobre sí mismo (horarios, preferencias, personas importantes), guárdalo con recordar_dato.
 - Si no puedes hacer algo con las herramientas que tienes, dilo en una frase."""
@@ -101,6 +103,42 @@ TOOLS = [
             "elemento": {"type": "string", "description": "Texto del elemento, o una parte que lo identifique."},
             "hecho": {"type": "boolean"},
         }, ["lista", "elemento", "hecho"]),
+    },
+    {
+        "name": "partir_en_pasos",
+        "description": "Añade micro-pasos a una tarea existente (se quedan dentro de la tarea; no crea tareas nuevas). Máximo 12 pasos por tarea.",
+        "input_schema": _obj({
+            "proyecto": {"type": ["string", "null"], "description": "Proyecto de la tarea, o null para buscar en todos."},
+            "tarea": {"type": "string", "description": "Título de la tarea, o una parte que la identifique."},
+            "pasos": {"type": "array", "items": {"type": "string"}, "description": "Pasos de 5 a 15 minutos, en orden; cada uno empieza con un verbo."},
+        }, ["proyecto", "tarea", "pasos"]),
+    },
+    {
+        "name": "marcar_paso",
+        "description": "Marca un micro-paso de una tarea como hecho (o lo devuelve a pendiente con hecho=false). Con paso null marca el siguiente pendiente.",
+        "input_schema": _obj({
+            "tarea": {"type": "string"},
+            "paso": {"type": ["string", "null"], "description": "Texto del paso o una parte; null = el siguiente pendiente."},
+            "hecho": {"type": "boolean"},
+        }, ["tarea", "paso", "hecho"]),
+    },
+    {
+        "name": "marcar_habito",
+        "description": "Marca un hábito como hecho hoy (o lo desmarca con hecho=false). Solo si el contexto lista hábitos.",
+        "input_schema": _obj({"habito": {"type": "string"}, "hecho": {"type": "boolean"}}, ["habito", "hecho"]),
+    },
+    {
+        "name": "apuntar_gasto",
+        "description": "Apunta un gasto en Finanzas rápidas. Solo si el contexto dice que está encendido.",
+        "input_schema": _obj({
+            "cantidad": {"type": "number", "description": "Importe, mayor que cero."},
+            "concepto": {"type": "string", "description": "En qué: una a tres palabras."},
+        }, ["cantidad", "concepto"]),
+    },
+    {
+        "name": "registrar_contacto",
+        "description": "Apunta que hoy habló con una persona de su lista de Personas. Solo si el contexto lista personas.",
+        "input_schema": _obj({"persona": {"type": "string"}}, ["persona"]),
     },
     {
         "name": "ir_a",

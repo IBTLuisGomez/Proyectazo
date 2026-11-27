@@ -553,11 +553,13 @@
   <link rel="stylesheet" href="assets/tailwind.css">
   <!-- Correcciones de contraste WCAG AA (generado: python scripts/gen-contraste.py) -->
   <link rel="stylesheet" href="assets/contraste.css">
+  <!-- Tema claro: aclara las superficies oscuras fijas (bg-slate-900…) y estilos de micro-pasos -->
+  <link rel="stylesheet" href="assets/tema-claro.css">
 </head>
 <body class="min-h-screen flex flex-col">
 
   <!-- ================= SPLASH INTRO CINEMÁTICA MÓVIL (VIDEO NEXUSORB_NEON) ================= -->
-  <div id="nexus-splash-overlay" class="fixed inset-0 z-[120] bg-[#070A10] flex flex-col justify-between items-center transition-all duration-700 p-4 sm:p-6 opacity-0 pointer-events-none hidden">
+  <div id="nexus-splash-overlay" class="keep-dark fixed inset-0 z-[120] bg-[#070A10] flex flex-col justify-between items-center transition-all duration-700 p-4 sm:p-6 opacity-0 pointer-events-none hidden">
     <!-- Top Skip / Brand Header -->
     <div class="w-full max-w-md flex items-center justify-between z-10 pt-2">
       <div class="flex items-center gap-2.5">
@@ -592,7 +594,7 @@
   </div>
 
   <!-- ================= PANTALLA DE LOGIN CON DISEÑO NEÓN & SESIÓN PERSISTENTE ================= -->
-  <div id="nexus-login-overlay" class="fixed inset-0 z-[115] bg-[#070A10]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 sm:p-6 transition-all duration-500 opacity-0 pointer-events-none hidden">
+  <div id="nexus-login-overlay" class="keep-dark fixed inset-0 z-[115] bg-[#070A10]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 sm:p-6 transition-all duration-500 opacity-0 pointer-events-none hidden">
     <div class="relative w-full max-w-sm rounded-3xl border border-slate-800/90 bg-slate-900/90 p-6 sm:p-8 shadow-2xl text-center space-y-5 fade-enter">
       <!-- Glow trasero -->
       <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -682,10 +684,7 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-between gap-3">
-        <button data-on-click='["promptMasticarTask", "$text:#zen-task-title"]' class="px-4 py-2.5 rounded-xl theme-card-subtle border theme-border text-xs font-semibold hover:brightness-110 flex items-center gap-1.5">
-          <span>🍴</span> ¿Abrumado? Masticar en 3 pasos
-        </button>
+      <div class="flex items-center justify-end gap-3">
         <button data-on-click='["completeZenTask"]' class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 active:scale-95 transition">
           ✓ Marcar Victoria & Cerrar
         </button>
@@ -694,7 +693,7 @@
   </div>
 
   <!-- ================= MODO "ONE THING" (FILTRO DE RUIDO TOTAL) ================= -->
-  <div id="onething-overlay" class="hidden fixed inset-0 z-50 bg-[#080c14] flex flex-col items-center justify-center p-6 text-center transition-all">
+  <div id="onething-overlay" class="keep-dark hidden fixed inset-0 z-50 bg-[#080c14] flex flex-col items-center justify-center p-6 text-center transition-all">
     <div class="max-w-xl w-full p-8 rounded-3xl bg-slate-900/90 border border-slate-700/60 shadow-2xl relative fade-enter text-left">
       <!-- Barra Fluida de Progreso Visual -->
       <div class="w-full bg-slate-800 rounded-full h-2 mb-5 overflow-hidden border border-slate-700">
@@ -1421,8 +1420,17 @@
       </div>
 
       <div class="nexus-modal-scroll-body">
-        <form id="project-form" data-on-submit='["submitProjectForm", "$event"]' class="space-y-4">
+        <form id="project-form" data-on-submit='["submitProjectForm", "$event"]' data-on-input='["updateProjectFormPreview"]' class="space-y-4">
           <input type="hidden" id="project-form-id" />
+
+          <!-- Vista previa: cómo se verá la tarjeta del proyecto (se actualiza al escribir) -->
+          <div id="project-form-preview" class="p-3 rounded-2xl border theme-border theme-card-subtle flex items-center gap-3" style="border-left: 6px solid #10b981;" aria-live="polite">
+            <span id="project-form-preview-emoji" class="text-2xl" aria-hidden="true">⚡</span>
+            <div class="min-w-0 flex-1">
+              <p id="project-form-preview-name" class="font-display font-bold text-sm truncate">Nuevo proyecto</p>
+              <p id="project-form-preview-desc" class="text-[11px] theme-text-muted truncate">Sin descripción</p>
+            </div>
+          </div>
 
           <div class="grid grid-cols-[60px_1fr] gap-3">
             <div>
@@ -1438,8 +1446,20 @@
           </div>
 
           <div>
+            <label for="project-form-description" class="block text-xs font-bold mb-1">Descripción</label>
+            <textarea id="project-form-description" rows="3" maxlength="600" placeholder="¿De qué va este proyecto? Contexto para tu yo del futuro: para quién es, qué lo hace importante, enlaces…"
+              class="w-full px-3.5 py-2 rounded-xl theme-card-subtle border theme-border text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+          </div>
+
+          <div>
             <label class="block text-xs font-bold mb-1">Color representativo</label>
-            <div class="flex items-center gap-2" id="project-color-picker"></div>
+            <div class="flex items-center gap-2 flex-wrap" id="project-color-picker"></div>
+            <div class="flex items-center gap-2 mt-2">
+              <label for="project-form-color-custom" class="text-[11px] theme-text-muted">Otro color:</label>
+              <input type="color" id="project-form-color-custom" value="#10b981" data-on-input='["selectProjectColor", "$value"]'
+                class="w-9 h-7 rounded-lg border theme-border cursor-pointer bg-transparent p-0" title="Elegir cualquier color" />
+              <span id="project-form-color-hex" class="text-[11px] font-mono theme-text-muted">#10b981</span>
+            </div>
             <input type="hidden" id="project-form-color" value="#10b981" />
           </div>
 
@@ -2450,6 +2470,20 @@
             </label>
           </div>
 
+          <!-- Micro-pasos: la tarea grande se parte en trozos de 5–15 min dentro de la misma tarjeta -->
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <label for="edit-task-step-input" class="text-xs font-bold flex items-center gap-1.5">🪜 Micro-pasos <span id="edit-task-steps-count" class="font-mono theme-text-muted font-normal"></span></label>
+              <button type="button" id="edit-task-suggest-btn" data-on-click='["suggestTaskSteps"]' class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition" title="Partir la tarea en pasos pequeños (Nexus o plantilla)">✨ Sugerir</button>
+            </div>
+            <div id="edit-task-steps" class="space-y-1.5"></div>
+            <div class="flex items-center gap-2 mt-2">
+              <input type="text" id="edit-task-step-input" maxlength="140" placeholder="Añadir un paso y pulsar Enter" data-on-enter='["addEditTaskStep", "$event"]'
+                class="flex-1 min-w-0 px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              <button type="button" data-on-click='["addEditTaskStep"]' class="px-3 py-2 rounded-xl theme-card-subtle border theme-border text-xs font-bold hover:brightness-110" aria-label="Añadir paso">+</button>
+            </div>
+          </div>
+
           <div>
             <label class="block text-xs font-bold mb-1">Notas / Contexto (Opcional)</label>
             <textarea id="edit-task-notes" rows="2" placeholder="Notas, enlaces, detalles..."
@@ -2459,7 +2493,7 @@
           <div>
             <label class="block text-xs font-bold mb-1">Snippet de Código / Comando (Opcional)</label>
             <textarea id="edit-task-code" rows="2" placeholder="git commit -m '...'"
-              class="w-full px-3.5 py-2 rounded-xl font-mono text-xs bg-slate-950 border theme-border text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+              class="keep-dark w-full px-3.5 py-2 rounded-xl font-mono text-xs bg-slate-950 border theme-border text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
           </div>
 
           <div class="nexus-modal-footer bg-slate-950/40 flex items-center justify-between pt-3 -mx-4 -mb-4 px-4 pb-3">
@@ -2564,6 +2598,9 @@
   <script src="js/captura-parser.js"></script>
   <script src="js/notas-core.js"></script>
   <script src="js/foco-core.js"></script>
+  <script src="js/pasos-core.js"></script>
+  <script src="js/energia-core.js"></script>
+  <script src="js/modulos-core.js"></script>
   <script src="js/orb-shader-engine.js"></script>
   <script src="js/app/ui/html.js"></script>
   <script src="js/app.js"></script>
@@ -2589,6 +2626,13 @@
   <script src="js/app/features/fechas.js"></script>
   <script src="js/app/features/jarvis.js"></script>
   <script src="js/app/features/acompanamiento.js"></script>
+  <script src="js/app/features/pasos.js"></script>
+  <script src="js/app/features/energia.js"></script>
+  <!-- Módulos opcionales: se encienden en Repasar → Ajustes → Módulos -->
+  <script src="js/app/features/modulos.js"></script>
+  <script src="js/app/modulos/habitos.js"></script>
+  <script src="js/app/modulos/personas.js"></script>
+  <script src="js/app/modulos/finanzas.js"></script>
   <!-- Delegación de eventos: atributos data-on-* en lugar de onclick inline -->
   <script src="js/app/ui/acciones.js"></script>
 </body>

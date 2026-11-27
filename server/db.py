@@ -64,6 +64,13 @@ CREATE TABLE IF NOT EXISTS notas (
   doc TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_notas_owner ON notas(owner_id);
+CREATE TABLE IF NOT EXISTS modulos (
+  owner_id INTEGER NOT NULL,
+  kind TEXT NOT NULL,
+  id TEXT NOT NULL,
+  doc TEXT NOT NULL,
+  PRIMARY KEY (owner_id, kind, id)
+);
 CREATE TABLE IF NOT EXISTS push_subscriptions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,

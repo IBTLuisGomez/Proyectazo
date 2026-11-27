@@ -19,6 +19,11 @@ defineAppMethods({
     const results = [];
 
     for (const idea of ideas) {
+      // «gasté 200 en café» va a Finanzas si ese módulo está encendido (js/app/modulos/finanzas.js)
+      if (!opts.noModulos && this.capturarGasto(idea, { ...opts, silent: opts.silent || multiple })) {
+        results.push({ kind: 'gasto', content: idea });
+        continue;
+      }
       const parsed = CapturaParser.parseIdea(idea);
       if (!parsed.text) continue;
       if (opts.dueAt) parsed.dueAt = opts.dueAt; // fecha ya resuelta (p. ej. por Jarvis)
@@ -70,7 +75,7 @@ defineAppMethods({
     }
 
     if (multiple && !opts.silent) {
-      const ids = results.filter(r => r.kind !== 'task').map(r => r.id);
+      const ids = results.filter(r => r.kind !== 'task' && r.kind !== 'gasto').map(r => r.id);
       this.showToast(`✂️ Separé ${ideas.length} ideas para que cada una vaya a su sitio`, () => {
         // Unir: deshacer la separación y guardar el texto como un solo pensamiento
         this.state.pensadero = (this.state.pensadero || []).filter(p => !ids.includes(p.id));

@@ -231,6 +231,7 @@ defineAppMethods({
             ${this.escapeHtml(t.title)}
           </h3>
           ${t.notes ? `<p class="text-xs text-slate-400 mt-0.5 line-clamp-1 italic">${this.escapeHtml(t.notes)}</p>` : ''}
+          ${this.renderPasosResumen(t.projectId, t)}
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
@@ -248,7 +249,7 @@ defineAppMethods({
             <span>✓</span> Victoria
           </button>
 
-          <button onclick="app.breakdownTaskWithAI('${this.uriArg(t.title)}', '${t.projectId}')" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs transition" title="Desglose Atómico Gemini (micro-pasos de 15m)">
+          <button onclick="app.breakTaskIntoSteps('${t.projectId}', '${t.id}')" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs transition" title="${(t.steps || []).length ? 'Ver micro-pasos' : 'Partir en micro-pasos de 5–15 min'}">
             🪄
           </button>
 
@@ -376,20 +377,20 @@ defineAppMethods({
             <span class="text-[10px] font-mono px-2 py-0.5 rounded-full border" style="border-color: ${project.color || '#10b981'}; color: ${project.color || '#10b981'}; background: ${project.color ? project.color + '15' : '#10b98115'}">Color Maestro</span>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-2xl">${project.emoji || '🎯'}</span>
-            <select onchange="app.changeKanbanProject(this.value)" class="text-xl sm:text-2xl font-display font-extrabold bg-transparent border-b theme-border pb-0.5 focus:outline-none cursor-pointer">
+            <select onchange="app.changeKanbanProject(this.value)" class="text-xl sm:text-2xl font-display font-extrabold bg-transparent border-b theme-border pb-0.5 focus:outline-none cursor-pointer" aria-label="Cambiar de proyecto">
               ${projects.map(p => `
                 <option value="${p.id}" ${p.id === project.id ? 'selected' : ''} class="theme-card text-sm">
-                  ${p.emoji || '🎯'} ${this.escapeHtml(p.name)} (${p.status})
+                  ${p.emoji || '🎯'} ${this.escapeHtml(p.name)}
                 </option>
               `).join('')}
             </select>
           </div>
-          ${project.objective ? `<p class="text-xs theme-text-muted mt-1">${project.objective}</p>` : ''}
+          ${project.objective ? `<p class="text-xs font-semibold mt-1">🎯 ${this.escapeHtml(project.objective)}</p>` : ''}
+          ${project.description ? `<p class="text-xs theme-text-muted mt-1 max-w-2xl line-clamp-2 whitespace-pre-line" title="${this.escapeHtml(project.description)}">${this.escapeHtml(project.description)}</p>` : ''}
           ${project.originThoughtContent ? `
             <div class="mt-1.5 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-300 max-w-xl truncate" title="Pensamiento original de El Pensadero">
               <span>🔮 Origen Pensadero:</span>
-              <span class="truncate italic font-mono">"${project.originThoughtContent}"</span>
+              <span class="truncate italic font-mono">"${this.escapeHtml(project.originThoughtContent)}"</span>
             </div>
           ` : ''}
         </div>
@@ -411,44 +412,52 @@ defineAppMethods({
             <span>⏸️</span> Pausar Proyecto (Aterrizaje)
           </button>
 
+          <!-- Editar proyecto: nombre, descripción, color… -->
+          <button onclick="app.openProjectModal('${project.id}')" class="px-3.5 py-2 rounded-xl theme-card-subtle border theme-border font-bold text-xs hover:brightness-110 transition flex items-center gap-1.5" title="Editar nombre, descripción, color y estado">
+            <span>✏️</span> Editar
+          </button>
+
+          <!-- Resto de herramientas plegadas: menos botones a la vista = menos decisiones -->
+          <details class="task-tools relative">
+            <summary class="px-3 py-2 rounded-xl theme-card-subtle border theme-border font-semibold text-xs hover:brightness-110 transition select-none" title="Más herramientas">⋯ Más</summary>
+            <div class="absolute right-0 z-30 mt-2 p-2 w-64 rounded-2xl theme-card border theme-border shadow-xl flex flex-col gap-1.5">
           <!-- Modo One Thing (Filtro de Ruido) -->
-          <button onclick="app.openOneThingMode('${project.id}')" class="px-3 py-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 font-bold text-xs flex items-center gap-1.5 transition" title="Pantalla negra enfocada en una sola tarea">
+          <button onclick="app.openOneThingMode('${project.id}')" class="w-full justify-start px-3 py-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 font-bold text-xs flex items-center gap-1.5 transition" title="Pantalla negra enfocada en una sola tarea">
             <span>👁️</span> Solo 1 Cosa
           </button>
 
           <!-- Desglose Atómico Gemini -->
-          <button onclick="app.openDeconstructModal('${project.id}')" class="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-xs transition flex items-center gap-1" title="Desglosar meta con Gemini en micro-pasos de 15m y Kickstart Action">
+          <button onclick="app.openDeconstructModal('${project.id}')" class="w-full justify-start px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-xs transition flex items-center gap-1" title="Desglosar meta con Gemini en micro-pasos de 15m y Kickstart Action">
             <span>🪄</span> Desglosar
           </button>
 
           <!-- Reactivación Anti-Abandono con IA -->
-          <button onclick="app.reactivateProjectWithGemini('${project.id}')" class="px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold text-xs transition flex items-center gap-1" title="Resumen Ejecutivo de Reactivación: ¿En qué te quedaste y por qué era importante?">
+          <button onclick="app.reactivateProjectWithGemini('${project.id}')" class="w-full justify-start px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold text-xs transition flex items-center gap-1" title="Resumen Ejecutivo de Reactivación: ¿En qué te quedaste y por qué era importante?">
             <span>🌱</span> Reactivar
           </button>
 
           <!-- Alternador de Congelador (Icebox) -->
-          <button onclick="app.toggleIcebox()" class="px-3 py-2 rounded-xl theme-card-subtle border ${this.showIcebox ? 'border-sky-500/50 text-sky-400 bg-sky-500/10' : 'theme-border theme-text-muted'} font-semibold text-xs transition" title="Ver u ocultar el congelador de ideas complejas">
+          <button onclick="app.toggleIcebox()" class="w-full justify-start px-3 py-2 rounded-xl theme-card-subtle border ${this.showIcebox ? 'border-sky-500/50 text-sky-400 bg-sky-500/10' : 'theme-border theme-text-muted'} font-semibold text-xs transition" title="Ver u ocultar el congelador de ideas complejas">
             <span>❄️</span> Congelador (${iceboxTasks.length})
           </button>
 
           <!-- Selector de Vista Celular (Tarjetas Tinder) vs Panorámica (Tableta/PC) -->
-          <button onclick="app.toggleKanbanViewMode()" class="px-3 py-2 rounded-xl theme-card-subtle border theme-border font-semibold text-xs hover:brightness-110 transition flex items-center gap-1" title="Alternar entre feed de tarjetas y columnas">
+          <button onclick="app.toggleKanbanViewMode()" class="w-full justify-start px-3 py-2 rounded-xl theme-card-subtle border theme-border font-semibold text-xs hover:brightness-110 transition flex items-center gap-1" title="Alternar entre feed de tarjetas y columnas">
             <span>📱</span> Tarjetas
           </button>
 
           <!-- Captura Rápida en Contexto al Ideario/Pensadero -->
-          <button onclick="app.openNexusInContext('${project.id}')" class="px-3 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 font-semibold text-xs transition flex items-center gap-1" title="Captura rápida por voz al Ideario en el contexto de este proyecto">
+          <button onclick="app.openNexusInContext('${project.id}')" class="w-full justify-start px-3 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 font-semibold text-xs transition flex items-center gap-1" title="Captura rápida por voz al Ideario en el contexto de este proyecto">
             <span>🎙️</span> Capturar
           </button>
 
           <!-- Modo Zen Hiperfoco -->
-          <button onclick="app.openZenMode(app.state.projects.find(p=>p.id==='${project.id}'), '${this.jsStr(project.nextAction)}')" class="p-2 rounded-xl theme-card-subtle text-emerald-400 hover:brightness-110 text-xs border theme-border transition" title="Modo Zen Hiperfoco">
-            🎯
+          <button onclick="app.openZenMode(app.state.projects.find(p=>p.id==='${project.id}'), '${this.jsStr(project.nextAction)}')" class="w-full text-left px-3 py-2 rounded-xl theme-card-subtle text-emerald-400 hover:brightness-110 text-xs border theme-border transition" title="Modo Zen Hiperfoco">
+            🎯 Modo Zen
           </button>
 
-          <button onclick="app.openProjectModal('${project.id}')" class="p-2 rounded-xl theme-card-subtle theme-text-muted hover:brightness-110 text-xs border theme-border transition" title="Configurar proyecto">
-            ⚙️
-          </button>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -531,8 +540,7 @@ defineAppMethods({
       <!-- Header Selector y Cambio de Modo -->
       <div class="mb-4 flex items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <span class="text-xl">${project.emoji || '🎯'}</span>
-          <select onchange="app.changeKanbanProject(this.value)" class="text-lg font-extrabold bg-transparent border-b theme-border focus:outline-none">
+          <select onchange="app.changeKanbanProject(this.value)" aria-label="Cambiar de proyecto" class="text-lg font-extrabold bg-transparent border-b theme-border focus:outline-none">
             ${(this.state.projects || []).map(p => `
               <option value="${p.id}" ${p.id === project.id ? 'selected' : ''} class="theme-card text-xs">${p.emoji || '🎯'} ${this.escapeHtml(p.name)}</option>
             `).join('')}
@@ -573,10 +581,9 @@ defineAppMethods({
             </h2>
 
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/70 border border-slate-800 text-[11px] font-mono text-slate-300 mb-3">
-              <span>⏱️</span> <span>Micro-paso: ~10 min</span>
-              <span class="text-slate-600">•</span>
-              <span class="text-emerald-400 font-semibold">Dificultad Mínima</span>
+              <span>⏱️</span> <span>~${(typeof NexusAhora !== 'undefined' && NexusAhora.EFFORT_MINUTES[task.effort]) || 15} min</span>
             </div>
+            ${this.renderPasosResumen(project.id, task, 'hero')}
 
             ${task.notes ? `<p class="text-xs text-slate-300 line-clamp-3 mb-2 font-mono bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">${this.escapeHtml(task.notes)}</p>` : ''}
             ${task.codeSnippet ? `<p class="text-[11px] text-emerald-400 font-mono bg-slate-950 p-2 rounded-lg border border-slate-800 truncate">💻 Snippet de código adjunto</p>` : ''}
@@ -703,7 +710,7 @@ defineAppMethods({
     const isCooling = (task.column === 'enfoco' || task.column === 'proximo') && ageDays >= 7;
 
     return `
-      <div class="p-3 rounded-xl theme-card border theme-border shadow-sm hover:border-brand-500/50 cursor-grab active:cursor-grabbing transition-all select-none group relative ${isCooling ? 'task-cooling' : ''}"
+      <div class="relative p-3 rounded-xl theme-card border theme-border shadow-sm hover:border-brand-500/50 cursor-grab active:cursor-grabbing transition-all select-none group ${isCooling ? 'task-cooling' : ''}"
            style="border-left: 4px solid ${masterColor};"
            draggable="true"
            ondragstart="app.handleDragStart(event, '${task.id}')"
@@ -718,8 +725,9 @@ defineAppMethods({
                 <span>🔮</span> <span class="truncate italic">${this.escapeHtml(task.originThoughtContent)}</span>
               </div>
             ` : ''}
+            ${this.renderPasosResumen(projectId, task)}
           </div>
-          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition shrink-0">
             <button onclick="app.openEditTaskModal('${projectId}', '${task.id}')" class="theme-text-muted hover:text-cyan-400 text-xs p-0.5" title="Editar tarea (CRUD)">✏️</button>
             <button onclick="app.deleteTaskWithUndo('${projectId}', '${task.id}')" class="theme-text-muted hover:text-rose-400 text-[10px] p-0.5" title="Eliminar">✕</button>
           </div>
@@ -748,24 +756,19 @@ defineAppMethods({
             <span class="text-[9px] font-mono px-1.5 py-0.5 rounded theme-card-subtle theme-text-muted">
               ${task.effort || 'M'}
             </span>
-            <button onclick="app.promptMasticarTask('${this.jsStr(task.title)}')" class="text-[9px] theme-text-muted hover:text-white px-1 py-0.5 rounded hover:bg-slate-700/50" title="Masticar en micro-pasos de 5 min">
-              🍴
-            </button>
-            <button onclick="app.openOneThingMode('${projectId}', '${task.id}')" class="text-[9px] theme-text-muted hover:text-purple-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Ver en Modo Solo 1 Cosa (Filtro de Ruido)">
-              👁️
-            </button>
-            <button onclick="app.openGapFillingModal('${task.id}', '${this.jsStr(task.title)}', 30, '${projectId}')" class="text-[9px] theme-text-muted hover:text-blue-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Gap Filling: Agendar en Google Calendar con buffers de 15 min y anti-optimismo">
-              📅
-            </button>
-            <button onclick="app.openDeconstructModal('${projectId}', '${this.jsStr(task.title)}')" class="text-[9px] theme-text-muted hover:text-amber-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Desglose Atómico Gemini (micro-pasos de 15m)">
+            <button onclick="app.breakTaskIntoSteps('${projectId}', '${task.id}')" class="text-[11px] theme-text-muted hover:text-amber-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="${(task.steps || []).length ? 'Ver micro-pasos' : 'Partir en micro-pasos de 5–15 min'}">
               🪄
             </button>
-            <button onclick="app.openScheduleEmailModal('${task.id}', '${this.jsStr(task.title)}', '${projectId}')" class="text-[9px] theme-text-muted hover:text-indigo-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Programar recordatorio por Google Mail (Gmail)">
-              📧
-            </button>
-            <button onclick="app.openDeepWork('${projectId}', '${task.id}')" class="text-[9px] theme-text-muted hover:text-sky-300 px-1 py-0.5 rounded hover:bg-slate-700/50" title="Abrir notas y fragmentos de código (Deep Work)">
-              💻
-            </button>
+            <!-- Herramientas secundarias plegadas: la tarjeta muestra solo lo esencial -->
+            <details class="task-tools" ondragstart="event.stopPropagation()">
+              <summary class="text-[11px] theme-text-muted hover:brightness-125 px-1.5 py-0.5 rounded" title="Más herramientas">⋯</summary>
+              <div class="absolute left-2 right-2 z-20 mt-1 p-1.5 rounded-xl theme-card border theme-border shadow-xl flex flex-wrap gap-1">
+                <button onclick="app.openOneThingMode('${projectId}', '${task.id}')" class="text-[11px] px-2 py-1 rounded-lg theme-card-subtle hover:brightness-110" title="Modo Solo 1 Cosa (filtro de ruido)">👁️ 1 cosa</button>
+                <button onclick="app.openGapFillingModal('${task.id}', '${this.jsStr(task.title)}', 30, '${projectId}')" class="text-[11px] px-2 py-1 rounded-lg theme-card-subtle hover:brightness-110" title="Agendar en un hueco del calendario">📅 Agendar</button>
+                <button onclick="app.openScheduleEmailModal('${task.id}', '${this.jsStr(task.title)}', '${projectId}')" class="text-[11px] px-2 py-1 rounded-lg theme-card-subtle hover:brightness-110" title="Programar recordatorio">🔔 Recordar</button>
+                <button onclick="app.openDeepWork('${projectId}', '${task.id}')" class="text-[11px] px-2 py-1 rounded-lg theme-card-subtle hover:brightness-110" title="Notas y fragmentos de código">💻 Notas</button>
+              </div>
+            </details>
           </div>
 
           <!-- Botones de Acción Rápida -->

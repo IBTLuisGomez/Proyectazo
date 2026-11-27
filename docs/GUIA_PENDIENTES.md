@@ -85,9 +85,24 @@ Lo automático ya pasa (backend, Nexus, sintaxis, barrido de botones en navegado
 - [ ] «Preguntarme si sigo» en 10 min, iniciar el temporizador y esperar: llega la pregunta; «Me distraje» responde sin regañar.
 - [ ] Con la app en otra pestaña, la pregunta llega como notificación del sistema.
 - [ ] **🌙 Cerrar el día**: rellenar «lo primero mañana»; al día siguiente aparece en el resumen de la mañana.
-- [ ] **📅 Revisión semanal**: los cuatro pasos se leen bien en el móvil; pausar un proyecto quieto no borra lo escrito en el paso 4.
+- [ ] **📅 Revisión semanal**: los cinco pasos se leen bien en el móvil; pausar un proyecto quieto no borra lo escrito en el último paso.
 - [ ] Tras cerrar tres tareas del mismo tamaño con el temporizador, Ahora muestra «sueles tardar».
 - [ ] Jarvis (con IA activada): «añade pan y leche a la compra» crea o usa la lista.
+
+**Energía del día (Ahora y Repasar → Proyectos)**
+- [ ] Con dos o tres tareas En foco, bajo los botones de energía aparece la barra «N de M puntos». Con energía Baja se pone ámbar (nunca roja) y ofrece «¿Mover algo a mañana?»; la hoja deja sacar una tarea del foco o pasarla a mañana.
+- [ ] Cambiar la energía en Ahora cambia también la de Proyectos (ya no hay «Batería mental»), y tras sincronizar aparece igual en otro dispositivo.
+- [ ] Con poca energía restante, Ahora propone primero una tarea pequeña; si la propuesta es grande, lo dice debajo del título.
+- [ ] Incubadora: una tarea del Buzón sin tocar 14 días pasa a «Congelador» al abrir la app, con aviso y **Deshacer**; en la revisión semanal (paso 4) se puede retomar.
+
+**Módulos (Repasar → Ajustes → 🧩 Módulos; apagados por defecto)**
+- [ ] Encender **Hábitos**: aparece la ficha 🌱 en Repasar. Crear uno, marcarlo, desmarcarlo con Deshacer; en Ahora sale «También hoy: …» mientras esté pendiente.
+- [ ] Encender **Personas**: añadir a alguien con «cada semana» y cumpleaños; «Hablamos hoy» quita el aviso.
+- [ ] Encender **Finanzas rápidas**: «café 65» en la ficha lo apunta; un gasto de 500 o más pregunta «¿dopamina rápida o necesidad?». En Soltar, «gasté 40 en pan» va a Finanzas y el aviso permite devolverlo a pensamiento.
+- [ ] Los tres en otro dispositivo tras sincronizar; marcar un hábito en cada uno el mismo día conserva los dos.
+- [ ] Apagar un módulo quita su ficha y conserva sus datos.
+- [ ] Las fichas en **tema claro** y en el **móvil** (los días de la semana de un hábito se marcan con el dedo).
+- [ ] Jarvis (con IA): «parte la tarea X en pasos» los añade dentro de la tarea; «ya hice el primero» lo marca.
 
 **Sin red**
 - [ ] Modo avión, borrar un pensamiento, volver a conectar: no debe reaparecer.

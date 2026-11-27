@@ -211,7 +211,7 @@ defineAppMethods({
     this.abrirHoja('revision-semanal', html`
       <div class="px-5 pt-5">
         <h2 class="font-display font-bold text-lg">📅 Revisión de la semana</h2>
-        <p class="text-xs text-slate-400 mt-1">Diez minutos. Cuatro pasos, de arriba abajo.</p>
+        <p class="text-xs text-slate-400 mt-1">Diez minutos. Cinco pasos, de arriba abajo.</p>
       </div>
       <div class="flex-1 overflow-y-auto px-5 py-3 space-y-5">
         ${paso(1, 'Lo que hiciste', hecho.length ? html`
@@ -234,7 +234,9 @@ defineAppMethods({
           </div>`)
           : html`<p class="text-sm text-slate-400">Ninguno lleva más de dos semanas parado.</p>`)}
 
-        ${paso(4, 'Tu foco para esta semana', html`
+        ${paso(4, 'Lo que esperaba en «Más tarde»', this.renderIncubadoraRevision())}
+
+        ${paso(5, 'Tu foco para esta semana', html`
           <textarea id="revision-focos" rows="3" maxlength="400" placeholder="De una a tres cosas. Lo demás puede esperar."
             class="w-full px-3 py-2 rounded-xl bg-transparent border theme-border text-sm outline-none focus:border-cyan-500 resize-none">${this.semanaActual()?.focos || ''}</textarea>`)}
       </div>
@@ -244,7 +246,7 @@ defineAppMethods({
       </div>`, 'Revisión de la semana');
   },
 
-  // Lo escrito en el paso 4 no se pierde al repintar la hoja o al salir a ordenar pensamientos
+  // Lo escrito en el último paso no se pierde al repintar la hoja o al salir a ordenar pensamientos
   guardarFocosSemana() {
     const campo = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('revision-focos'));
     if (!campo) return;
@@ -275,6 +277,7 @@ defineAppMethods({
   // ---------------- Recordatorios suaves (una vez, sin insistir) ----------------
   // Al abrir la app: por la tarde, cerrar el día; de viernes a domingo, la revisión semanal.
   ofrecerRutinas() {
+    this.incubarAutomatico(); // js/app/features/energia.js: una vez al día
     const ahora = new Date();
     const leer = clave => { try { return localStorage.getItem(clave); } catch (e) { return null; } };
     const marcar = (clave, valor) => { try { localStorage.setItem(clave, valor); } catch (e) {} };

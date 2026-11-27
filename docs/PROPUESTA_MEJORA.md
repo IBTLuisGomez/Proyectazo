@@ -178,7 +178,7 @@ Limpieza inmediata: borrar `nexus_deploy_v1.tar.gz`, `__pycache__/`, `android/bu
 
 ## 7. Hoja de ruta y estado
 
-**Actualizado: 2026-11-25.** Se desarrolla en la rama `development` y, cuando está probado, se fusiona a `main`.
+**Actualizado: 2026-11-27.** Se desarrolla en la rama `development` y, cuando está probado, se fusiona a `main`.
 
 Leyenda: ✅ hecho y probado con tests · 🟡 hecho, falta una comprobación que no se puede hacer en el equipo de desarrollo · ⏳ pendiente · 🔒 bloqueado por algo externo.
 
@@ -215,7 +215,33 @@ Qué significa 🟡 en cada caso:
 - **15**: sin compilar, porque el equipo de desarrollo no tiene Android SDK.
 - **16**: el script de restauración tiene la sintaxis comprobada, pero no se ha ejecutado contra un servidor en marcha.
 
-### 7.3 Lo que falta, por orden recomendado
+### 7.3 Fases 17 a 26: energía y módulos
+
+Siguen la hoja de ruta de [ECOSISTEMA_HIVEBRAIN.md](ECOSISTEMA_HIVEBRAIN.md) (una sola app con módulos que se encienden). Todas tienen tests de su lógica y de su interfaz sobre un DOM simulado; **ninguna se ha visto todavía en un navegador real**, por eso van en 🟡.
+
+| Fase | Estado | Qué hace | Dónde |
+|---|---|---|---|
+| **17. Medidor de energía** | 🟡 | La energía del día da una capacidad (3, 6 o 9 puntos); lo de hoy la gasta. Al pasarse: ámbar y «¿mover algo a mañana?». Se guarda por día y se sincroniza | `js/energia-core.js`, `js/app/features/energia.js` |
+| **18. ¿Qué cabe ahora?** | 🟡 | «Ahora» propone primero lo que cabe en la energía que queda y avisa si la propuesta es grande | los mismos |
+| **19. Incubadora** | 🟡 | Lo que lleva 14 días sin tocarse pasa a «Más tarde», con Deshacer; la revisión semanal gana un paso para decidir | `js/foco-core.js`, `js/app/features/energia.js` |
+| **20. Pasos en Jarvis** | 🟡 | Herramientas `partir_en_pasos` y `marcar_paso` | `js/app/features/jarvis.js`, `jarvis.py` |
+| **21. Registro de módulos** | 🟡 | `ModulosCore.registrar`, interruptores en Ajustes, fichas en Repasar y sincronización con el servidor (tabla `modulos`) | `js/modulos-core.js`, `js/app/features/modulos.js`, `server/store.py` |
+| **22. Hábitos** | 🟡 | Racha flexible, días de la semana, sugerencia en Ahora | `js/app/modulos/habitos.js` |
+| **23. Personas** | 🟡 | Cumpleaños y «hace N días que no hablas con…» | `js/app/modulos/personas.js` |
+| **24. Finanzas rápidas** | 🟡 | «café 65» en dos toques, también desde Soltar; totales por semana, mes y categoría | `js/app/modulos/finanzas.js` |
+| **25. Limpieza** | 🟡 | Fuera «Masticar»; una sola energía (adiós «Batería mental»); «Esta semana: N avances» en vez de 28 puntos; etiqueta duplicada arreglada | `js/app/views/ahora-hoy.js`, `js/app.js` |
+| **26. Jarvis y los módulos** | 🟡 | `marcar_habito`, `apuntar_gasto`, `registrar_contacto`; línea de cada módulo en el resumen de la mañana | `js/app/features/jarvis.js`, `jarvis.py` |
+
+Además hay un test nuevo (`tests/js/carga.test.mjs`) que carga todos los scripts de `index.html` en orden: caza un método repetido o un script sin registrar en el service worker, que antes solo se veían al abrir la app.
+
+Lo que quedó fuera a propósito:
+- **Medicación con aviso que pide confirmación** (Hábitos): necesita avisos programados por hábito.
+- **Notas por persona** y edición de una persona o un hábito ya creados (hoy se quita y se vuelve a añadir).
+- **Un solo nombre** en la interfaz (Hive Brain / Nexus / Pensadero): toca decenas de textos y conviene verlo en pantalla.
+- **Menos botones sobre el orbe** y **Radar dentro de Proyectos**: cambios de diseño que no se pueden validar sin navegador.
+- Las herramientas nuevas de Jarvis no se han probado contra la API real, solo sobre datos simulados.
+
+### 7.4 Lo que falta, por orden recomendado
 
 1. **Probar en un navegador y en un teléfono** lo marcado 🟡. Es lo único que separa buena parte de lo hecho de estar terminado. La lista está en [GUIA_PENDIENTES.md](GUIA_PENDIENTES.md).
 2. **Compilar la app Android** en Android Studio e instalar los widgets.
@@ -223,7 +249,8 @@ Qué significa 🟡 en cada caso:
 4. **Recuperar el CI**: el workflow de GitHub Actions está retirado por el límite de facturación de la cuenta. Sin CI no hay E2E, y sin E2E no conviene terminar la Fase 4.
 5. **Fase 5** cuando tengas el *Client ID* de Google: OAuth sustituye a la contraseña de aplicación de Gmail y trae el calendario.
 6. **Retirar `backend/`** (Spring) y el perfil `legacy` del compose cuando des la migración por cerrada.
-7. Más adelante: Whisper, Capacitor, recordatorios por lugar y terminar la Fase 4.
+7. **Lo que quedó fuera de las fases 17 a 26** (lista en 7.3): medicación, editar hábitos y personas, un solo nombre, menos botones sobre el orbe.
+8. Más adelante: Whisper, Capacitor, recordatorios por lugar y terminar la Fase 4.
 
 ---
 

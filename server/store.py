@@ -130,6 +130,54 @@ def merge_nota(existing, incoming):
     return out
 
 
+# ---------------- Módulos opcionales (la misma regla que js/modulos-core.js) ----------------
+# Hábitos, personas, gastos y energía del día: documentos JSON por colección. El servidor no
+# interpreta su contenido; solo los guarda por cuenta y los mezcla entre dispositivos.
+MODULO_KINDS = ("habits", "people", "expenses", "energy")
+MODULO_DOC_MAX = 40_000       # caracteres del documento serializado
+MODULO_DOCS_MAX = 5000        # documentos por colección y cuenta
+
+
+def clean_modulo_doc(incoming):
+    """Valida un documento de módulo. Devuelve None si no se puede guardar."""
+    if not isinstance(incoming, dict) or _blank(incoming.get("id")):
+        return None
+    doc = _clean(incoming)
+    doc.pop("ownerId", None)
+    doc["id"] = str(doc["id"])[:80]
+    doc["updatedAt"] = iso(parse_dt(doc.get("updatedAt"))) or iso(now())
+    if doc.get("createdAt") is not None:
+        doc["createdAt"] = iso(parse_dt(doc["createdAt"]))
+    if doc.get("deleted") is True:
+        doc = {"id": doc["id"], "deleted": True, "createdAt": doc.get("createdAt"), "updatedAt": doc["updatedAt"]}
+    if "marks" in doc and not isinstance(doc["marks"], dict):
+        doc.pop("marks")
+    return doc if len(dumps(doc)) <= MODULO_DOC_MAX else None
+
+
+def merge_marks(a, b):
+    """Marcas por día ({fecha: {done, at}}): gana, día a día, la de «at» más reciente."""
+    out = dict(a or {})
+    for key, mark in (b or {}).items():
+        if not isinstance(mark, dict):
+            continue
+        current = out.get(key)
+        if not isinstance(current, dict) or _stamp(mark.get("at")) > _stamp(current.get("at")):
+            out[key] = mark
+    return out
+
+
+def merge_modulo_doc(existing, incoming):
+    """Gana el documento con updatedAt más reciente (con fechas iguales, el guardado); las marcas se mezclan."""
+    win = incoming if _stamp(incoming.get("updatedAt")) > _stamp(existing.get("updatedAt")) else existing
+    out = dict(win)
+    if "marks" in existing or "marks" in incoming:
+        out["marks"] = {} if win.get("deleted") else merge_marks(existing.get("marks"), incoming.get("marks"))
+        if win.get("deleted"):
+            out.pop("marks")
+    return out
+
+
 def nota_public(doc):
     out = dict(doc)
     out["items"] = [i for i in doc.get("items") or [] if not i.get("deleted")]
@@ -492,20 +540,55 @@ class Store:
                 self._write_nota(owner, doc)
         return nota_public(doc)
 
+    # ---------------- Módulos opcionales ----------------
+    def list_modulos(self, owner):
+        """{colección: [documentos]} con todas las colecciones, incluidas las marcas de borrado."""
+        out = {kind: [] for kind in MODULO_KINDS}
+        for r in self.db.query("SELECT kind, doc FROM modulos WHERE owner_id = ? ORDER BY rowid", (owner,)):
+            if r["kind"] in out:
+                out[r["kind"]].append(loads(r["doc"]))
+        return out
+
+    def save_modulos(self, owner, incoming):
+        """Mezcla lo que manda un dispositivo. Colecciones desconocidas y documentos no válidos se ignoran."""
+        if not isinstance(incoming, dict):
+            return
+        with self.db.transaction() as conn:
+            for kind in MODULO_KINDS:
+                docs = incoming.get(kind)
+                if not isinstance(docs, list):
+                    continue
+                count = conn.execute("SELECT COUNT(*) AS n FROM modulos WHERE owner_id = ? AND kind = ?", (owner, kind)).fetchone()["n"]
+                for raw in docs[:MODULO_DOCS_MAX]:
+                    doc = clean_modulo_doc(raw)
+                    if doc is None:
+                        continue
+                    row = conn.execute("SELECT doc FROM modulos WHERE owner_id = ? AND kind = ? AND id = ?",
+                                       (owner, kind, doc["id"])).fetchone()
+                    if row:
+                        doc = merge_modulo_doc(loads(row["doc"]), doc)
+                    elif count >= MODULO_DOCS_MAX:
+                        continue
+                    else:
+                        count += 1
+                    conn.execute("INSERT INTO modulos(owner_id, kind, id, doc) VALUES (?, ?, ?, ?) "
+                                 "ON CONFLICT(owner_id, kind, id) DO UPDATE SET doc = excluded.doc",
+                                 (owner, kind, doc["id"], dumps(doc)))
+
     # ---------------- Sincronización ----------------
     def pull(self, owner):
         inbox = [loads(r["doc"]) for r in self.db.query("SELECT doc FROM inbox WHERE owner_id = ?", (owner,))]
         epoch = parse_dt("1970-01-01T00:00:00Z")
         inbox.sort(key=lambda d: parse_dt(d.get("createdAt")) or epoch, reverse=True)
         return {"projects": self.list_projects(owner), "inbox": inbox, "pensadero": self.list_pensadero(owner),
-                "notas": self.list_notas(owner, include_deleted=True)}
+                "notas": self.list_notas(owner, include_deleted=True), "modulos": self.list_modulos(owner)}
 
     def push(self, owner, incoming):
         if not isinstance(incoming, dict):
             return self.pull(owner)
         if incoming.get("wipe") is True:
             with self.db.transaction() as conn:
-                for table in ("projects", "inbox", "pensadero", "notas"):
+                for table in ("projects", "inbox", "pensadero", "notas", "modulos"):
                     conn.execute(f"DELETE FROM {table} WHERE owner_id = ?", (owner,))
             return self.pull(owner)
         for project in incoming.get("projects") or []:
@@ -523,6 +606,7 @@ class Store:
         for nota in incoming.get("notas") or []:
             if isinstance(nota, dict) and not _blank(nota.get("id")):
                 self.save_nota(owner, nota)
+        self.save_modulos(owner, incoming.get("modulos"))
         return self.pull(owner)
 
     def _merge_project(self, owner, incoming):
