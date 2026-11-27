@@ -188,7 +188,6 @@ Después abre un Pull Request de `dev` a `main`: GitHub Actions ejecutará los t
 
 - Borrados `nexus_deploy_v1.tar.gz`, `__pycache__/`, `.pytest_cache/` y `android/build/`.
 - `archive/` y las especificaciones antiguas están en `docs/archivo/`. La especificación vigente es [PRODUCTO.md](PRODUCTO.md).
-- Quedan en disco (fuera de git) `data/` y `backend/data/` (bases H2 antiguas): bórralas si no las necesitas.
 - Los modelos de IA se eligen con `NEXUS_AI_MODELS` en `.env` (ver `.env.example`).
 
 ## 5b. Activar Jarvis con IA (opcional)

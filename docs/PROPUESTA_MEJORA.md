@@ -186,10 +186,10 @@ Leyenda: ✅ hecho y probado con tests · 🟡 hecho, falta una comprobación qu
 
 | Fase | Estado | Qué hay | Qué falta |
 |---|---|---|---|
-| **0. Limpieza** | ✅ | Repo ordenado, especificación única ([PRODUCTO.md](PRODUCTO.md)), modelo de IA configurable | Borrar del disco `data/` y `backend/data/` (bases H2 antiguas, fuera de git) |
+| **0. Limpieza** | ✅ | Repo ordenado, especificación única ([PRODUCTO.md](PRODUCTO.md)), modelo de IA configurable | — |
 | **1. Simplificar UX** | ✅ | 3 secciones, 4 colores + Luego, tarjeta «Ahora», energía, «No sé por dónde empezar» | Recordatorios por lugar (necesita app nativa con geolocalización) |
 | **2. Jarvis v1** | ✅ | Herramientas, memoria, resumen del día, voz de entrada y salida | Activarlo con `ANTHROPIC_API_KEY`; avisos de transición antes de un evento (depende del calendario, Fase 5) |
-| **3. Backend único** | ✅ | Python + SQLite, mismos contratos; HTTPS con Caddy (perfil `https`) | Retirar la carpeta `backend/` (Spring) cuando confirmes que la migración está cerrada |
+| **3. Backend único** | ✅ | Python + SQLite, mismos contratos; HTTPS con Caddy (perfil `https`) | — (`backend/` Spring retirado el 2026-11-27) |
 | **4. Frontend modular** | 🟡 | Acciones `data-on-*`, plantillas que escapan, ESLint y comprobación de tipos | Módulos ES con un bundle, componentes, store central y E2E con Playwright. A propósito: solo se puede validar en un navegador, con CI |
 | **5. Integraciones** | 🔒 | Nada todavía | Google Calendar y Gmail con OAuth (hace falta tu *Client ID* de Google Cloud); Whisper en servidor para voz en iOS/Firefox |
 | **6. Móvil nativo** | 🟡 | Tres widgets Android (lista de pendientes, añadir pendiente, soltar) | Compilar y probar en un teléfono; Capacitor; widget de «Ahora» |
@@ -248,7 +248,7 @@ Lo que quedó fuera a propósito:
 3. **Activar HTTPS** en el servidor (`COMPOSE_PROFILES=https`): sin él, el móvil no permite push ni micrófono.
 4. **Recuperar el CI**: el workflow de GitHub Actions está retirado por el límite de facturación de la cuenta. Sin CI no hay E2E, y sin E2E no conviene terminar la Fase 4.
 5. **Fase 5** cuando tengas el *Client ID* de Google: OAuth sustituye a la contraseña de aplicación de Gmail y trae el calendario.
-6. **Retirar `backend/`** (Spring) y el perfil `legacy` del compose cuando des la migración por cerrada.
+6. ~~Retirar `backend/` y el perfil `legacy`~~ ✅ hecho el 2026-11-27.
 7. **Lo que quedó fuera de las fases 17 a 26** (lista en 7.3): medicación, editar hábitos y personas, un solo nombre, menos botones sobre el orbe.
 8. Más adelante: Whisper, Capacitor, recordatorios por lugar y terminar la Fase 4.
 

@@ -1,10 +1,6 @@
 # Avisos semanales de dependencias con fallos de seguridad o desactualizadas.
 version: 2
 updates:
-  - package-ecosystem: maven
-    directory: /backend
-    schedule: { interval: weekly }
-    open-pull-requests-limit: 5
   - package-ecosystem: npm
     directory: /
     schedule: { interval: weekly }
@@ -14,7 +10,7 @@ updates:
     schedule: { interval: monthly }
     open-pull-requests-limit: 3
   - package-ecosystem: docker
-    directories: [/, /backend]
+    directories: [/]
     schedule: { interval: monthly }
   - package-ecosystem: github-actions
     directory: /

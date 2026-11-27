@@ -72,8 +72,7 @@ Proyectazo/
 ├── nexus_service.py, jarvis.py # IA: clasificación, desglose y asistente Jarvis
 ├── js/notas-core.js           # Listas y notas: modelo y mezcla entre dispositivos (vista en js/app/views/notas.js)
 ├── js/modulos-core.js         # Registro de módulos opcionales; cada módulo en js/app/modulos/ (hábitos, personas, finanzas)
-├── android/                   # App Android (WebView) y widgets de listas (app/src/main/java/com/nexus/orb/notas/)
-└── backend/                   # Versión anterior en Spring Boot (se retirará tras migrar)
+└── android/                   # App Android (WebView) y widgets de listas (app/src/main/java/com/nexus/orb/notas/)
 ```
 
 ---

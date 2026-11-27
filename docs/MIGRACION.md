@@ -60,7 +60,7 @@ Abre la app, inicia sesión y comprueba que están tus proyectos y pensamientos.
 
 ### 5. Cuando lo hayas comprobado (días después)
 
-- Se puede borrar la carpeta `backend/` (Spring) y el volumen viejo: `docker volume rm proyectazo_postgres_data`. **Esto borra los datos antiguos para siempre: hazlo solo cuando estés seguro.**
+- La carpeta `backend/` (Spring) y el perfil `legacy` se retiraron el 2026-11-27; para volver a leer el Postgres antiguo, recupéralos del historial de git. Queda borrar el volumen viejo: `docker volume rm proyectazo_postgres_data`. **Esto borra los datos antiguos para siempre: hazlo solo cuando estés seguro.**
 - Copia de seguridad de la nueva base: es un solo archivo.
   `docker compose exec app python -c "import sqlite3; s=sqlite3.connect('/app/data/nexus.db'); d=sqlite3.connect('/app/data/copia.db'); s.backup(d)"` y luego `docker cp nexus-app:/app/data/copia.db .`
 
